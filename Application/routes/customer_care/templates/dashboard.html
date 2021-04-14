@@ -1,0 +1,82 @@
+{% extends 'base_customer_care.html'%}
+{%from 'helper_customer_care.html' import sidebar %}
+{% block body%}
+
+<div class="container-fluid">
+  <div class="row mt-2">
+      <div class="col-md-3">
+      <!--
+      *** CUSTOMER MENU ***
+      _________________________________________________________
+      -->
+       {{sidebar(page='dash')}}
+      <!-- /.col-lg-3-->
+      <!-- *** CUSTOMER MENU END ***-->
+      </div>
+      <div class="col-md-9">
+        <div class="d-flex flex-row flex-wrap justify-content-left">
+            <div class="card rounded-0 col-12 px-0 mb-4">
+              <div class="card-body rgba-mdb-color-slight py-1">
+                <h3 class="card-title">Total Sales Today</h3>
+                <h4 class="card-title">{{"{:,} Ugx".format(product_sales_today+commission_sales_today+shipping_sales_today)}}</h4>
+                <hr>
+                <div class="d-flex flex-row flex-wrap">
+                  <div class="flex-fill">
+                    <h3 class="card-title">Product Sales</h3>
+                    <h4 class="card-title">{{"{:,} Ugx".format(product_sales_today)}}</h4>
+                  </div>
+                  <div class="flex-fill">
+                    <h3 class="card-title">Commission Sales</h3>
+                    <h4 class="card-title">{{"{:,} Ugx".format(commission_sales_today)}}</h4>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+            <div class="card rounded-0 col-lg-4 col-md-4 col-sm-5 px-0 mb-4">
+              <div class="card-body rgba-mdb-color-slight py-1">
+                <h3 class="card-title">Revenue</h3>
+                <h4 class="card-title">{{"{:,} Ugx".format(total_revenue)}}</h4>
+              </div>
+             
+            </div>
+            <div class="card rounded-0 col-lg-4 col-md-4 col-sm-5 px-0 mb-4">
+              <div class="card-body rgba-mdb-color-slight py-1">
+                <h3 class="card-title">Customer Orders</h3>
+                <h4 class="card-title">{{orders_count}}</h4>
+              </div>
+              
+            </div>
+              <div class="card rounded-0 col-lg-4 col-md-4 col-sm-5 px-0 mb-4">
+                <div class="card-body rgba-mdb-color-slight py-1">
+                  <h3 class="card-title">Registered Customers</h3>
+                  <h4 class="card-title">
+                    <span class="text-primary">{{customer_count}} customer(s)</h4>
+                </div>
+                
+              </div>
+            <div class="card rounded-0 col-lg-4 col-md-4 col-sm-5 px-0 mb-4">
+                <div class="card-body rgba-mdb-color-slight py-1">
+                <h3 class="card-title">Registered Restaurants</h3>
+                <h4 class="card-title text-primary">{{vendors_count}} Restaurant(s)</h4>
+                </div>
+                
+            </div>
+            <div class="card rounded-0 col-lg-4 col-md-4 col-sm-5 px-0 mb-4">
+                <div class="card-body rgba-mdb-color-slight py-1">
+                <h3 class="card-title">Registered Menu Items</h3>
+                <h4 class="card-title text-primary">{{products_count}} product(s)</h4>
+                </div>
+                
+            </div>
+        </div>
+      </div>
+     
+
+  </div>
+
+</div>
+
+{%endblock%}
+
+

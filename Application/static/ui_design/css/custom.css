@@ -1,0 +1,238 @@
+/* your styles go here */
+  #content .product {
+    background: #fff;
+    border: solid 1px #e6e6e6;
+    margin-bottom: 30px;
+    /* entire container, keeps perspective */
+    /* flip speed goes here */
+    /* hide back of pane during swap */
+    /*  UPDATED! front pane, placed above back */
+    /* back, initially hidden pane */
+  }
+
+  #content .product .flip-container {
+    cursor: pointer;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+  }
+
+  #content .product .flip-container, #content .product .front, #content .product .back {
+    width: 100%;
+  }
+
+  #content .product .flipper {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transition: 0.6s;
+    transition: 0.6s;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    position: relative;
+  }
+
+  #content .product .front, #content .product .back {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-transition: 0.6s;
+    transition: 0.6s;
+    transform-style: preserve-3d;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  #content .product .front {
+    z-index: 2;
+    -webkit-transform: rotateY(0deg);
+    transform: rotateY(0deg);
+  }
+
+  #content .product .back {
+    -webkit-transform: rotateY(-180deg);
+    transform: rotateY(-180deg);
+  }
+
+  #content .product:hover .back {
+    -webkit-transform: rotateY(0deg);
+    transform: rotateY(0deg);
+    z-index: 2;
+  }
+
+  #content .product:hover .front {
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+    z-index: 1;
+  }
+
+  #content .product .invisible {
+    visibility: hidden;
+  }
+
+#content .product .text {
+  padding: 10px 10px 0;
+}
+
+#content .product .text h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  height: 42px;
+  text-align: center;
+  overflow: hidden;
+}
+
+#content .product .text h3 a {
+  color: #555;
+}
+
+#content .product .text p.price {
+  font-size: 1.125rem;
+  text-align: center;
+  font-weight: 300;
+}
+
+#content .product .text p.price del {
+  color: #999;
+}
+
+#content .product .text .buttons {
+  clear: both;
+  text-align: center;
+}
+
+#content .product .text .buttons .btn {
+  margin-bottom: 10px;
+}
+
+
+/*
+*
+* ======================================================================
+* RIBBONS
+* ======================================================================
+*
+*/
+.ribbon {
+  position: absolute;
+  top: 50px;
+  padding-left: 51px;
+  z-index: 20;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.ribbon .ribbon-background {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.ribbon .theribbon {
+  position: relative;
+  width: 80px;
+  padding: 6px 20px 6px 20px;
+  margin: 30px 10px 10px -71px;
+  color: #fff;
+  background-color: #ff0000e8;
+  text-shadow: 0px 1px 2px #bbb;
+}
+
+.ribbon .theribbon:before, .ribbon .theribbon:after {
+  content: ' ';
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.ribbon .theribbon:after {
+  left: 0px;
+  top: 100%;
+  border-width: 5px 10px;
+  border-style: solid;
+  border-color: #321c58 #45277a transparent transparent;
+}
+
+.ribbon.sale {
+  top: 0;
+}
+
+.ribbon.new {
+  top: 50px;
+}
+
+.ribbon.new .theribbon {
+  background-color: #17a2b8;
+  text-shadow: 0px 1px 2px #bbb;
+}
+
+.ribbon.new .theribbon:after {
+  border-color: #0c525d #0c525d transparent transparent;
+}
+
+.ribbon.gift {
+  top: 100px;
+}
+
+.ribbon.gift .theribbon {
+  background-color: #28a745;
+  text-shadow: 0px 1px 2px #bbb;
+}
+
+.ribbon.gift .theribbon:after {
+  border-color: #145523 #145523 transparent transparent;
+}
+
+
+.icon {
+  position: absolute;
+  font-size: 120px;
+  width: 100%;
+  text-align: center;
+  top: -20px;
+  left: 0;
+  height: 100%;
+  float: left;
+  color: rgb(221, 221, 221);
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  z-index: -1;
+}
+*{
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+.font-size-small{
+  font-size:0.95rem;
+}
+.font-size-xs{
+  font-size:0.7rem;
+}
+.font-size-medium{
+  font-size: 1rem;
+}
+.font-size-big{
+  font-size: 1.2rem;
+}
+.height-small{
+  max-height: 10rem;
+  height: auto;
+}
+a:hover{
+  text-decoration: none;
+  cursor: pointer;
+}
+.custome-hide-item{
+  display: none;
+}
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+  background-color: #7b1fa2;
+  color: white !important;
+}
+.text-decoration-underline{
+  text-decoration: underline;
+}
+html,
+body,
+.view {
+  height: 100%;
+}

@@ -1,0 +1,9 @@
+export FLASK_APP=run.py
+export FLASK_ENV=development
+export MAIL_DEFAULT_SENDER="jbyenkyaaaron@gmail.com"
+export MAIL_PASSWORD="xxxxxxxxxxxx"
+export DATABASE_USER="click_eat_user"
+export DATABASE_USER_PASSWORD="5FJc_?]-JSCsOMfDCcU1xhJGTsiSN^pr"
+export DATABASE_ADDRESS="localhost:3306"
+export DATABASE_NAME="clickEat"
+

@@ -1,0 +1,45 @@
+{% macro renderinputfield(field) %}
+	{% if field.errors %}
+		{{field(class="form-control is-invalid", **kwargs)|safe}}
+		<div class="invalid-feedback">
+			{%- for error in field.errors -%}
+				{{error}}
+			{%- endfor -%}
+		</div>
+	{%else%}
+		{{field(class="form-control", **kwargs)|safe}}
+	{%endif%} 
+	
+{%endmacro%}
+
+{% macro renderformfield(field) %}
+	<div class='form-group'>
+		<b>{{field.label.text}}</b>
+	{%if field.errors%}
+		{{field(class="form-control rounded-0 is-invalid", **kwargs)|safe}}
+		<div class="invalid-feedback">
+			{%- for error in field.errors -%}
+				{{error}}
+			{%- endfor -%}
+		</div>
+	{%else%}
+		{{field(class="form-control rounded-0", **kwargs)|safe}}
+	{%endif%} 
+	</div>
+{%endmacro%}
+
+{% macro rendermdfield(field) %}
+	<div class='md-form'>
+	{{field.label()}}
+	{%if field.errors%}
+		{{field(class="form-control is-invalid", **kwargs)|safe}}
+		<div class="invalid-feedback">
+			{%- for error in field.errors -%}
+				{{error}}
+			{%- endfor -%}
+		</div>
+	{%else%}
+		{{field(class="form-control", **kwargs)|safe}}
+	{%endif%} 
+	</div>
+{%endmacro%}

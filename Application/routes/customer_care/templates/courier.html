@@ -1,0 +1,110 @@
+{% extends 'base_customer_care.html'%}
+{%from 'helper_customer_care.html' import sidebar %}
+{% block body%}
+<div id="all">
+<div id="content">
+    <div class="container-fluid mt-2">
+    <div class="row">
+        <div class="col-md-3">
+        <!--
+        *** CUSTOMER MENU ***
+        _________________________________________________________
+        -->
+        {{sidebar(page='couriers')}}
+        <!-- /.col-lg-3-->
+        <!-- *** CUSTOMER MENU END ***-->
+        </div>
+        <div class="col-md-9">
+
+            <div class="card rounded-0">
+                <div class="card-body">
+                    <h1 class="text-center text-success mb-2">{{couriers|length ~ " Couriers"}}</h1>
+
+                    <div class="card rounded-0">
+                        <div class="row card-body py-1 mt-3">
+                            <div class="col-md-3">  
+                                <input type="text" class="form-control" placeholder="carrrier name"> 
+                            </div>
+                            <div class="col-md-3 form-group">  
+                                <select class="form-control">
+                                <option> Boda boda</option>
+                                <option>Truck</option>
+                                <option>Box body</option>
+                                <option>Pickup</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 form-group">  
+                                <select class="form-control">
+                                <option>Available</option>
+                                <option>Operating</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="#" class="btn btn-secondary w-100">Find</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Courier Name</th>
+                                <th>NIN</th>
+                                <th>Contact</th>
+                                <th>Vehicle Type</th>
+                                <th>Vehicle Plate Number</th>
+                                <th>Deliveries</th>
+                                <th>Is Available</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for courier in  couriers %}
+                                <tr>
+                                    <td>{{courier.courier_name|title}}</td>
+                                    <td>{{courier.national_id_number}}</td>
+                                    <td>{{courier.contact}}</td>
+                                    <td>{{courier.vehicle_type}}</td>
+                                    <td>{{courier.vehicle_license_plate_number|upper}}</td>
+                                    <td>{{courier.deliveries_count}}</td>
+                                    <td>
+                                        {% if courier.is_available %}
+                                            <i class="fa fa-check-square-o text-success"></i>
+                                        {% else %}
+                                            <i class="fa fa-square-o"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td><a href="{{url_for('customer_care.courier_details', courier_id=courier.id)}}" class="btn btn-primary btn-sm">View</a></td>
+                                </tr>
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                    </div>
+                    <div class="pages">
+                        
+                        <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+                        <ul class="pagination">
+                            <li class="page-item"><a href="#" aria-label="Previous" class="page-link"><span aria-hidden="true">«</span><span class="sr-only">Previous</span></a></li>
+                            <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                            <li class="page-item"><a href="#" class="page-link">2</a></li>
+                            <li class="page-item"><a href="#" class="page-link">3</a></li>
+                            <li class="page-item"><a href="#" class="page-link">4</a></li>
+                            <li class="page-item"><a href="#" class="page-link">5</a></li>
+                            <li class="page-item"><a href="#" aria-label="Next" class="page-link"><span aria-hidden="true">»</span><span class="sr-only">Next</span></a></li>
+                        </ul>
+                        </nav>
+                    </div>
+                </div>
+                    
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+</div>
+{%endblock%}
+
+

@@ -1,0 +1,72 @@
+{%macro sidebar(page)%}
+
+	<div class="card sidebar-menu">
+	    <div class="card-body">
+	    <ul class="nav nav-pills flex-column">
+	    	<a href="{{url_for('customer_care.dashboard')}}" class="nav-link {% if page=='dash'%}active{%endif%}"><i class="fa fa-home mr-2"></i>Dashboard</a>
+	    	<a href="{{url_for('customer_care.customer_care_orders')}}" class="nav-link {% if page=='orders'%}active{%endif%}"><i class="fa fa-first-order mr-2"></i>Orders <span class="badge badge-pill badge-danger" id="orders_prepared_count">{{session.orders_not_prepared}}</span></a>
+	    	<!-- <a href="#" class="nav-link {% if page=='order_returns'%}active{%endif%}"><i class="fa fa-bicycle mr-2"></i>Order Returns</a> -->
+	    	<a href="{{url_for('customer_care.couriers')}}" class="nav-link {% if page=='couriers'%}active{%endif%}"><i class="fa fa-bicycle mr-2"></i>Couriers</a>
+	    	<a href="{{url_for('customer_care.custcare_shops', shop_state='all')}}" class="nav-link {% if page=='shops'%}active{%endif%}"><i class="fa fa-user mr-2"></i>Restaurants</a>
+	    	<!-- <a href="#" class="nav-link {% if page=='messages'%}active{%endif%}"><i class="fa fa-envelope mr-2"></i>Messages <span class="badge badge-pill badge-danger">20</span></a> -->
+	    	<a href="{{url_for('customer_care.account_settings')}}" class="nav-link {% if page=='settings'%}active{%endif%}"><i class="fa fa-cog mr-2"></i>Settings</a></ul>
+	    	<a href="{{url_for('customer_care.logout')}}" class="nav-link"><i class="fa fa-sign-out mr-2"></i>Logout</a></ul>
+	    </div>
+	</div>
+
+{%endmacro%}
+
+{%macro orders_nav(page) %}
+<div>
+	<nav class="nav nav-pills justify-content-around">
+		<a class="nav-link {% if page=='all_orders'%}active{%endif%}" href="{{url_for('customer_care.customer_care_orders')}}">All orders</a>
+		<a class="nav-link {% if page=='need_preparing_orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='need_preparing_orders')}}">Need Preparing</a>
+		<a class="nav-link {% if page=='Need Transporting'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='need_transporting')}}">Need Transporting</a>
+		<a class="nav-link {% if page=='prepared_orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='prepared_orders')}}">Prepared</a>
+		<a class="nav-link {% if page=='Recieved Orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='received_orders')}}">Received Orders</a>
+		<a class="nav-link {% if page=='cancelled'%}active{%endif%}" href="{{url_for('customer_care.cancelled_orders')}}">Cancelled</a>
+	</nav>
+</div>
+{%endmacro%}
+
+{%macro orders_filter_nav()%}
+<div class="card rounded-0 mt-3">
+	<div class="card-body row py-1">
+		<div class="col-md-4 col-sm-4 mt-2 box">
+			<strong>Filter by Order Reference</strong>
+			<form class=" form-group">
+			  <label for="">Order reference</label>
+			  <input type="text" class="form-control" placeholder="For example 3-434-536-656"> 
+			</form>
+
+		</div>
+		<div class=" col-md-8 col-sm-8 mt-2 box">
+			<strong>Filter by order date</strong>
+		  <div class="row">
+			  <div class="col-md-6 col-sm-6">
+				<form>
+					<label>start date</label>
+					<input type="date" class="form-control" placeholder="">
+				</form>
+			  </div>
+			  <div class="col-md-6 col-sm-6">
+				<form>
+					<label>end date</label>
+					<input type="date" class="form-control" placeholder="">
+				</form>
+
+			  </div>
+
+		  </div>
+		   
+		</div>
+	</div>
+	
+</div>
+{%endmacro%}
+
+{% macro shops_nav(page)%}
+<nav class="nav nav-pills nav-fill">
+  <a href="{{url_for('customer_care.custcare_shops', shop_state='all')}}" class="nav-item nav-link {%if page == 'all'%}active{%endif%}">All Restaurants</a>
+</nav>
+{% endmacro%}

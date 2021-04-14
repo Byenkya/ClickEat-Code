@@ -1,0 +1,53 @@
+{% extends 'admin/login_base.html' %}
+
+{% block body %}
+
+
+<div class="container">
+	<div class="login-content">
+		<div align="center">
+			<img height="140" class="shadow rounded rounded-circle m-2" src="{{url_for('static', filename='images/click_eat.png')}}" align="center" />
+		</div>
+
+		<div class="login-form card bg-light shadow">
+			<h1 class="text-center">Login</h1>
+			<hr>
+			<form method="POST" action="{{url_for('loginview.loginView')}}">
+				{{form.hidden_tag()}}
+				<div class="container w-75 mx-auto">
+					{%- with messages = get_flashed_messages(with_categories=true) -%}
+					{% if messages %}
+					  {%- for category,message in messages -%}
+						<div class="alert alert-{{ category}} alert-dismissible text-center">
+						  <strong>{{ message }}</strong>
+						  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						  </button>
+						</div>
+					  {%- endfor -%}
+					{% endif %}
+				  {%- endwith -%}
+				  </div>
+				<div class="md-form mt-0">
+					<!-- <div class="prefix">
+						<i class="fa fa-envelope"></i>
+					</div> -->
+					{{form.username.label()}}
+					{{renderinputfield(form.username)}}
+					
+				</div>
+				<div class="md-form">
+					<!-- <div class="prefix">
+						<i class="fa fa-lock"></i>
+					</div> -->
+					{{form.password.label()}}
+					{{renderinputfield(form.password)}}
+				</div><br/>
+				{{form.submit(class=" btn-primary btn-lg btn-block border-0 rounded-pill z-depth-1")}}
+			</form> 
+		</div>
+		
+	</div>
+</div>
+
+{% endblock %}

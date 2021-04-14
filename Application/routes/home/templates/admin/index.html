@@ -1,0 +1,40 @@
+{% extends 'admin/master.html' %}
+{% block head_css %}
+    {{ super() }}
+    <link href="{{ url_for('static', filename='admini.css' )}}" rel="stylesheet">
+{% endblock head_css %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="jumbotron">
+                    <h2>Customers</h2>
+                    <p class="text-right" style="font-size:2em">{{ customer_number }} <small>customer(s)</small></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="jumbotron">
+                    <h2>Resturants</h2>
+                    <p class="text-right" style="font-size: 2em;">{{ resturant_number }} <smal>resturant(s)</smal></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="jumbotron">
+                    <h2>Sales</h2>
+                    <p class="text-right" style="font-size:2em;">{{ sales_amount }} <small>sale(s)</small></p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="jumbotron">
+                    <h2>Products Sold</h2>
+                    <p class="text-right" style="font-size: 2em;">{{ products_sold }} <small>product(s)</small></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ClickEat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/bootstrap.min.css')}}?version={{session.file_version}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/mdb.min.css')}}?version={{session.file_version}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/style.css')}}?version={{session.file_version}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/font-awesome/font-awesome.min.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/custom.css') }}?version={{session.file_version}}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.ico') }}">
+    
+  </head>
+  <body>
+      <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <h1 class="navbar-brand">Customer Care 24/7</h1>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#custcarenav" aria-controls="custcarenav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="custcarenav">
+              <ul class="navbar-nav ml-auto">
+                
+                <li class="nav-item dropdown">
+                  <a class="nav-link" href="#" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-user"></i>
+                    <p class="d-lg-none d-md-block">
+                      Account
+                    </p>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
+                   
+                    <a class="dropdown-item" href="{{url_for('customer_care.logout')}}">Log out</a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+        </nav>
+      </header>
+      <div class="container-fluid col-sm-12 col-md-8 col-lg-6 mx-auto">
+        {%- with messages = get_flashed_messages(with_categories=true) -%}
+        {%- if messages -%}
+          {%- for category,message in messages -%}
+            <div class="alert alert-{{ category}} alert-dismissible text-center">
+              <strong>{{ message }}</strong>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      {%- endwith -%}
+      </div>
+      {% block body%}
+      {%endblock%}
+
+      <script src="{{ url_for ('static',filename='ui_design/js/jquery.min.js') }}"></script>
+      <script src="{{url_for ('static',filename='ui_design/js/popper.min.js') }}"></script>
+      <script src="{{url_for ('static',filename='ui_design/js/bootstrap.min.js') }}"></script>
+      <script src="{{url_for ('static',filename='ui_design/js/mdb.min.js') }}"></script>
+      <script type="text/javascript">
+        var csrftoken = "{{csrf_token()}}"
+  
+        $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken)
+            }
+          }
+        })
+        
+        $("#select_district").on("input", function(){
+              $.ajax({
+                url: "{{ url_for('customer_care.get_district_couriers', district='')}}"+$("#select_district").val().trim(),
+                type: "GET",
+                success: function(response,status,xhr){
+                  $("#all_couriers").empty()
+                  $(response.couriers).each(function(_,courier){
+                    $("#all_couriers").append(`
+                    <div class="col-6">
+                      <div id="courier_card${courier.courier_id}" class="card rounded-0 font-size-small mt-2">
+                        <div class="card-header">
+                        <div><strong>${String(courier.vehicle_type).toUpperCase()}</strong><i class="fa fa-check text-success font-size-medium float-right custome-hide-item"></i></div>
+                        <div><strong>${String(courier.vehicle_reg).toUpperCase()}</strong></div>
+                        </div>
+                        <div class="card-body">
+                          <input id="${courier.courier_id}" class="custome-hide-item" name="courier" type="number" value="${courier.courier_id}"/>
+                          <div><strong>Name </strong>: ${courier.courier_name}</div>
+                          <div><strong>National Id Number </strong>: ${courier.NIN},</div>
+                          <div><strong>Driver License Number </strong>: ${courier.driver_license_number},</div>
+                          <div><strong>Contact </strong>: ${courier.contact} </div>
+                          <div><strong>Email </strong>: ${courier.email} </div>
+                          <div><strong>Address </strong>: ${courier.address} </div>
+                        </div>
+                      </div>
+                    </div>              
+                  `)
+                  $(`#courier_card${courier.courier_id}`).click(function(){
+                    $("#all_couriers").find("div.card.border-white.shadow")
+                      .toggleClass("border-white shadow")
+                    $("#all_couriers").find("i:not(.custome-hide-item)")
+                      .toggleClass("custome-hide-item")
+                      
+                    $(this).toggleClass("border-white shadow");
+                    $(this).find("i").toggleClass("custome-hide-item");
+                    $("#set_courier").on("click", function(){
+                      update_order({"courier_id": courier.courier_id});
+                      $("#courier_modal").modal('hide')
+                      $(this).off()
+                    })
+                  })
+                  })
+                }
+              })
+            })
+            $("#set_order_received").click(function(){
+              update_order({"customer_received": true});
+            })
+            $("#set_order_paid").click(function(){
+              update_order({"is_paid": true});
+            })
+            $("#set_order_prepared").click(function(){
+              update_order({"is_prepared": true});
+            })
+  
+          function update_order(attr){
+            var order_id = $("#order_id").val().trim()
+            attr["order_id"] = order_id
+            $.ajax({
+              url: "{{url_for('customer_care.customer_care_order_detail', order_id='')}}"+order_id,
+              type: "POST",
+              data: JSON.stringify(attr),
+              contentType: "application/json",
+              success: function(response,status,xhr){
+                window.location.reload();
+                window.scrollTo(0,0)
+              }
+            })
+          }
+      </script>
+  </body>
+</html>

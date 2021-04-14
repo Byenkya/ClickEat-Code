@@ -1,0 +1,70 @@
+{% extends 'base_customer_care.html'%}
+{%from 'helper_customer_care.html' import sidebar, orders_nav, orders_filter_nav %}
+{% block body%}
+<div>
+    <div>
+        <div class="container-fluid mt-2">
+        <div class="row">
+            <div class="col-md-3 col-lg-3">
+          
+            {{sidebar(page='orders')}}
+            <!-- /.col-lg-3-->
+            </div>
+            <div id="customer-orders" class="col-md-9 col-lg-9">
+            <div class="card rounded-0">
+                <div class="card-body">
+                    <h1 class="text-center">Cancelled orders</h1>
+                    {{orders_nav("cancelled")}}
+                    {{orders_filter_nav()}}
+                   
+                    <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th class="text-nowrap">Order Reference</th>
+                            <th>Customer Name</th>
+                            <th class="text-nowrap">Order Date</th>
+                            <th>Total Amount</th>
+                            <th class="text-nowrap">Cancellation Reason</th>
+                            <th>Details</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {%  for order in orders_terminated %}
+                            <tr>
+                                <th class="text-nowrap">{{order.order_ref_small}}</th>
+                                <th>{{order.customer.name|title}}</th>
+                                <td>{{order.order_date.strftime('%m/%d/%Y')}}</td>
+                                <td class="text-nowrap">{{"{:,} Ugx".format(order.read_order_total_amount)}}
+                                <td class="text-wrap">{{order.termination_reason}}</td>
+                                <td><a href="{{url_for('customer_care.customer_care_order_detail', order_id=order.id)}}" class="btn btn-primary btn-sm">View</a></td>
+                            </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-muted text-center">No Cancelled Orders</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                    <div class="pages">
+                        <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+                          <ul class="pagination">
+                            <li class="page-item"><a href="#" aria-label="Previous" class="page-link"><span aria-hidden="true">«</span><span class="sr-only">Previous</span></a></li>
+                            <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                            <li class="page-item"><a href="#" class="page-link">2</a></li>
+                            <li class="page-item"><a href="#" class="page-link">3</a></li>
+                            <li class="page-item"><a href="#" class="page-link">4</a></li>
+                            <li class="page-item"><a href="#" class="page-link">5</a></li>
+                            <li class="page-item"><a href="#" aria-label="Next" class="page-link"><span aria-hidden="true">»</span><span class="sr-only">Next</span></a></li>
+                          </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+{% endblock%}

@@ -1,0 +1,78 @@
+{% from 'form_helper.html' import renderinputfield %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>ClickEat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/bootstrap.min.css')}}?version={{session.file_version}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/mdb.min.css')}}?version={{session.file_version}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/style.css')}}?version={{session.file_version}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/font-awesome/font-awesome.min.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui_design/css/custom.css') }}?version={{session.file_version}}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.ico') }}">
+    
+    </head>
+    <body>
+      <div id="content" style="height: 100%">
+        <div class="view" style="height: 100%;background-size: contain;background-repeat: no-repeat; background-size: cover; background-position: center center;">
+          <div class="mask rgba-mdb-color-light align-items-center">
+            <div class="container d-flex align-items-center" style="height: 100%">
+              <div class="col-12 col-sm-12 col-md-6 col-lg-6 mx-auto py-5">
+                <div class="card card-body rounded" style="background-color: rgba(255, 255, 255, 0.83)">
+                  <div class="h4 font-weight-bold mb-0 text-center">Welcome to ClickEat</div>
+                  <hr>
+                  <form method="POST" action="{{url_for('customer_care.customer_care_login')}}">
+                    {{form.hidden_tag()}}
+                    <div class="container w-75 mx-auto">
+                      {%- with messages = get_flashed_messages(with_categories=true) -%}
+                      {% if messages %}
+                      {%- for category,message in messages -%}
+                      <div class="alert alert-{{ category}} alert-dismissible text-center">
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      {%- endfor -%}
+                      {% endif %}
+                      {%- endwith -%}
+                    </div>
+                    <div class="md-form mt-3">
+                      <div class="prefix">
+                        <i class="fa fa-envelope"></i>
+                      </div>
+                      {{renderinputfield(form.username)}}
+                      {{form.username.label()}}
+                    </div>
+                    <div class="md-form">
+                      <div class="prefix">
+                        <i class="fa fa-lock"></i>
+                      </div>
+                      {{renderinputfield(form.password)}}
+                      {{form.password.label()}}
+                    </div>
+                    {{form.submit(class="btn-lg btn-block border-0 rounded-pill z-depth-1")}}
+                  </form>
+                  <div class="mt-2 container-fluid text-center">
+                    <a href="#">Forgot password</a>
+                  </div>
+                 
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+      
+      </div>
+        
+        <script src="{{ url_for ('static',filename='ui_design/js/jquery.min.js') }}"></script>
+        <script src="{{url_for ('static',filename='ui_design/js/popper.min.js') }}"></script>
+        <script src="{{url_for ('static',filename='ui_design/js/bootstrap.min.js') }}"></script>
+        <script src="{{url_for ('static',filename='ui_design/js/mdb.min.js') }}"></script>
+        
+    </body>
+</html>

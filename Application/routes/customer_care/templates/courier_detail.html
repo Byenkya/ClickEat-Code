@@ -1,0 +1,108 @@
+{% extends 'base_customer_care.html'%}
+{%from 'helper_customer_care.html' import sidebar %}
+{% block body%}
+  <div class="container-fluid mt-2">
+    <div class="row">
+        <div class="col-lg-3">
+        <!--
+        *** CUSTOMER MENU ***
+        _________________________________________________________
+        -->
+        {{sidebar(page='couriers')}}
+        <!-- /.col-lg-3-->
+        <!-- *** CUSTOMER MENU END ***-->
+        </div>
+        <div class="col-lg-9">
+          <!-- breadcrumb-->
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{{url_for('customer_care.couriers')}}">Couriers</a></li>
+              <li class="breadcrumb-item">Courier</li>
+            </ol>
+          </nav>
+          <div class="card rounded-0">
+              <div class="card-body">
+                <div class="w-100 d-flex flex-row">
+                  <div class="h3">{{"Name: "~courier.courier_name|title}} <i class="fa fa-certificate"></i></div>
+                  <div class="ml-auto">
+                    <img src="{{url_for ('static', filename='courier_images/' + courier.courier_pic )}}" alt="{{ courier.courier_name }}" class="img-fluid img-thumbnail border-0" >
+                  </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <p class="text-muted">{{"Operational since: " ~ courier.registration_date.strftime('%m/%d/%Y')}}</p>
+                        <p><i class="fa fa-home"> </i> {{courier.address}}</p>
+                        <p><i class="fa fa-envelope"></i> {{courier.email}}</p>
+                        <p><i class="fa fa-phone"></i> {{courier.contact ~ " or " ~ courier.second_contact }}</p> 
+                        <p><i class="fa fa-id-card-o"></i> {{courier.national_id_number}}</p> 
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                      <div class="card card-stats">
+                        <div class="card-header card-header-info card-header-icon">
+                          <h4 class="card-title">Other Details</h4>
+                          <p>{{"Driver License: " ~ courier.driver_license_number}}</p>
+                          <p>{{"Vehicle Type: " ~ courier.vehicle_type}}</p>
+                          <p>{{"Vehicle Reg : " ~ courier.vehicle_license_plate_number|upper}}</p>
+                        </div>
+                      </div>  
+                    </div>
+                    
+                </div>
+                <hr>
+                <div class="row justify-content-center">
+                  <h3>Orders Delivered</h3>
+                </div>
+                <hr>
+                <div class="row mb-5">
+                  <div class="col-md-3">  
+                      <input type="text" class="form-control" placeholder="start date"> 
+                  </div>
+                  <div class="col-md-3">  
+                      <input type="text" class="form-control" placeholder="end date"> 
+                  </div>
+                  <div class=" col-md-3">
+                      <input type="text" class="form-control" placeholder="item"> 
+                  </div>
+                  <div class="col-md-3">
+                      <a href="#" class="btn btn-secondary">Find</a>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Order Ref</th>
+                                <th>Customer Name</th>
+                                <th>Order Amount</th>
+                                <th>Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          {%  for order in orders %}
+                          <tr>
+                            <td>{{order.order_date.strftime('%m/%d/%Y')}}</td>
+                            <th>{{order.order_ref_simple_version}}</th>
+                              <th>{{order.customer.name|title}}</th>
+                              <td class="text-nowrap">{{"{:,} Ugx".format(order.read_order_total_amount)}}
+                              <td><a href="{{url_for('customer_care.customer_care_order_detail', order_id=order.id)}}" class="btn btn-primary btn-sm">View</a></td>
+                          </tr>
+                          {% else %}
+                              <tr>
+                                  <td colspan="5" class="text-muted text-center">No Orders Available</td>
+                              </tr>
+                          {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+              
+
+          </div>
+        </div>
+    </div>
+  </div>
+{%endblock%}
+
+

@@ -1,0 +1,246 @@
+{% extends 'base_customer_care.html'%}
+{%from 'helper_customer_care.html' import sidebar %}
+{%from 'form_helper.html' import renderformfield %}
+{% block body%}
+<div>
+    <div>
+      <div class="container-fluid mt-2">
+        <div class="row">
+          <div class="col-md-3">
+            {{sidebar(page='orders')}}
+          </div>
+          <div class="col-md-9">
+            <!-- breadcrumb-->
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{url_for('customer_care.customer_care_orders')}}">Orders</a></li>
+                <li aria-current="page" class="breadcrumb-item active">{{"order-" ~ order.order_ref_simple_version}}</li>
+              </ol>
+            </nav>
+            <div class="card rounded-0 mt-2 pb-5">
+              <div class="card-body pb-5">
+                  <h1>{{"Order " ~ order.order_ref_simple_version}}</h1>
+                  <div class="w-100 mb-2">
+                    <input id="order_id" type="number" name="order_id" value="{{order.id}}" hidden >
+                    <div class="btn-group w-100">
+                    {% if not order.is_terminated %}
+                      {% if order.is_prepared %}
+                          <button type="button" class="btn btn-dark disabled">Ordered prepared<i class="fa fa-suitcase ml-2 w-100"></i></button>
+                        {%else%}
+                          <button id="set_order_prepared" type="button" class="btn btn-dark">Prepare Order<i class="fa fa-exclamation-circle ml-2 w-100"></i></button>
+                      {% endif %}
+                      {%if order.delivery_details[0].courier_id %}
+                        <button type="button" class="btn btn-primary disabled">Assigned Courier<div class="w-100"><i class="fa fa-motorcycle ml-2"></i><i class="fa fa-car ml-2"></i><i class="fa fa-truck ml-2"></i><i class="fa fa-plane ml-2"></i></div></button>
+                        {%else%}
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#courier_modal">Assign Courier<i class="fa fa-exclamation-circle w-100 ml-2"></i></button>
+                      {%endif%}
+                      {% if order.is_paid %}
+                          <button type="button" class="btn btn-success">Order Paid<i class="fa fa-money ml-2 w-100"></i></button>
+                        {%else%}
+                          <button id="set_order_paid" type="button" class="btn btn-danger">Not Yet Paid<i class="fa fa-exclamation-circle ml-2 w-100"></i></button>
+                      {% endif %}
+                      {% if order.customer_received %}
+                          <button type="button" class="btn btn-warning disabled">Customer Received<i class="fa fa-thumbs-up ml-2 w-100"></i></button>
+                        {%else%}
+                          <button id="set_order_received" type="button" class="btn btn-warning">Not Yet Received<i class="fa fa-exclamation-circle ml-2 w-100"></i></button>
+                      {% endif %}
+                      {% endif %}
+                    </div>
+                    {% if not order.is_terminated and not order.customer_received and not order.is_paid %}
+                      <div class="my-2">
+                        <button type="button" class="btn btn-outline-danger btn-block" data-toggle="modal" data-target="#order_termination_modal">Terminate Order</button>
+                      </div>
+                    {% endif %}
+                    {% if order.is_paid and order.customer_received %}
+                      <div>
+                        <button type="button" class="btn btn-outline-primary rounded-pill btn-block my-2" data-toggle="modal" data-target="#customer_refund_modal">Return products</button>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead class="thead-dark">
+                        <tr>
+                          <th scope="col">Product</th>
+                          <th scope="col"></th>
+                          <th scope="col" class="text-nowrap">Hotel/Restaurant</th>
+                          <th scope="col">Quantity</th>
+                          <th scope="col" class="text-nowrap">Unit Price</th>
+                          <th scope="col">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in order.cart %}
+                          <tr>
+                            <td><img src="{{url_for ('static', filename='product_images/' + item.product_image )}}" alt="{{ item.product_image }}" class="img-fluid img-thumbnail" style="height: 4rem;width:7rem"></td>                              
+                            <td>{{item.product_name}}</td>
+                            <td>{{item.read_item_shop_details|safe}}</td>
+                            <td>{{item.quantity}}</td>
+                            <td scope="row" class="text-nowrap">{{ "{:,} Ugx".format(item.unit_price) }}</td>
+                            <td scope="row" class="text-nowrap">{{ "{:,} Ugx".format((item.quantity * item.unit_price))}}</td>
+                          </tr>
+                        {% endfor %}
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr class="table-active">
+                          <th colspan="8" scope="row">Sub Total</th>
+                          <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(cart_items_sum)}}</th>
+                        </tr>
+                        <tr class="table-active">
+                          <th colspan="8" scope="row">Tax</th>
+                          <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(0) }}</th>
+                        </tr>
+                        <tr class="table-active">
+                          <th colspan="8" scope="row">Total</th>
+                          <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(cart_items_sum) }}</th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead class="thead-dark">
+                        <tr>
+                          <th scope="col">Payment Method</th>
+                          <th scope="col">Order Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td class="text-nowrap">{{order.payment[0].payment_method.method|title}}</td>
+                          <td>{{ order.order_date.strftime('%m/%d/%Y')}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /.content-->
+                  
+              </div>
+              
+            </div>
+            <!-- /.box-->
+          </div>
+          <!-- /.col-lg-3-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="courier_modal" tabindex="-1" role="dialog" aria-labelledby="couriers_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="couriers_label">Select A Courier</h5>
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-close"></i></button>
+
+        </div>
+        <div class="modal-body">
+          <div class="row no-gutters">
+            <div class="col-12">
+              <input id="select_district" type="text" placeholder="Select district" class="form-control" list="districts_available" aria-label="select_district" aria-autocomplete="both">
+              <datalist id="districts_available">
+                {% for district in districts %}
+                  <option>{{district[0]}}</option>
+                {% endfor %}
+              </datalist>
+            </div>
+          </div>
+          <div id="all_couriers" class="d-flex flex-row flex-wrap mt-2 border-top p-2">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-primary rounded-pill" data-dismiss="modal">Close</button>
+          <button id="set_courier" type="button" class="btn btn-primary rounded-pill">Set Courier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="order_termination_modal" tabindex="-1" role="dialog" aria-labelledby="order_termination_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="order_termination_label">Enter Reason</h5>
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-close"></i></button>
+
+        </div>
+        <div class="modal-body">
+          <form method="POST", action="{{url_for('customer_care.terminate_order', order_id=order.id)}}">
+            {{form.hidden_tag()}}
+            <div class="row">
+              <div class="col-12">
+                {{ renderformfield(form.reason)}}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary rounded-pill" data-dismiss="modal">Close</button>
+              {{form.submit_request(class="btn btn-primary rounded-pill")}}
+
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="customer_refund_modal" tabindex="-1" role="dialog" aria-labelledby="customer_refund_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="customer_refund_label">Order Product Returns</h5>
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-close"></i></button>
+
+        </div>
+        <div class="modal-body">
+          <div class="h5 font-weight-bold">Order {{order.order_ref_small}}</div>
+          <form method="POST", action="#">
+            {{order_return_form.hidden_tag()}}
+            <div class="form-group">
+              {{order_return_form.order_products.label}}
+              {{order_return_form.order_products()}}
+            </div>
+            <div class="form-group input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">{{ order_return_form.unit_price.label.text}}</div>
+              </div>
+              {{order_return_form.unit_price(class="form-control", value=0)}}
+            </div>
+            <div class="form-group input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">{{ order_return_form.quantity.label.text}}</div>
+              </div>
+              {{order_return_form.quantity(class="form-control")}}
+            </div>
+            <div class="form-group input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">{{ order_return_form.total_amount.label.text}}</div>
+              </div>
+              {{order_return_form.total_amount(class="form-control")}}
+            </div>
+            <div class="form-group input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">{{ order_return_form.compensation_options.label.text}}</div>
+              </div>
+              {{order_return_form.compensation_options(class="form-control")}}
+            </div>
+            <div class="form-group input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">{{ order_return_form.return_reason.label.text}}</div>
+              </div>
+              {{order_return_form.return_reason(class="form-control")}}
+            </div>
+            <div class="form-group custom-control custom-checkbox">
+              {{order_return_form.has_warranty(class="custom-control-input")}}
+              {{order_return_form.has_warranty.label(class="custom-control-label")}}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-primary rounded-pill" data-dismiss="modal">Close</button>
+              {{order_return_form.submit_return(class="btn btn-primary rounded-pill")}}
+            </div>
+            
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+{%endblock%}
