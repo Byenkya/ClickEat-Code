@@ -35,6 +35,10 @@ class SubCategory(Base):
         }
 
     @classmethod
+    def read_sub_cat(cls):
+        return [sub.serialize() for sub in cls.query.all()]
+        
+    @classmethod
     def read_drink_sub_categories(cls):
         return session.query(cls).join(cls.category).filter_by(name="Drinks").all()
 

@@ -183,11 +183,19 @@ class ForgotPasswordResource(Resource):
             mail_.recipients = [user.email]
             mail_.send()
 
-        return jsonify(
-            status = "success",
-            message="If you provided a right email, check your email inbox for password reset link.",
-            data = 0
-        )
+            return jsonify(
+                status = "success",
+                message="Check your email inbox for password reset link.",
+                data = 0
+            )
+
+        else:
+            email = args["email"]
+            return jsonify(
+                status = "error",
+                message= "This email: {} is not registered with clickeat".format(email),
+                data = 0
+            )
 
 
 

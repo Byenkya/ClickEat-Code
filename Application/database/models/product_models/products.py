@@ -79,6 +79,14 @@ class Products(Base):
             return product
 
     @classmethod
+    def read_product_by_sub_cat(cls, sub_category_id):
+        return cls.query.filter_by(sub_category_id=sub_category_id).first() 
+
+    @classmethod
+    def read_products_based_on_sub_cat(cls, sub_category_id):
+        return cls.query.filter_by(sub_category_id=sub_category_id).all()
+
+    @classmethod
     def read_products_count(cls):
         return session.query(func.count(cls.product_id)).scalar()
 

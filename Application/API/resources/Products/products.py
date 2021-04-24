@@ -98,7 +98,20 @@ class DrinksSubCatApi(Resource):
 #Home products
 class HomeProductsResource(Resource):
     def get(self):
-        return Products.home_products()
+        home_products = Products.home_products()
+        home_sub_cats_list = []
+        sub_cats = SubCategory.read_sub_cat()
+
+        for sub in sub_cats:
+            product_image = Products.read_product_by_sub_cat(sub["sub_category_id"])
+            if product_image:
+                home_sub_cats = {}
+                home_sub_cats['id'] = sub["sub_category_id"]
+                home_sub_cats['subCatImage'] = product_image.product_picture 
+                home_sub_cats['name'] = sub["name"]
+                home_sub_cats_list.append(home_sub_cats)
+            
+        return {"home_images_products": home_products,"home_images": HomeImages.home_images(), "sub_cats": home_sub_cats_list}
 
 #searched Products
 searchStringsArgs = reqparse.RequestParser()
@@ -126,9 +139,12 @@ class SearchedProductsResource(Resource):
                     ).order_by(Products.product_id).all()
         return [product.serialize() for product in products]
 
-#home_images
-class HomeImagesAPI(Resource):
-    def get(self):
-        return HomeImages.home_images()
+#sub_category_products
+class SubCategoryProductsApI(Resource):
+    def get(self, id):
+        products = Products.read_products_based_on_sub_cat(id)
+    
+        return [product.serialize() for product in products]
+
 
         
