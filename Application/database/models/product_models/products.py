@@ -94,8 +94,8 @@ class Products(Base):
     def home_products(cls):
         #home products
         home_products = []
-        products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite], 2)
-        drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all()], 2)
+        products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite], 4)
+        drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all()], 4)
 
         home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":products})
         home_products.append({"id":2,"title":"Most Selling Drinks", "products":drinks })
