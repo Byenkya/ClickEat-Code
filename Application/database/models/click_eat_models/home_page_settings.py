@@ -19,8 +19,12 @@ class HomeImages(Base):
 
     @classmethod
     def home_images(cls):
-        images = cls.query.all()
-        return [image.serialize() for image in images]
+        try:
+            images = cls.query.all()
+            return [image.serialize() for image in images]
+
+        except:
+            session.rollback()
 
     @classmethod
     def read_image(cls, id):

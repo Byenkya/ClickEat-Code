@@ -83,8 +83,13 @@ class Order(Base):
 
     @classmethod
     def read_customer_orders(cls, customer_id):
-        customer_orders = cls.query.filter_by(customer_id=customer_id).order_by(desc(cls.order_date)).all()
-        return [item.serialize() for item in customer_orders]
+        try:
+            customer_orders = cls.query.filter_by(customer_id=customer_id).order_by(desc(cls.order_date)).all()
+            return [item.serialize() for item in customer_orders]
+
+        except:
+            session.rollback()
+
 
     @classmethod
     def customer_order_exists(cls, customer_id):
