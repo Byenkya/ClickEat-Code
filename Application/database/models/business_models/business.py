@@ -74,15 +74,24 @@ class Resturant(Base):
 
     @classmethod
     def read_restaurant(cls, id):
-        return cls.query.filter_by(id=id).first()
+        try:
+            return cls.query.filter_by(id=id).first()
+        except:
+            session.rollback()
 
     @classmethod
     def read_restaurants(cls):
-        return cls.query.filter_by(deals_in="food").all()
+        try:
+            return cls.query.filter_by(deals_in="food").all()
+        except:
+            session.rollback()
 
     @classmethod
     def read_restaurants_count(cls):
-        return session.query(func.count(cls.id)).scalar()
+        try:
+            return session.query(func.count(cls.id)).scalar()
+        except:
+            session.rollback()
 
 
     

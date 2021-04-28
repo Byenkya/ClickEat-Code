@@ -70,16 +70,22 @@ class Order(Base):
 
     @classmethod
     def customer_order_count(cls, customer_id):
-        count = session.query(func.count(cls.id)).filter_by(
-            is_paid = True,
-            is_terminated = False
-        ).scalar()
+        try:
+            count = session.query(func.count(cls.id)).filter_by(
+                is_paid = True,
+                is_terminated = False
+            ).scalar()
 
-        return count
+            return count
+        except:
+            session.rollback()
 
     @classmethod
     def read_order(cls, **kwargs):
-        return cls.query.filter_by(**kwargs).options(lazyload("*")).first()
+        try:
+            return cls.query.filter_by(**kwargs).options(lazyload("*")).first()
+        except:
+            session.rollback()
 
     @classmethod
     def read_customer_orders(cls, customer_id):
@@ -93,49 +99,73 @@ class Order(Base):
 
     @classmethod
     def customer_order_exists(cls, customer_id):
-        return session.query(cls).filter_by(customer_id=customer_id,is_paid=False,is_terminated=False).first()
+        try:
+            return session.query(cls).filter_by(customer_id=customer_id,is_paid=False,is_terminated=False).first()
+        except:
+            session.rollback()
         
 
     @classmethod
     def delete_order(self, id):
-        self.query.filter_by(id=id).delete()
-        session.commit()
+        try:
+            self.query.filter_by(id=id).delete()
+            session.commit()
+        except:
+            session.rollback()
 
     @classmethod
     def read_orders_count(cls):
-        return session.query(func.count(cls.id)).filter_by(is_paid=False,is_terminated=False).scalar()
+        try:
+            return session.query(func.count(cls.id)).filter_by(is_paid=False,is_terminated=False).scalar()
+        except:
+            session.rollback()
 
     @classmethod
     def read_all_orders(cls):
-        return cls.query.order_by(Order.id.desc())
+        try:
+            return cls.query.order_by(Order.id.desc())
+        except:
+            session.rollback()
 
     @property
     def read_order_total_amount(self):
-        return pdts.Cart.customer_order_items_total(self.id)
+        try:
+            return pdts.Cart.customer_order_items_total(self.id)
+        except:
+            session.rollback()
 
     @classmethod
     def read_all_orders_filter(cls, *args):
-        return cls.query.filter(
-            *args
-        ).order_by(Order.id.desc()).all()
+        try:
+            return cls.query.filter(
+                *args
+            ).order_by(Order.id.desc()).all()
+        except:
+            session.rollback()
 
     @classmethod
     def read_all_orders_delivery_details_filter(cls, *args):
-        return session.query(cls).join(cls.delivery_details)\
-            .filter(
-                *args
-            ).order_by(cls.id.desc()).options(
-                lazyload("*")).all()
+        try:
+            return session.query(cls).join(cls.delivery_details)\
+                .filter(
+                    *args
+                ).order_by(cls.id.desc()).options(
+                    lazyload("*")).all()
+        except:
+            session.rollback()
 
     @classmethod
     def read_orders_not_prepared_count(cls):
-        return session.query(func.count(cls.id))\
-            .filter(
-                and_(
-                    cls.is_prepared==False,
-                    cls.is_terminated == False
-                    )
-                ).scalar()
+        try:
+            return session.query(func.count(cls.id))\
+                .filter(
+                    and_(
+                        cls.is_prepared==False,
+                        cls.is_terminated == False
+                        )
+                    ).scalar()
+        except:
+            session.rollback()
 
 
     def customer_care_terminate_order(self, reason):
@@ -198,6 +228,7 @@ class Order(Base):
 
         except Exception as e:
             print("Terminating order error: ", e)
+            session.rollback()
             return False  
 
     @classmethod

@@ -1,4 +1,5 @@
 from Application.flask_imports import Flask, make_response, abort
+from Application.database.initialize_database import session
 from Application import config
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -145,3 +146,7 @@ def before_request_function():
             abort(404)
 
     return None
+
+@app.teardown_request
+def remove_session(exception=None):
+    session.remove()

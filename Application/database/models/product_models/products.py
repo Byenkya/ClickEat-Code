@@ -74,33 +74,51 @@ class Products(Base):
 
     @classmethod
     def read_product(cls,id):
-        product = cls.query.filter_by(product_id=id).first()
-        if product:
-            return product
+        try:
+            product = cls.query.filter_by(product_id=id).first()
+            if product:
+                return product
+        except:
+            session.rollback()
 
     @classmethod
     def read_product_by_sub_cat(cls, sub_category_id):
-        return cls.query.filter_by(sub_category_id=sub_category_id).first() 
+        try:
+            return cls.query.filter_by(sub_category_id=sub_category_id).first() 
+        except:
+            session.rollback()
+
 
     @classmethod
     def read_products_based_on_sub_cat(cls, sub_category_id):
-        return cls.query.filter_by(sub_category_id=sub_category_id).all()
+        try:
+            return cls.query.filter_by(sub_category_id=sub_category_id).all()
+        except:
+            session.rollback()
 
     @classmethod
     def read_products_count(cls):
-        return session.query(func.count(cls.product_id)).scalar()
+        try:
+            return session.query(func.count(cls.product_id)).scalar()
+        except:
+            session.rollback()
 
     @classmethod
     def home_products(cls):
-        #home products
-        home_products = []
-        products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite], 4)
-        drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all()], 4)
+        try:
+            #home products
+            home_products = []
+            products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite], 4)
+            drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all()], 4)
 
-        home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":products})
-        home_products.append({"id":2,"title":"Most Selling Drinks", "products":drinks })
+            home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":products})
+            home_products.append({"id":2,"title":"Most Selling Drinks", "products":drinks })
 
-        return home_products
+            return home_products
+
+        except:
+            session.rollback()
+
 
 
 
@@ -111,26 +129,33 @@ class Products(Base):
             otherwise returns list.
         """
         if return_query:
-            return cls.query.filter_by(**kwargs).first()
+            try:
+                return cls.query.filter_by(**kwargs).first()
+            except:
+                session.rollback()
         else:
-            products_based_on_sub_cat_dict = {}
-            product_based_on_sub_cat_list = []
-            restaurant_products = cls.query.filter_by(**kwargs).all()
+            try:
+                products_based_on_sub_cat_dict = {}
+                product_based_on_sub_cat_list = []
+                restaurant_products = cls.query.filter_by(**kwargs).all()
 
-            for product in restaurant_products:
-                if f"{product.sub_category}" in products_based_on_sub_cat_dict:
-                    if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
-                        products_based_on_sub_cat_dict[f"{product.sub_category}"] += [product.serialize()] #Add the product to is group
+                for product in restaurant_products:
+                    if f"{product.sub_category}" in products_based_on_sub_cat_dict:
+                        if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
+                            products_based_on_sub_cat_dict[f"{product.sub_category}"] += [product.serialize()] #Add the product to is group
 
-                else:
-                    products_based_on_sub_cat_dict[f"{product.sub_category}"] = [product.serialize()]
+                    else:
+                        products_based_on_sub_cat_dict[f"{product.sub_category}"] = [product.serialize()]
 
-            for sub_cat,products in products_based_on_sub_cat_dict.items():
-                banch = {"sub_category": sub_cat, "products": products}
-                product_based_on_sub_cat_list.append(banch)
+                for sub_cat,products in products_based_on_sub_cat_dict.items():
+                    banch = {"sub_category": sub_cat, "products": products}
+                    product_based_on_sub_cat_list.append(banch)
 
 
-            return product_based_on_sub_cat_list
+                return product_based_on_sub_cat_list
+
+            except:
+                session.rollback()
 
 
 

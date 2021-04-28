@@ -51,8 +51,11 @@ class CustomerAddress(Base):
     
     @classmethod
     def get_customer_addresses(cls, customer_id):
-        customer_addresses = cls.query.filter_by(customer_id=customer_id).all()
-        return [customer_address.serialize() for customer_address in customer_addresses]
+        try:
+            customer_addresses = cls.query.filter_by(customer_id=customer_id).all()
+            return [customer_address.serialize() for customer_address in customer_addresses]
+        except:
+            session.rollback()
 
     @classmethod
     def update_customer_address(cls, **kwargs):
@@ -66,6 +69,7 @@ class CustomerAddress(Base):
             return True
         except Exception as e:
             print("Error: >>>>>>>>>>>>>>>>", e)
+            session.rollback()
             return False
 
     @classmethod
@@ -76,5 +80,6 @@ class CustomerAddress(Base):
             return True
         except Exception as e:
             print("Error: >>>>>>>>>>>>>", e)
+            session.rollback()
             return False
         

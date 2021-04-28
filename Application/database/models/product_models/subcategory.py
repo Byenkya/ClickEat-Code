@@ -36,10 +36,16 @@ class SubCategory(Base):
 
     @classmethod
     def read_sub_cat(cls):
-        return [sub.serialize() for sub in cls.query.all()]
+        try:
+            return [sub.serialize() for sub in cls.query.all()]
+        except:
+            session.rollback()
         
     @classmethod
     def read_drink_sub_categories(cls):
-        return session.query(cls).join(cls.category).filter_by(name="Drinks").all()
+        try:
+            return session.query(cls).join(cls.category).filter_by(name="Drinks").all()
+        except:
+            session.rollback()
 
     

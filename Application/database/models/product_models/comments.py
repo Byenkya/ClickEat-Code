@@ -44,9 +44,12 @@ class Comments(Base):
 
     @classmethod
     def get_product_comments(cls, product_id):
-        comments = cls.query.filter_by(product_id=product_id).order_by(desc(cls.date)).all()
+        try:
+            comments = cls.query.filter_by(product_id=product_id).order_by(desc(cls.date)).all()
 
-        return [comment.serialize() for comment in comments]
+            return [comment.serialize() for comment in comments]
+        except:
+            session.rollback()
         
 
 

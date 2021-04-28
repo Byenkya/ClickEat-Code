@@ -28,15 +28,21 @@ class HomeImages(Base):
 
     @classmethod
     def read_image(cls, id):
-        image = cls.query.filter_by(image_id=id).first()
-        return image.serialize()
+        try:
+            image = cls.query.filter_by(image_id=id).first()
+            return image.serialize()
+        except:
+            session.rollback()
 
     @classmethod
     def delete_image(cls, id):
-        image = cls.query.filter_by(image_id=id).first()
-        if image:
-            session.query(cls).filter_by(image_id=id).delete()
-            session.commit()
-            return True
-        else:
-            return False
+        try:
+            image = cls.query.filter_by(image_id=id).first()
+            if image:
+                session.query(cls).filter_by(image_id=id).delete()
+                session.commit()
+                return True
+            else:
+                return False
+        except:
+            session.rollback()

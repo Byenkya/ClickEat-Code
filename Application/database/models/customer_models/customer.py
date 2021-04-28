@@ -102,8 +102,11 @@ class Customer(Base, UserMixin):
             }
 
     def delete_customer(self, id):
-        self.query.filter_by(id=id).delete()
-        session.commit()
+        try:
+            self.query.filter_by(id=id).delete()
+            session.commit()
+        except:
+            session.rollback()
 
     @classmethod
     def check_user(cls,telephone,password):
@@ -131,21 +134,31 @@ class Customer(Base, UserMixin):
                 
         except Exception as e:
             print(">>>>>>>>>>>>", e)
+            session.rollback()
 
     @classmethod
     def read_customer_by_contact(cls, **kwargs):
-        customer = cls.query.filter_by(contact=kwargs.get("telephone")).first()
+        try:
+            customer = cls.query.filter_by(contact=kwargs.get("telephone")).first()
 
-        return customer
+            return customer
+        except:
+            session.rollback()
 
     @classmethod
     def read_customer(cls, **kwargs):
-        customer = cls.query.filter_by(**kwargs).first()
-        return customer
+        try:
+            customer = cls.query.filter_by(**kwargs).first()
+            return customer
+        except:
+            session.rollback()
 
     @classmethod
     def read_customer_count(cls):
-        return session.query(func.count(cls.id)).scalar()
+        try:
+            return session.query(func.count(cls.id)).scalar()
+        except:
+            session.rollback()
 
 
 

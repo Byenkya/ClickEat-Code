@@ -32,34 +32,37 @@ class Rate(Base):
 
     @classmethod
     def read_product_rate(cls, product_id):
-        pdt_ratings = session.query(func.count(cls.rate), cls.rate)\
-            .group_by(cls.rate).filter_by(product_id=product_id).all()
+        try:
+            pdt_ratings = session.query(func.count(cls.rate), cls.rate)\
+                .group_by(cls.rate).filter_by(product_id=product_id).all()
 
-        numerator = 0
-        denomenator = 0
+            numerator = 0
+            denomenator = 0
 
-        for rate in pdt_ratings:
-            denomenator += rate[0]
+            for rate in pdt_ratings:
+                denomenator += rate[0]
 
-            if rate[1] == 5:
-                numerator += rate[0] * 100
+                if rate[1] == 5:
+                    numerator += rate[0] * 100
 
-            elif rate[1] == 4:
-                numerator += rate[0] * 80
+                elif rate[1] == 4:
+                    numerator += rate[0] * 80
 
-            elif rate[1] == 3:
-                numerator += rate[0] * 60
+                elif rate[1] == 3:
+                    numerator += rate[0] * 60
 
-            elif rate[1] == 2:
-                numerator += rate[0] * 40
+                elif rate[1] == 2:
+                    numerator += rate[0] * 40
 
-            elif rate[1] == 1:
-                numerator += rate[0] * 20
+                elif rate[1] == 1:
+                    numerator += rate[0] * 20
 
-        if pdt_ratings:
-            return int(((numerator/denomenator)/100) * 5)
-        else:
-            return 0
+            if pdt_ratings:
+                return int(((numerator/denomenator)/100) * 5)
+            else:
+                return 0
+        except:
+            session.rollback()
 
 
 

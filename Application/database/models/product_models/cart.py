@@ -82,23 +82,29 @@ class Cart(Base):
 
     @classmethod
     def read_customer_cart_items(cls, customer_id):
-        cart_items = cls.query.filter_by(
-            customer_id=customer_id,
-            is_ordered=False
-        ).all()
+        try:
+            cart_items = cls.query.filter_by(
+                customer_id=customer_id,
+                is_ordered=False
+            ).all()
 
-        return cls.update_cart_items_prices(cart_items)
+            return cls.update_cart_items_prices(cart_items)
+        except:
+            session.rollback()
 
     @classmethod
     def update_cart_items_prices(cls, cart_items):
-        for item in cart_items:
-            product = pdts.Products.read_all_products(return_query=True, product_id=item.product_id)
-            item.unit_price = product.price
-        session.commit()
+        try:
+            for item in cart_items:
+                product = pdts.Products.read_all_products(return_query=True, product_id=item.product_id)
+                item.unit_price = product.price
+            session.commit()
 
-        customer_cart_items = {"cart_items": [cart_item.serialize() for cart_item in cart_items]}
+            customer_cart_items = {"cart_items": [cart_item.serialize() for cart_item in cart_items]}
 
-        return customer_cart_items
+            return customer_cart_items
+        except:
+            session.rollback()
 
     @classmethod
     def update_cart_item(cls, **kwargs):
