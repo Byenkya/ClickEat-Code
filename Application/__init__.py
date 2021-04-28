@@ -1,5 +1,4 @@
 from Application.flask_imports import Flask, make_response, abort
-from Application.database.initialize_database import session
 from Application import config
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -39,7 +38,7 @@ celery.__init__(app)
 celery.config_from_object(config.CeleryConfig)
 
 #create the database
-from Application.database.initialize_database import Base, engine
+from Application.database.initialize_database import Base, engine, session
 from Application.database.models import *
 
 def init_db():  
