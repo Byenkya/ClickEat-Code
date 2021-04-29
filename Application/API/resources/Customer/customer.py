@@ -40,13 +40,25 @@ class CustomerApi(Resource):
             return response
                 
         else:
-            response = {
-                "status": "failure",
-                "message": "Your Information was not saved!",
-                "data":0
-            } 
+            customer = Customer().read_customer(contact=contact)
+            if customer:
 
-            return response
+                response = {
+                    "status": "failure",
+                    "message": "User already exists!!",
+                    "data":0
+                } 
+
+                return response
+            else:
+
+                response = {
+                    "status": "failure",
+                    "message": "Your Information was not saved!",
+                    "data":0
+                } 
+
+                return response
 
 
 class AuthenticationApi(Resource):
