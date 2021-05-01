@@ -99,7 +99,6 @@ class TokenGenerator:
             except Exception:
                 self.user = None
         except Exception as e:
-            print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", e)
             self.user = None
         return self.user
     

@@ -40,6 +40,7 @@ class Customer(Base, UserMixin):
         except Exception as e:
             print("Add customer Error: ", e)
             session.rollback()
+            return False
 
     @property
     def password(self):
@@ -113,14 +114,14 @@ class Customer(Base, UserMixin):
         try:
             user = cls.query.filter_by(contact=telephone).first()
         
-            if user:
+            if user and user.verify_password(password):
                 token = TokenGenerator(user).generate_api_token()
                 user = user.serializer()
                 user["token"] = token
                 return user
             elif not user:
                 user = cls.query.filter_by(email=telephone).first()
-                if user:
+                if user and user.verify_password(password):
                     token = TokenGenerator(user).generate_api_token()
                     user = user.serializer()
                     user["token"] = token
