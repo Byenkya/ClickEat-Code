@@ -107,9 +107,11 @@ api.add_resource(ForgotPasswordResource, '/api/v1/forgot_password')
 
 #Register Blueprints
 from Application.routes.customer_care.routes import customer_care
+from Application.routes.password_reset.password_reset import password_reset
 from Application.flask_imports import _session, request
 
 app.register_blueprint(customer_care)
+app.register_blueprint(password_reset)
 
 @app.after_request
 def after_request_function(response):
