@@ -15,6 +15,14 @@ class BaseConfig:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     TIMEZONE = "UTC"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 587   
+    MAIL_USE_SSL =  False
+    MAIL_USE_TLS = True
+    MAIL_ASCII_ATTACHMENTS = True
+    MAIL_DEFAULT_SENDER = os.environ["MAIL_DEFAULT_SENDER"]
+    MAIL_USERNAME = os.environ["MAIL_USERNAME"]
+    MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
     # UPLOADED_RESTURANT_PICS = "Application/database/media/"
 
 class ProductionConfig(BaseConfig):
