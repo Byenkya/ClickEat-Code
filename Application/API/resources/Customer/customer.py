@@ -3,6 +3,7 @@ from Application.flask_imports import request, jsonify
 from Application.database.models import Customer, CustomerAddress
 from Application.helpers.generators import TokenGenerator
 from Application.utils.email import reset_email
+from Application.flask_imports import url_for
 
 address_fields = {
     "id": fields.Integer,
@@ -188,11 +189,12 @@ class ForgotPasswordResource(Resource):
             token_gen = TokenGenerator(user=user)
             token = token_gen.generate_password_reset_token()
             mail_ = reset_email
-            mail_.context = dict(
-                user_name=user.name,
-                token=token
-            )
+            # mail_.context = dict(
+            #     user_name=user.name,
+            #     token=token
+            # )
             mail_.recipients = [user.email]
+            mail_.text = "To reset your password visit the following link "+url_for('reset_token', token=token, _external=True)+ "\n if you did not request for this email then ignore."
             mail_.send()
 
             return jsonify(
