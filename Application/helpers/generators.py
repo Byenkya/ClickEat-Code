@@ -83,11 +83,8 @@ class TokenGenerator:
                 key=app_pkg.app.config["SECRET_KEY"],
                 algorithms=["HS256"]
             )
-            print("*************", data)
             user_type = data["user"]
             user_id = data["password_reset"]
-            print("**************", user_type)
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", user_id)
 
             if user_type == 'customer':
                 self.user = mdl.Customer.read_customer(id=user_id)

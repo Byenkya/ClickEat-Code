@@ -184,7 +184,7 @@ def forgot_password(user_type):
                 return redirect(url_for(".forgot_password", user_type=user_type))
 
             except Exception as e:
-                print("KKKKKKKKK", e)
+                print("Error whilst sending email: ", e)
 
        
 
@@ -201,14 +201,6 @@ def set_new_password(token):
         if user != None:
             user.password = form.new_password.data
             session.commit()
-            mail_  = general_email
-            mail_.context = dict(
-                user_name=user.name,
-                text = "Your password has been reset successfully."
-            )
-            mail_.title= "Password Reset"
-            mail_.recipients = [user.email]
-            mail_.send()
             flash("Your new password has been reset. Please try to log in with the new password.", "success")
         else:
             flash("Please request a new password reset. Either this link is invalid or expired.", "danger")
