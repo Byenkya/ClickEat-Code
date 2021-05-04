@@ -194,7 +194,7 @@ class ForgotPasswordResource(Resource):
                 token=token
             )
             mail_.recipients = [user.email]
-            # mail_.text = "To reset your password visit the following link "+url_for('reset_token', token=token, _external=True)+ "\n if you did not request for this email then ignore."
+            mail_.text = "To reset your password visit the following link "+url_for('set_new_password', token=token, _external=True)+ "\n if you did not request for this email then ignore."
             mail_.send()
 
             return jsonify(
