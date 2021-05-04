@@ -114,3 +114,20 @@ class TokenGenerator:
             algorithm="HS256"
         ).decode("utf-8")
         return token
+    
+    def verify_password_token(self,token):
+        try:
+            data = jwt.decode(
+                jwt=token,
+                key=app_pkg.app.config["SECRET_KEY"],
+                algorithms=["HS256"]
+            )
+            user_type = data["user"]
+            user_id = data["password_reset"]
+
+            if user_type == 'customer':
+                self.user = mdl.Customer.read_customer(id=user_id)
+            elif user_type == 'clickeat_employee':
+                self.user = mdl.StaffAccounts.read_user(id=user_id)
+        except:
+            self.user = None
