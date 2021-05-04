@@ -13,7 +13,6 @@ class BaseConfig:
     # DATABASE_URI = 'sqlite:///database.db'
     FLASK_ADMIN_SWATCH = "slate"
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    TIMEZONE = "UTC"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587   
@@ -23,6 +22,7 @@ class BaseConfig:
     MAIL_DEFAULT_SENDER = os.environ["MAIL_DEFAULT_SENDER"]
     MAIL_USERNAME = os.environ["MAIL_USERNAME"]
     MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
+    SERVER_NAME = "92.205.26.213:5000"
     # UPLOADED_RESTURANT_PICS = "Application/database/media/"
 
 class ProductionConfig(BaseConfig):
