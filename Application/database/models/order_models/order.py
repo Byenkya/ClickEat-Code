@@ -298,9 +298,10 @@ class Order(Base):
 
                             customer_care_mail_ = order_placed_email
                             customer_care_mail_.recipients = ["nelsonnahabwe95@gmail.com", "tayebwaian0@gmail.com", "willbrodmutesi@gmail.com"]
-                            customer_care_mail_.text = "The following customer: {customer} has placed an order withe reference number: {order_ref_simple_version}".format(
+                            customer_care_mail_.text = "The following customer: {customer} has placed an order with reference number: {order_ref_simple_version}.\nCustomer contact: {contact}".format(
                                 customer=customer_object.name,
-                                order_ref_simple_version=order_ref_simple_version
+                                order_ref_simple_version=order_ref_simple_version,
+                                contact=customer_object.contact
                             )
                             customer_care_mail_.send()
                             session.commit()
