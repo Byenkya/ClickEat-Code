@@ -170,17 +170,18 @@ def forgot_password(user_type):
 
         if user is not None:
             try:
-                token_gen = TokenGenerator(user=user)
-                token = token_gen.generate_password_reset_token()
-                mail_ = reset_email
-                mail_.context = dict(
-                    user_name=user.name,
-                    token=token
-                )
-                mail_.recipients = [user.email]
-                mail_.send()  
-                flash("If you provided a right email, check your email inbox for password reset link.", "success")
-                return redirect(url_for(".forgot_password", user_type=user_type))
+                with app.app_context():
+                    token_gen = TokenGenerator(user=user)
+                    token = token_gen.generate_password_reset_token()
+                    mail_ = reset_email
+                    mail_.context = dict(
+                        user_name=user.name,
+                        token=token
+                    )
+                    mail_.recipients = [user.email]
+                    mail_.send()  
+                    flash("If you provided a right email, check your email inbox for password reset link.", "success")
+                    return redirect(url_for(".forgot_password", user_type=user_type))
 
             except Exception as e:
                 print("KKKKKKKKK", e)
