@@ -215,7 +215,7 @@ class Order(Base):
                 if order.customer.email:
                     mail_ = order_cancelled_email
                     mail_.recipients = [order.customer.email]
-                    mail_.text = kwargs.get("reason")
+                    mail_.text = "You have cancelled the following order:{order}, because of this reason: \n{reason}".format(order=order.order_ref_simple_version, reason=order.kwargs.get("reason"))
                     mail_.send()
                     session.commit()
                     return True
@@ -294,6 +294,15 @@ class Order(Base):
                             )
                             mail_.send()
 
+                            #customer_care email
+
+                            customer_care_mail_ = order_placed_email
+                            customer_care_mail_.recipients = ["nelsonnahabwe95@gmail.com", "tayebwaian0@gmail.com", "willbrodmutesi@gmail.com"]
+                            customer_care_mail_.text = "The following customer: {customer} has placed an order withe reference number: {order_ref_simple_version}".format(
+                                customer=customer_object.name,
+                                order_ref_simple_version=order_ref_simple_version
+                            )
+                            customer_care_mail_.send()
                             session.commit()
                             return True
                         
