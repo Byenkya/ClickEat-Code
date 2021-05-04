@@ -1,0 +1,14 @@
+{% extends 'home_base.html' %}
+{% from 'form_helper.html' import rendermdfield %}
+{% block body %}
+    <div class="container py-5 mx-auto my-5">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6 mx-auto">
+            <div class="h5">Enter your email for the account whose password you would like to reset.</div>
+            <form role="form" method="POST" action="{{url_for('forgot_password', user_type=user_type)}}">
+                {{form.hidden_tag()}}
+                {{ rendermdfield(form.email) }}
+                {{ form.submit(class="btn-primary btn-lg btn-block border-0 rounded-0 z-depth-1") }}
+            </form>
+        </div>
+    </div>
+{% endblock %}
