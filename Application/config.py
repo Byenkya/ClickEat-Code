@@ -22,7 +22,7 @@ class BaseConfig:
     MAIL_DEFAULT_SENDER = os.environ["MAIL_DEFAULT_SENDER"]
     MAIL_USERNAME = os.environ["MAIL_USERNAME"]
     MAIL_PASSWORD = os.environ['MAIL_PASSWORD']
-    SERVER_NAME = "92.205.26.213:5000"
+    SERVER_NAME = "0.0.0.0:5000"
     # UPLOADED_RESTURANT_PICS = "Application/database/media/"
 
 class ProductionConfig(BaseConfig):
