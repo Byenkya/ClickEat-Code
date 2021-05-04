@@ -56,7 +56,7 @@ class SendEmails:
 reset_email = SendEmails(
     title="Reset Password",
     recipients=None,
-    template="emails/password_reset.html",
+    template=None,
     context=None
 )
 

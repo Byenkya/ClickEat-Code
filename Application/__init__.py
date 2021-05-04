@@ -173,10 +173,11 @@ def forgot_password(user_type):
                 token_gen = TokenGenerator(user=user)
                 token = token_gen.generate_password_reset_token()
                 mail_ = reset_email
-                mail_.context = dict(
-                    user_name=user.name,
-                    token=token
-                )
+                # mail_.context = dict(
+                #     user_name=user.name,
+                #     token=token
+                # )
+                mail_.text = "To reset your password visit the following link "+url_for('set_new_password', token=token, _external=True)+ "\n if you did not request for this email then ignore."
                 mail_.recipients = [user.email]
                 mail_.send()  
                 flash("If you provided a right email, check your email inbox for password reset link.", "success")
