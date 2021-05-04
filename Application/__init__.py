@@ -38,7 +38,7 @@ celery.__init__(app)
 celery.config_from_object(config.CeleryConfig)
 
 #create the database
-from Application.database.initialize_database import Base, engine, session
+from Application.database.initialize_database import Base, engine, session, pwd_context
 from Application.database.models import *
 
 def init_db():  
@@ -199,7 +199,11 @@ def set_new_password(token):
         token_gen.verify_password_token(token)
         user = token_gen.user
         if user != None:
-            user.password = form.new_password.data
+            customer = Customer.read_customer(id=user.id)
+            if customer:
+                customer.password = form.new_password.data
+            else:
+                user.password = pwd_context.hash(form.new_password.data)
             session.commit()
             flash("Your new password has been reset. Please try to log in with the new password.", "success")
         else:
