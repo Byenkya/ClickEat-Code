@@ -1,6 +1,6 @@
 from Application.flask_imports import Flask, make_response, abort
 from Application import config
-from flask_migrate import Migrate
+# from flask_migrate import Migrate, MigrateCommand, Manager
 from flask_restful import Api
 import Application.extensions as ext
 
@@ -18,8 +18,7 @@ login_manager.init_app(app)
 login_manager.login = "info"
 
 
-app.config.from_object(config.DevelopmentConfig)
-
+app.config.from_object(config.ProductionConfig)
 
 #flask mail
 mail = ext.mail
@@ -41,9 +40,18 @@ celery.config_from_object(config.CeleryConfig)
 from Application.database.initialize_database import Base, engine, session, pwd_context
 from Application.database.models import *
 
+# class db(object):
+#     engine = engine
+#     metadata = Base.metadata
+
 def init_db():  
     Base.metadata.bind = engine
     Base.metadata.create_all()
+
+#flask migrate
+# migrate = Migrate(app, db)
+# manager = Manager(app)
+# manager.add_command('db', MigrateCommand)
 
 init_db()
 
@@ -210,3 +218,38 @@ def set_new_password(token):
             flash("Please request a new password reset. Either this link is invalid or expired.", "danger")
     context = dict(form=form,token=token)
     return render_template("new_password.html",**context)
+
+app.config['LOG_FILE'] = 'application.log'
+
+RECEPIENTS = ['jbyenkyaaaron@gmail.com', 'tayebwaian0@gmail.com', 'willbrodmutesi@gmail.com', 'charlitrix1@gmail.com']
+
+if not app.debug:
+    import os
+    import logging
+    from logging import FileHandler, Formatter
+    from logging.handlers import SMTPHandler
+    file_handler = FileHandler(app.config['LOG_FILE'])
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+    mail_handler = SMTPHandler(
+        ("smtp.gmail.com", 587), os.environ["MAIL_USERNAME"], RECEPIENTS,
+        'Error occurred in your ClickEat application',
+        (os.environ["MAIL_USERNAME"], os.environ['MAIL_PASSWORD']), secure=()
+    )
+
+    mail_handler.setLevel(logging.ERROR)
+    app.logger.addHandler(mail_handler)
+
+    for handler in [file_handler, mail_handler]:
+        handler.setFormatter(
+            Formatter(
+                '%(asctime)s %(levelname)s: %(message)s '
+                '[in %(pathname)s: %(lineno)d]'
+            )
+        )
+
+@app.errorhandler(404)
+def page_not_found(e):
+    app.logger.error(e)
+    return render_template('404.html'), 404

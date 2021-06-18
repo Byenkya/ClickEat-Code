@@ -3,7 +3,7 @@ FLASK_ENV=development
 MAIL_USERNAME="customercare.clickeat@gmail.com"
 MAIL_DEFAULT_SENDER="customercare.clickeat@gmail.com"
 MAIL_PASSWORD="yqcpydmypsourkxv"
-DATABASE_USER="click_eat_user"
+DATABASE_"
 DATABASE_USER_PASSWORD="5FJc_?]-JSCsOMfDCcU1xhJGTsiSN^pr"
 DATABASE_ADDRESS="localhost:3306"
 
