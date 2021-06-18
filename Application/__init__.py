@@ -248,8 +248,3 @@ if not app.debug:
                 '[in %(pathname)s: %(lineno)d]'
             )
         )
-
-@app.errorhandler(404)
-def page_not_found(e):
-    app.logger.error(e)
-    return render_template('admin/login.html'), 404
