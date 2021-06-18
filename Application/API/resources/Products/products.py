@@ -93,7 +93,6 @@ class CartOperationApi(Resource):
 #Drinks
 class DrinksSubCatApi(Resource):  
     def get(self):
-        print("TTTTTTTTTTTTTTTTTTTTTttttttdddddddddddddddddd",jsonify(drinksSubCat = [sub_cat.serialize() for sub_cat in SubCategory.read_drink_sub_categories()]))
         return jsonify(drinksSubCat = [sub_cat.serialize() for sub_cat in SubCategory.read_drink_sub_categories()])
 
 #Home products
