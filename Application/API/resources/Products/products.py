@@ -186,10 +186,9 @@ class AllProductsAPI(Resource):
 #top selling products
 class TopSellingProductsAPI(Resource):
     def get(self):
+        all_products = [product.serialize() for product in Products.read_products()]
         products = TopSellingProducts.read_all_top_discount_products()
-        if products:
-            return products
-        else:
-            return None
+
+        return {"all_products": all_products, "top_selling": products}
 
         
