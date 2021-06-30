@@ -26,6 +26,8 @@ with warnings.catch_warnings():
     admin.add_view(admin_models.SubCategoryView(db.SubCategory, session, category="Products"))
     admin.add_view(admin_models.BrandView(db.Brand, session, category="Products"))
     admin.add_view(admin_models.CartView(db.Cart, session, category="Products"))
+    admin.add_view(admin_models.ProductDiscountsView(db.ProductDiscounts, session, category="Products"))
+    admin.add_view(admin_models.TopSellingProductsView(db.TopSellingProducts, session, category="Products"))
     admin.add_view(admin_models.CommentsView(db.Comments, session, category="Products"))
     admin.add_view(admin_models.RateView(db.Rate, session, category="Products"))
     admin.add_view(admin_models.SalesView(db.Sales, session, category="Products"))

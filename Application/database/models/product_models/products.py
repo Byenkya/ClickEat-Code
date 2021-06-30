@@ -1,13 +1,17 @@
 from Application.database.sqlalchemy_imports import (Column, Integer, String, ForeignKey, relationship, BigInteger,
-func)
+func, Boolean, Float)
 from Application.database.initialize_database import Base, session
 from Application.utils import LazyLoader
 from random import sample
 from Application.flask_imports import jsonify
 from Application.database.models import HomeImages
+import math
 
 #lazy loading dependencies.
 brnd = LazyLoader("Application.database.models.product_models.brand")
+pdtds = LazyLoader("Application.database.models.product_models.product_discounts")
+subCat = LazyLoader("Application.database.models.product_models.subcategory")
+cat = LazyLoader("Application.database.models.product_models.category")
 
 class Products(Base):
     __tablename__ = "products"
@@ -17,13 +21,19 @@ class Products(Base):
     product_picture =  Column(String(100), nullable=False)
     description = Column(String(1000), nullable=False)
     price = Column(BigInteger, nullable=False)
-    promotional_price = Column(BigInteger, nullable=True)
+    selling_price = Column(BigInteger, nullable=False, default=0)
+    # promotional_price = Column(BigInteger, nullable=True)
+    promotional_price_set = Column(Boolean, default=False, nullable=False)
+    commission_fee = Column(Float, default=0.0)
     resturant_id = Column(Integer, ForeignKey("resturant.id"), nullable=True)
     resturant = relationship("Resturant", backref="products")
     brand_id = Column(Integer, ForeignKey("brand.brand_id"), index=True, nullable=False)
     brand = relationship("Brand", backref="products")
     sub_category_id = Column(Integer, ForeignKey("sub_category.sub_category_id"), index=True, nullable=False)
     sub_category = relationship("SubCategory", backref="products")
+    approved = Column(Boolean, nullable=False, default=False)
+    suspend = Column(Boolean, nullable=False, default=False)
+    headsup = Column(String(100), nullable=False, default="clickEat") 
 
     def __repr__(self):
         return str(self.name)
@@ -63,14 +73,45 @@ class Products(Base):
                 "name": self.name,
                 "product_picture": self.product_picture,
                 "description": self.description,
-                "price": self.price,
+                "price": self.product_price,
                 "resturant_id": self.resturant_id,
                 "resturant": self.resturant.business_name,
                 "brand_id": self.brand_id,
                 "brand": self.brand.name,
                 "sub_category_id": self.sub_category_id,
-                "sub_category": self.sub_category.name
+                "sub_category": self.sub_category.name,
+                "promotional_price_set": self.promotional_price_set,
+                "promotional_price": self.promotional_price,
+                "headsup": self.headsup
             }
+
+    @property
+    def product_price(self):
+        if self.commission_fee != 0.0:
+            product_price = self.commission_amount + self.price
+            return product_price
+        else:
+            return self.price
+
+    @property
+    def promotional_price(self):
+        if self.promotional_price_set:
+            price = session.query(pdtds.ProductDiscounts).filter_by(product_id=self.product_id).first()
+            return (price.price+self.commission_amount) if price else None
+        else:
+            return None 
+
+    @property
+    def commission_amount(self):
+        commission_amount = ((self.commission_fee)/100)*self.price
+        return math.ceil(commission_amount)
+
+    @classmethod
+    def read_products(cls):
+        try:
+            return cls.query.all()
+        except:
+            session.rollback()
 
     @classmethod
     def read_product(cls,id):
@@ -84,7 +125,11 @@ class Products(Base):
     @classmethod
     def read_product_by_sub_cat(cls, sub_category_id):
         try:
-            return cls.query.filter_by(sub_category_id=sub_category_id).first() 
+            product = cls.query.filter_by(sub_category_id=sub_category_id).first() 
+            if product.approved and product.suspend != True:
+                return product
+            else:
+                return None
         except:
             session.rollback()
 
@@ -108,11 +153,11 @@ class Products(Base):
         try:
             #home products
             home_products = []
-            products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite], 4)
-            drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all()], 4)
+            products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite and product.approved and product.suspend != True], 2)
+            drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all() if product.approved and product.suspend != True], 2)
 
             home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":products})
-            home_products.append({"id":2,"title":"Most Selling Drinks", "products":drinks })
+            home_products.append({"id":2,"title":"Drinks & Beverages", "products":drinks })
 
             return home_products
 
@@ -137,7 +182,7 @@ class Products(Base):
             try:
                 products_based_on_sub_cat_dict = {}
                 product_based_on_sub_cat_list = []
-                restaurant_products = cls.query.filter_by(**kwargs).all()
+                restaurant_products = [product for product in cls.query.filter_by(**kwargs).all() if product.approved and product.suspend != True]
 
                 for product in restaurant_products:
                     if f"{product.sub_category}" in products_based_on_sub_cat_dict:
@@ -150,7 +195,6 @@ class Products(Base):
                 for sub_cat,products in products_based_on_sub_cat_dict.items():
                     banch = {"sub_category": sub_cat, "products": products}
                     product_based_on_sub_cat_list.append(banch)
-
 
                 return product_based_on_sub_cat_list
 

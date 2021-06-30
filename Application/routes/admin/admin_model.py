@@ -184,24 +184,52 @@ class ProductsView(CustomModelView):
 
         return form_class
 
-    def update_model(self,form, model):
-        product = db.Products.read_product(model.product_id)
-        try:
-            from random import randint      
-            filename = form.product_picture.data
-            file_path = os.path.join(product_images, model.product_picture)
-            os.remove(file_path)
-            new_image_name = "-".join(["clickEat",str(randint(1000000,10000000)),filename.filename])
-            new_image_path = os.path.join(product_images, new_image_name)
-            i = Image.open(filename)
-            new_image =  i.resize((500,500))
-            new_image.save(new_image_path)
-            product.product_picture = new_image_name
-            session.commit()
-            flash("Product updated successfully!!")
+    # def update_model(self,form, model):
+    #     product = db.Products.read_product(model.product_id)
+    #     try:
+    #         from random import randint      
+    #         filename = form.product_picture.data
+    #         file_path = os.path.join(product_images, model.product_picture)
+    #         os.remove(file_path)
+    #         new_image_name = "-".join(["clickEat",str(randint(1000000,10000000)),filename.filename])
+    #         new_image_path = os.path.join(product_images, new_image_name)
+    #         i = Image.open(filename)
+    #         new_image =  i.resize((500,500))
+    #         new_image.save(new_image_path)
+    #         product.product_picture = new_image_name
+    #         session.commit()
+    #         flash("Product updated successfully!!")
 
-        except Exception as e:
-            flash(str(e))
+    #     except Exception as e:
+    #         flash(str(e))
+
+class ProductDiscountsView(CustomerView):
+    can_delete = True
+    can_view_details = True
+    can_export = True
+    can_create = True
+
+    column_searchable_list = ("product_id",)
+    column_filters = ("price",)
+
+    def scaffold_form(self):
+        form_class = super(ProductDiscountsView, self).scaffold_form()
+
+        return form_class
+
+class TopSellingProductsView(CustomerView):
+    can_delete = True
+    can_view_details = True
+    can_export = True
+    can_create = True
+
+    column_searchable_list = ("product_id",)
+    column_filters = ("product_id",)
+
+    def scaffold_form(self):
+        form_class = super(TopSellingProductsView, self).scaffold_form()
+
+        return form_class
 
 class CategoryView(CustomModelView):
     can_delete = True

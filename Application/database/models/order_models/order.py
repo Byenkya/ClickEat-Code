@@ -16,6 +16,7 @@ pym = LazyLoader("Application.database.models.payment_models")
 pdts = LazyLoader("Application.database.models.product_models")
 delivery_detials = LazyLoader("Application.database.models.order_models.delivery_details")
 sales = LazyLoader("Application.database.models.product_models.sales")
+cart = LazyLoader("Application.database.models.product_models.cart")
 
 
 #click_mysql_password = 5FJc_?]-JSCsOMfDCcU1xhJGTsiSN^pr

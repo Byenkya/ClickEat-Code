@@ -1,7 +1,8 @@
 from flask_restful import Resource, fields, marshal_with, reqparse
 from Application.flask_imports import request, jsonify
-from Application.database.models import Products, Cart, Customer, SubCategory, Brand, HomeImages
+from Application.database.models import Products, Cart, Customer, SubCategory, Brand, HomeImages, TopSellingProducts, Category
 from Application.database.initialize_database import session
+from random import sample
 
 product_fields = {
     "product_id": fields.Integer,
@@ -37,7 +38,6 @@ class AddToCartApi(Resource):
         product_image = request.json["product_image"]
         unit_price = request.json["unit_price"]
         quantity = request.json["quantity"]
-
         customer = Customer.read_customer(id=customer_id)
 
         if customer:
@@ -98,7 +98,9 @@ class DrinksSubCatApi(Resource):
 #Home products
 class HomeProductsResource(Resource):
     def get(self):
+        fruits_vegetables = sample([product.serialize() for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all()], 2)
         home_products = Products.home_products()
+        home_products.append({"id": 3, "title":"Fruits & Vegetables", "products": fruits_vegetables})
         home_sub_cats_list = []
         sub_cats = SubCategory.read_sub_cat()
 
@@ -112,6 +114,23 @@ class HomeProductsResource(Resource):
                 home_sub_cats_list.append(home_sub_cats)
             
         return {"home_images_products": home_products,"home_images": HomeImages.home_images(), "sub_cats": home_sub_cats_list}
+
+#read subcategories
+class FetchAllSubCategoriesApi(Resource):
+    def get(self):
+        home_sub_cats_list = []
+        sub_cats = SubCategory.read_sub_cat()
+        for sub in sub_cats:
+            product_image = Products.read_product_by_sub_cat(sub["sub_category_id"])
+            if product_image:
+                home_sub_cats = {}
+                home_sub_cats['id'] = sub["sub_category_id"]
+                home_sub_cats['subCatImage'] = product_image.product_picture 
+                home_sub_cats['name'] = sub["name"]
+                home_sub_cats_list.append(home_sub_cats)
+
+        return home_sub_cats_list
+
 
 #searched Products
 searchStringsArgs = reqparse.RequestParser()
@@ -139,6 +158,17 @@ class SearchedProductsResource(Resource):
                     ).order_by(Products.product_id).all()
         return [product.serialize() for product in products]
 
+#products based on category
+categoryProductsStringsArgs = reqparse.RequestParser()
+categoryProductsStringsArgs.add_argument("categoryName", type=str)
+class CategoryProductsApI(Resource):
+    def get(self):
+        args = categoryProductsStringsArgs.parse_args()
+        if args.get("categoryName", None):
+            categoryName = args["categoryName"]
+            products = [product.serialize() for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all()]
+            return products
+
 #sub_category_products
 class SubCategoryProductsApI(Resource):
     def get(self, id):
@@ -146,5 +176,20 @@ class SubCategoryProductsApI(Resource):
     
         return [product.serialize() for product in products]
 
+#other products
+class AllProductsAPI(Resource):
+    def get(self):
+        products = Products.read_products()
+
+        return [product.serialize() for product in products]
+
+#top selling products
+class TopSellingProductsAPI(Resource):
+    def get(self):
+        products = TopSellingProducts.read_all_top_discount_products()
+        if products:
+            return products
+        else:
+            return None
 
         

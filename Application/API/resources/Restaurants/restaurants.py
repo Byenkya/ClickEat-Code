@@ -6,4 +6,4 @@ class RestaurantApi(Resource):
     def get(self):
         rests = Resturant.read_restaurants()
 
-        return jsonify(restaurants = [restaurant.serialize() for restaurant in rests])
+        return jsonify(restaurants = [restaurant.serialize() for restaurant in rests if restaurant.approved])

@@ -13,7 +13,7 @@ class Resturant(Base):
     id = Column(Integer, primary_key=True)
     business_name = Column(String(100), nullable=False)
     business_profile_picture = Column(String(100), nullable=False)
-    deals_in = Column(Enum("drinks", "food"))
+    deals_in = Column(Enum("drinks", "food", "Vegetables$Fruits"))
     address = Column(String(255), nullable=False)
     email = Column(String(50), nullable=False)
     contact = Column(String(13), unique=True, nullable=False)
@@ -25,8 +25,8 @@ class Resturant(Base):
     admin_email = Column(String(50), nullable=False)
     admin_telephone = Column(String(13), unique=True, nullable=False)
     date_of_registration = Column(DateTime, default=datetime.now(), nullable=False)
-    favourite = Column(Boolean, nullable=False, default=True)
-
+    favourite = Column(Boolean, nullable=False, default=False)
+    approved = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return self.business_name

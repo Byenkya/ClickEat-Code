@@ -80,6 +80,7 @@ class Cart(Base):
     def total(self):
         return self.quantity * self.unit_price
 
+
     @classmethod
     def read_customer_cart_items(cls, customer_id):
         try:
@@ -97,7 +98,10 @@ class Cart(Base):
         try:
             for item in cart_items:
                 product = pdts.Products.read_all_products(return_query=True, product_id=item.product_id)
-                item.unit_price = product.price
+                if product.promotional_price_set:
+                    item.unit_price = product.promotional_price
+                else:
+                    item.unit_price = product.price
             session.commit()
 
             customer_cart_items = {"cart_items": [cart_item.serialize() for cart_item in cart_items]}
