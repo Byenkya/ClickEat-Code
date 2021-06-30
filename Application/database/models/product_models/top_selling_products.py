@@ -19,7 +19,7 @@ class TopSellingProducts(Base):
 
             if top_discounts_ids:
                 for product in top_discounts_ids:
-                    pdt = pdts.Products.read_product(id=product[0].product_id)
+                    pdt = pdts.Products.read_product(id=product.product_id)
                     if pdt:
                         products.append(pdt)
 
