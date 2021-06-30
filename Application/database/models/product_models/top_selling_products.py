@@ -15,7 +15,7 @@ class TopSellingProducts(Base):
     def read_all_top_discount_products(cls):
         try:
             products = []
-            top_discounts_ids = session.query(cls).all()
+            top_discounts_ids = cls.query.all()
 
             if top_discounts_ids:
                 for product in top_discounts_ids:
