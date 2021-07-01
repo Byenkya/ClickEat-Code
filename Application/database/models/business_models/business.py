@@ -82,7 +82,9 @@ class Resturant(Base):
     @classmethod
     def read_restaurants(cls):
         try:
-            return cls.query.filter_by(deals_in="food").all()
+            food = cls.query.filter_by(deals_in="food").all()
+            fruits_veggie = cls.query.filter_by(deals_in="").all()
+            return food + fruits_veggie
         except:
             session.rollback()
 
