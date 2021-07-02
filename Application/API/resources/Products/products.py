@@ -112,8 +112,15 @@ class HomeProductsResource(Resource):
                 home_sub_cats['subCatImage'] = product_image.product_picture 
                 home_sub_cats['name'] = sub["name"]
                 home_sub_cats_list.append(home_sub_cats)
+
+        all_products = [product.serialize() for product in Products.read_products() if product.approved and product.suspend != True]
             
-        return {"home_images_products": home_products,"home_images": HomeImages.home_images(), "sub_cats": home_sub_cats_list}
+        return {
+                "home_images_products": home_products,
+                "home_images": HomeImages.home_images(), 
+                "sub_cats": home_sub_cats_list,
+                "all_products": all_products
+            }
 
 #read subcategories
 class FetchAllSubCategoriesApi(Resource):
@@ -186,9 +193,7 @@ class AllProductsAPI(Resource):
 #top selling products
 class TopSellingProductsAPI(Resource):
     def get(self):
-        all_products = [product.serialize() for product in Products.read_products() if product.approved and product.suspend != True]
         products = TopSellingProducts.read_all_top_discount_products()
 
-        return {"all_products": all_products, "top_selling": products}
-
+        return products
         
