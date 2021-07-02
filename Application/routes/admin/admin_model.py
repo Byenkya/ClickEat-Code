@@ -101,7 +101,7 @@ class ResturantView(CustomModelView):
             label = "Resturant Profile Picture",
             base_path = business_storage,
             allowed_extensions = ["png", "jpg", "jpeg"],
-            max_size = (500,500, True),
+            max_size = (250,250, True),
             url_relative_path="business_profile_picture/"
         )
 
@@ -178,7 +178,7 @@ class ProductsView(CustomModelView):
             label = "Product Image",
             base_path = product_images,
             allowed_extensions = ["png", "jpg", "jpeg"],
-            max_size = (500,500, True),
+            max_size = (250,250, True),
             url_relative_path="product_images/"
         )
 
@@ -383,7 +383,7 @@ class CourierView(CustomModelView):
             label = "Courier Profile Picture",
             base_path = courier_images,
             allowed_extensions = ["png", "jpg", "jpeg"],
-            max_size = (500,500, True),
+            max_size = (250,250, True),
             url_relative_path="product_images/"
         )
 
