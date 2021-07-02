@@ -21,7 +21,8 @@ class TopSellingProducts(Base):
                 for product in top_discounts_ids:
                     pdt = pdts.Products.read_product(id=product.product_id)
                     if pdt:
-                        products.append(pdt)
+                        if pdt.approved and pdt.suspend != True:
+                            products.append(pdt)
 
                 return [product.serialize() for product in products]
 
