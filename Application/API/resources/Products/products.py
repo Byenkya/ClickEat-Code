@@ -114,12 +114,13 @@ class HomeProductsResource(Resource):
                 home_sub_cats_list.append(home_sub_cats)
 
         all_products = [product.serialize() for product in Products.read_products() if product.approved and product.suspend != True]
-            
+        top_selling_products = TopSellingProducts.read_all_top_discount_products()    
         return {
                 "home_images_products": home_products,
                 "home_images": HomeImages.home_images(), 
                 "sub_cats": home_sub_cats_list,
-                "all_products": all_products
+                "all_products": all_products,
+                "top_selling_products": top_selling_products
             }
 
 #read subcategories
