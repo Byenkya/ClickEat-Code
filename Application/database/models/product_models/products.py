@@ -21,7 +21,9 @@ class Products(Base):
     product_picture =  Column(String(100), nullable=False)
     description = Column(String(1000), nullable=False)
     price = Column(BigInteger, nullable=False)
+    buying_price = Column(BigInteger, nullable=False, default=0)
     selling_price = Column(BigInteger, nullable=False, default=0)
+    served_with = Column(String(1000), nullable=False, default="none")
     # promotional_price = Column(BigInteger, nullable=True)
     promotional_price_set = Column(Boolean, default=False, nullable=False)
     commission_fee = Column(Float, default=0.0)
@@ -82,7 +84,8 @@ class Products(Base):
                 "sub_category": self.sub_category.name,
                 "promotional_price_set": self.promotional_price_set,
                 "promotional_price": self.promotional_price,
-                "headsup": self.headsup
+                "headsup": self.headsup,
+                "served_with": self.served_with
             }
 
     @property

@@ -21,6 +21,7 @@ class Cart(Base):
     quantity = Column(BigInteger, nullable=False)
     unit_price = Column(BigInteger, nullable=False)
     commision_amount = Column(BigInteger, nullable=True)
+    served_with = Column(String(1000), nullable=False, default="none")
     date = Column(DateTime, default=datetime.now(), nullable=False)
     is_ordered = Column(Boolean, default=False, nullable=False)
     customer_id = Column(Integer, ForeignKey("customer.id"), index=True, nullable=False)
@@ -71,6 +72,7 @@ class Cart(Base):
             "product_image": self.product_image,
             "unit_price": self.unit_price,
             "quantity": self.quantity,
+            "served_with": self.served_with,
             "total": self.total,
             "total_quantity": int(self.cart_total_quantity_or_item_count(self.customer_id)),
             "cart_total_amount": int(self.cart_total_amount(self.customer_id))
