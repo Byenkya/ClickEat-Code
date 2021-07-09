@@ -38,6 +38,9 @@ class AddToCartApi(Resource):
         product_image = request.json["product_image"]
         unit_price = request.json["unit_price"]
         quantity = request.json["quantity"]
+        served_with = "none"
+        if "served_with" in request.json:
+            served_with = request.json["served_with"]
         customer = Customer.read_customer(id=customer_id)
 
         if customer:
@@ -47,7 +50,8 @@ class AddToCartApi(Resource):
                 product_name=product_name,
                 product_image=product_image,
                 unit_price=unit_price,
-                quantity=quantity
+                quantity=quantity,
+                served_with=served_with
             )
 
             if cart_item:

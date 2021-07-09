@@ -61,10 +61,11 @@
                     <table class="table">
                       <thead class="thead-dark">
                         <tr>
+                          <th scope="col">Product Image</th>
                           <th scope="col">Product</th>
-                          <th scope="col"></th>
                           <th scope="col" class="text-nowrap">Hotel/Restaurant</th>
                           <th scope="col">Quantity</th>
+                          <th scope="col" colspan="2" class="text-nowrap">Served With</th>
                           <th scope="col" class="text-nowrap">Unit Price</th>
                           <th scope="col">Total</th>
                         </tr>
@@ -76,6 +77,17 @@
                             <td>{{item.product_name}}</td>
                             <td>{{item.read_item_shop_details|safe}}</td>
                             <td>{{item.quantity}}</td>
+                            {% if item.served_with == "none" %}
+                              <td colspan="2">------</td>
+                            {% else %}
+                            <td colspan="2">
+                                <ul>
+                                  {% for item in item.served_with.split(",")%}
+                                    <li>{{item}}</li>
+                                  {%endfor%}
+                                </ul>
+                            </td>
+                            {% endif %}
                             <td scope="row" class="text-nowrap">{{ "{:,} Ugx".format(item.unit_price) }}</td>
                             <td scope="row" class="text-nowrap">{{ "{:,} Ugx".format((item.quantity * item.unit_price))}}</td>
                           </tr>

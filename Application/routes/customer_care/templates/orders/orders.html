@@ -34,7 +34,7 @@
                         <tbody>
                             {% for order in pagination.items %}
                                 <tr>
-                                    <th class="text-nowrap">{{order.order_ref_small}}</th>
+                                    <th class="text-nowrap">{{order.order_ref_simple_version}}</th>
                                     <th>{{order.customer.name|title}}</th>
                                     <td>{{order.order_date.strftime('%m/%d/%Y')}}</td>
                                     <td  class="text-nowrap">{{"{:,} Ugx".format(order.read_order_total_amount)}}</td>

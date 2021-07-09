@@ -40,6 +40,7 @@ class Cart(Base):
             self.product_image = kwargs.get("product_image")
             self.unit_price = kwargs.get("unit_price")
             self.quantity = kwargs.get("quantity")
+            self.served_with = kwargs.get("served_with", "none")
             item_exists = self.query.filter_by(
                 customer_id = self.customer_id,
                 product_id = self.product_id,
@@ -101,7 +102,10 @@ class Cart(Base):
             for item in cart_items:
                 product = pdts.Products.read_all_products(return_query=True, product_id=item.product_id)
                 if product.promotional_price_set:
-                    item.unit_price = product.promotional_price
+                    if product.promotional_price:
+                        item.unit_price = product.promotional_price
+                    else:
+                        item.unit_price = product.price
                 else:
                     item.unit_price = product.price
             session.commit()
