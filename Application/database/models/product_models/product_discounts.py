@@ -29,15 +29,15 @@ class ProductDiscounts(Base):
             if self.is_scheduled:
                 product_discount = self.read_product_discount(self.product_id)
 
-                if product:
+                if product_discount:
                     kwargs["products_discount"] = product_discount
                     return self.update_promotional_price(**kwargs)
                 else:
-                    product = pdts.Products.read_product(product_id=self.product_id)
+                    product = pdts.Products.read_product(self.product_id)
                     if product and product.price > self.price:
                         product.promotional_price_set = True
                         session.add(self)
-                        session.commit(self)
+                        session.commit()
                     else:
                         return False
 
@@ -79,7 +79,7 @@ class ProductDiscounts(Base):
     @classmethod
     def remove_promotion_price(cls, product_id):
         try:
-            product = pdts.Products.read_product(product_id=product_id)
+            product = pdts.Products.read_product(product_id)
             if product and cls.query.filter_by(product_id=product_id).delete():
                 product.promotional_price_set = False
                 session.commit()

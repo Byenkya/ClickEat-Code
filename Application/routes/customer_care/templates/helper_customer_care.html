@@ -1,3 +1,63 @@
+{%macro render_product(id ,shop_id, name, product_picture, price, brand, promo_price,heads_up, approved, suspended)%}
+<div class="card shadow-sm mb-3" style="width:11rem">
+  <a href="{{ url_for('customer_care.rest_product_detail', product_id=id) }}">
+	  <img src="{{url_for ('static',filename='product_images/' + product_picture ) }}" alt="" height="150px;" width="100%">
+	</a>
+  <div class="card-body pt-0 pb-3">
+    <!-- <a href="#" class="invisible card-img-top"><img src="{{url_for ('static',filename='product_images/' +  product_picture ) }}" alt="" class="img-fluid"></a> -->
+    <h6 class="card-title mt-2 mb-1 text-center" style="font-size: small;">
+        <b>{{ name }}</b>
+    </h6>
+    <div class="text-center" style="font-size: 1.1rem;">
+    {% if promo_price %}
+      <p class="card-text mb-1"> 
+        <del style="font-size: small;" class="text-danger">{{price}}</del>
+        <sup>  
+          <span class="badge deep-orange z-depth-0 font-size-xs rounded-0">-{{ ((price-promo_price)/price * 100)|round }}%</span>
+        </sup>
+      </p>
+      <p class="card-text mb-2">
+        <b>{{promo_price}}</b>
+      </p>
+    {% else %}
+      <p class="card-text mb-0">
+        {{price}}
+      </p>
+    {% endif %}
+    
+    </div>
+    
+  </div>
+  {%if not approved %}
+    <div class="ribbon sale" style="font-size: small;">
+      <div class="theribbon bg-danger" style="width:8rem;">
+        <span><small>Not Approved</small></span>
+      </div>
+      <div class="ribbon-background"></div>
+    </div>
+  {%elif suspended %}
+    <div class="ribbon sale" style="font-size: small;">
+      <div class="theribbon bg-danger" style="width:8rem;">
+        <span><small>Not Active</small></span>
+      </div>
+      <div class="ribbon-background"></div>
+    </div>
+  {%else%}
+	{% if heads_up != "clickEat"%}
+		<div class="ribbon sale" style="font-size: small;">
+		<div class="theribbon bg-success"  style="width:9rem;"><span><small>{{heads_up}}</span></small></span></div>
+		<div class="ribbon-background"></div>
+		</div>
+	{% endif %}
+  {%endif%}
+  <div class="card-footer" align="center">
+    <a href="{{ url_for('customer_care.rest_product_detail', product_id=id) }}" class="btn" style="color: purple;">
+		View Details
+	</a>
+  </div>
+</div>
+{%endmacro%}  
+
 {%macro sidebar(page)%}
 
 	<div class="card sidebar-menu">
@@ -8,7 +68,7 @@
 	    	<!-- <a href="#" class="nav-link {% if page=='order_returns'%}active{%endif%}"><i class="fa fa-bicycle mr-2"></i>Order Returns</a> -->
 	    	<a href="{{url_for('customer_care.couriers')}}" class="nav-link {% if page=='couriers'%}active{%endif%}"><i class="fa fa-bicycle mr-2"></i>Couriers</a>
 	    	<a href="{{url_for('customer_care.custcare_shops', shop_state='all')}}" class="nav-link {% if page=='shops'%}active{%endif%}"><i class="fa fa-user mr-2"></i>Restaurants</a>
-	    	<!-- <a href="#" class="nav-link {% if page=='messages'%}active{%endif%}"><i class="fa fa-envelope mr-2"></i>Messages <span class="badge badge-pill badge-danger">20</span></a> -->
+	    	<a href="{{url_for('customer_care.add_product')}}" class="nav-link {% if page=='add_product'%}active{%endif%}"><i class="fa fa-plus mr-2"></i>Add Product</a>
 	    	<a href="{{url_for('customer_care.account_settings')}}" class="nav-link {% if page=='settings'%}active{%endif%}"><i class="fa fa-cog mr-2"></i>Settings</a></ul>
 	    	<a href="{{url_for('customer_care.logout')}}" class="nav-link"><i class="fa fa-sign-out mr-2"></i>Logout</a></ul>
 	    </div>
@@ -25,6 +85,18 @@
 		<a class="nav-link {% if page=='prepared_orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='prepared_orders')}}">Prepared</a>
 		<a class="nav-link {% if page=='Recieved Orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='received_orders')}}">Received Orders</a>
 		<a class="nav-link {% if page=='cancelled'%}active{%endif%}" href="{{url_for('customer_care.cancelled_orders')}}">Cancelled</a>
+	</nav>
+</div>
+{%endmacro%}
+
+{%macro product_status(page, rest)%}
+<div>
+	<nav class="nav nav-pills justify-content-around">
+		<a class="nav-link {% if page=='all_products'%}active{%endif%}" href="{{ url_for('customer_care.shop_detail', shop_id=rest.id, state='all_products') }}">All Products</a>
+		<a class="nav-link {% if page=='approved'%}active{%endif%}" href="{{ url_for('customer_care.shop_detail', shop_id=rest.id, state='approved') }}">Approved</a>
+		<a class="nav-link {% if page=='not_approved'%}active{%endif%}" href="{{ url_for('customer_care.shop_detail', shop_id=rest.id, state='not_approved') }}">Not Approved</a>
+		<a class="nav-link {% if page=='suspended'%}active{%endif%}" href="{{ url_for('customer_care.shop_detail', shop_id=rest.id, state='suspended') }}">Suspended</a>
+		
 	</nav>
 </div>
 {%endmacro%}

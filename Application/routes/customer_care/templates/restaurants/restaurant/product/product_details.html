@@ -1,0 +1,513 @@
+{% extends 'base_customer_care.html'%}
+{%from 'helper_customer_care.html' import sidebar, render_product%}
+{% block body%}
+<div id="all">
+    <div id="content">
+      <div class="container pb-5 mb-5">
+        <div class="row mt-3 container">
+          <div class="col-lg-12">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{url_for('customer_care.shop_detail', shop_id=shop.id, state='all_products')}}">{{shop.business_name}}</a></li>
+                <li class="breadcrumb-item"><a href="#">{{ product.name }}</a></li>
+                <li class="breadcrumb-item">{{ product.product_id }}</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+        
+        <div class="container row" >
+          <div class="col-md-3"> 
+            <div class="card rounded-0">
+              <img src="{{url_for ('static',filename='product_images/' + product.product_picture ) }}" alt="" class="card-img-top img-fluid">
+              <div class="card-footer">
+                <figcaption class="text-center">{{ product.name }}</figcaption>
+              </div>
+            </div>
+            {%if product.headsup != 'clickEat'%}
+                <div class="ribbon new" style="font-size: small;">
+                <div class="theribbon bg-success" style="width:9rem;"><span>{{product.headsup}}</span></div>
+                <div class="ribbon-background"></div>
+                </div>
+            {%endif%}
+            <div class="custom-control custom-switch my-2">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="{{ product.product_id }}" id="productApproved" {%if product.approved %}checked{%endif%} >
+                <label class="form-check-label" for="productApproved">
+                  {% if product.approved %}Product Approved{% else %}Product Not Approved {% endif %}
+                </label>
+              </div>
+            </div>
+            <div class="custom-control custom-switch my-2">
+              {%if not product.suspend%}
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="productSuspended" {%if not product.suspend %}checked{%endif%} readonly>
+                  <label class="form-check-label" for="productSuspended">
+                    Product Active
+                  </label>
+                </div>
+              {%else%}
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="productSuspended" {%if product.suspend %}checked{%endif%} readonly>
+                  <label class="form-check-label" for="productSuspended">
+                    Product Suspended
+                  </label>
+                </div>
+              {%endif%}
+            </div>
+            <div class="card rounded-0">
+                <div class="card-body">
+                  <div class="w-100">
+                    <h6 class=""><span class="font-weight-bold">Name:</span> {{ product.name }}</h6>
+                    <h6 class=""><span class="font-weight-bold">Set Price:</span> {{"{:,} Ugx".format(product.price) }}</h6>
+                    <h6 class=""><span class="font-weight-bold">Sell Price:</span> {{"{:,} Ugx".format(product.price) }}</h6>
+                    <h6 class=""><span class="font-weight-bold">Buying Price:</span> {{"{:,} Ugx".format(product.buying_price) }}</h6>
+                    {% if product.promotional_price %}
+                    <h6 class=""><span class="font-weight-bold">Promotional Price:</span> {{"{:,} Ugx".format(product.promotional_price)}}</h6>
+                    <h6 class=""><span class="font-weight-bold">Percentage discount:</span> {{ ((product.price-product.promotional_price)/product.price * 100)|round }}%</h6>
+                    {% endif %}
+                  </div>
+                  
+                  <hr>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h6>Product Ratings</h6>
+                      {% if product_rating %}
+                        <p>
+                          {% for rate in range(1,product_rating+1) %}
+                            <i class="fa fa-star" style="color:orange;"></i>
+                          {% endfor %}
+                        </p>
+                      {% else %}
+                        <small style="color:orange;"><b>Not yet rated</b></small>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-9">
+            <div class="card rounded-0">
+              <div class="card-body">
+                <div class="w-100">
+                  <form method="POST", role="form" action="" enctype="multipart/form-data">
+                    {{form.hidden_tag()}}
+                    <div class="row form-group">
+                      {{form.sub_category.label(class="col-form-label col-5")}}
+                      <div class="col-7">
+                        {{form.sub_category(class="form-control selected-product-subcategory is-invalid" if form.sub_category.errors else "form-control selected-product-subcategory")}}
+                        {% for error in form.sub_category.errors %}
+                        <div class="invalid-feedback">
+                          {{error}}
+                        </div>
+                      {% endfor%}
+                      </div>
+                    </div>
+                    <div class="row form-group">
+                        {{form.name.label(class="col-form-label col-5")}}
+                        <div class="col-7 input-group">
+                          {{form.name(class="form-control is-invalid" if form.name.errors else "form-control")}}
+                          {% for error in form.name.errors %}
+                            <div class="invalid-feedback">
+                                {{error}}
+                            </div>
+                          {% endfor%}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        {{form.product_picture.label(class="col-form-label col-5")}}
+                        <div class="col-7 input-group">
+                          {{form.product_picture(class="form-control is-invalid" if form.product_picture.errors else "form-control")}}
+                          {% for error in form.product_picture.errors %}
+                          <div class="invalid-feedback">
+                            {{error}}
+                          </div>
+                        {% endfor%}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        {{form.description.label(class="col-form-label col-5")}}
+                        <div class="col-7 input-group">
+                          {{form.description(class="form-control is-invalid" if form.description.errors else "form-control")}}
+                          {% for error in form.description.errors %}
+                          <div class="invalid-feedback">
+                            {{error}}
+                          </div>
+                        {% endfor%}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        {{form.price.label(class="col-form-label col-5")}}
+                        <div class="col-7 input-group">
+                          {{form.price(class="form-control is-invalid" if form.price.errors else "form-control")}}
+                          {% for error in form.price.errors %}
+                          <div class="invalid-feedback">
+                            {{error}}
+                          </div>
+                        {% endfor%}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        {{form.buying_price.label(class="col-form-label col-5")}}
+                        <div class="col-7 input-group">
+                          {{form.buying_price(class="form-control is-invalid" if form.buying_price.errors else "form-control")}}
+                          {% for error in form.buying_price.errors %}
+                          <div class="invalid-feedback">
+                            {{error}}
+                          </div>
+                        {% endfor%}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        {{form.selling_price.label(class="col-form-label col-5")}}
+                        <div class="col-7 input-group">
+                          {{form.selling_price(class="form-control is-invalid" if form.selling_price.errors else "form-control")}}
+                          {% for error in form.selling_price.errors %}
+                          <div class="invalid-feedback">
+                            {{error}}
+                          </div>
+                        {% endfor%}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        {{form.served_with.label(class="col-form-label col-5")}}
+                        <div class="col-7 input-group">
+                          {{form.served_with(class="form-control is-invalid" if form.served_with.errors else "form-control")}}
+                          {% for error in form.served_with.errors %}
+                          <div class="invalid-feedback">
+                            {{error}}
+                          </div>
+                        {% endfor%}
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                      {{form.commission_fee.label(class="col-form-label col-5")}}
+                      <div class="col-7 input-group">
+                        {{form.commission_fee(class="form-control is-invalid" if form.commission_fee.errors else "form-control")}}
+                        <div class="input-group-append">
+                          <span class="input-group-text">%</span>
+                        </div>
+                        {% for error in form.commission_fee.errors %}
+                        <div class="invalid-feedback">
+                          {{error}}
+                        </div>
+                      {% endfor%}
+                      </div>
+                    </div>
+                    <div class="row form-group">
+                      {{form.headsup.label(class="col-form-label col-5")}}
+                      <div class="col-7 input-group">
+                        {{form.headsup(class="form-control is-invalid" if form.headsup.errors else "form-control")}}
+                        {% for error in form.headsup.errors %}
+                        <div class="invalid-feedback">
+                          {{error}}
+                        </div>
+                      {% endfor%}
+                      </div>
+                    </div>
+                    {{form.submit(class="btn-outline-primary btn-block")}}
+                  </form>
+                  <br><hr>
+                  <div class="row">
+                    {% if not product.approved %}
+                      <div class="col-md-4">
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#approveProductModal">
+                          Approve Product
+                        </button>
+                      </div>
+                    {% else %}
+                     <div class="col-md-4"></div>
+                    {% endif %}
+                    <div class="col-md-4">
+                      {% if product.promotional_price_set %}
+                        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#removePromotionModal">
+                          Remove Promotion
+                        </button>
+                      {% else %}
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#promotionModal">
+                          Set Promotion
+                        </button>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                      {% if product.suspend %}
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#removeSuspensionModal">
+                          Remove Suspension
+                        </button>
+                      {% else %}
+                        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#suspendModal">
+                          Suspend Product
+                        </button>
+                      {% endif %}
+                    </div>
+                    <!-- set promotional price modal -->
+                    <div class="modal fade" id="promotionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Set Promotional Price For {{product.name}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form method="POST" role="form" action="{{ url_for('customer_care.set_promotional_price', product_id=product.product_id) }}">
+                              {{promo_form.hidden_tag()}}
+                              <div class="row form-group">
+                                {{promo_form.price.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{promo_form.price(class="form-control selected-product-category is-invalid" if promo_form.price.errors else "form-control selected-product-category")}}
+                                  {% for error in promo_form.price.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              <div class="row form-group">
+                                {{promo_form.from_date.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{promo_form.from_date(class="form-control selected-product-category is-invalid" if promo_form.from_date.errors else "form-control selected-product-category")}}
+                                  {% for error in promo_form.from_date.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              <div class="row form-group">
+                                {{promo_form.to_date.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{promo_form.to_date(class="form-control selected-product-category is-invalid" if promo_form.to_date.errors else "form-control selected-product-category")}}
+                                  {% for error in promo_form.to_date.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              {{promo_form.save_price(class="btn btn-outline-primary btn-block")}}
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Suspend Product Modal -->
+                    <div class="modal fade" id="suspendModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Suspend Product</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form method="POST" action="{{ url_for('customer_care.suspend_product', product_id=product.product_id) }}">
+                              {{suspend_form.hidden_tag()}}
+                              <div class="form-group">
+                                <label for="suspendProductForm">Are you sure you  want to suspend {{ product.name }}?</label>
+                                <!-- <input type="number" name="product_id" value="{{product.product_id}}" class="form-control" id="suspendProductForm" aria-describedby="productHelp" hidden> -->
+                              </div>
+                              <div class="row form-group" hidden>
+                                {{suspend_form.product_id.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{suspend_form.product_id(class="form-control selected-product-category is-invalid" if suspend_form.product_id.errors else "form-control selected-product-category")}}
+                                  {% for error in suspend_form.product_id.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              {{suspend_form.save(class="btn btn-outline-primary btn-block")}}
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Remove product suspension -->
+                    <div class="modal fade" id="removeSuspensionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Remove Product Suspension</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form method="POST" action="{{ url_for('customer_care.remove_product_suspension', product_id=product.product_id) }}">
+                              {{suspend_form.hidden_tag()}}
+                              <div class="form-group">
+                                <label for="suspendProductForm">Are you sure you  want to remove {{ product.name }} suspension?</label>
+                                <!-- <input type="number" name="product_id" value="{{product.product_id}}" class="form-control" id="suspendProductForm" aria-describedby="productHelp" hidden> -->
+                              </div>
+                              <div class="row form-group" hidden>
+                                {{suspend_form.product_id.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{suspend_form.product_id(class="form-control selected-product-category is-invalid" if suspend_form.product_id.errors else "form-control selected-product-category")}}
+                                  {% for error in suspend_form.product_id.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              {{suspend_form.save(class="btn btn-outline-primary btn-block")}}
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Remove product promotional price -->
+                    <div class="modal fade" id="removePromotionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Remove Product Promotional Price</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form method="POST" action="{{ url_for('customer_care.remove_promotion_price', product_id=product.product_id) }}">
+                              {{suspend_form.hidden_tag()}}
+                              <div class="form-group">
+                                <label for="suspendProductForm">Are you sure you  want to remove {{ product.name }} promotional price?</label>
+                                <!-- <input type="number" name="product_id" value="{{product.product_id}}" class="form-control" id="suspendProductForm" aria-describedby="productHelp" hidden> -->
+                              </div>
+                              <div class="row form-group" hidden>
+                                {{suspend_form.product_id.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{suspend_form.product_id(class="form-control selected-product-category is-invalid" if suspend_form.product_id.errors else "form-control selected-product-category")}}
+                                  {% for error in suspend_form.product_id.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              {{suspend_form.save(class="btn btn-outline-primary btn-block")}}
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Approve product -->
+                    <div class="modal fade" id="approveProductModal" tabindex="-1" role="dialog" aria-labelledby="approveProductModal" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Approve Product</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form method="POST" action="{{ url_for('customer_care.approve_product', product_id=product.product_id) }}">
+                              {{suspend_form.hidden_tag()}}
+                              <div class="form-group">
+                                <label for="suspendProductForm">Are you sure you  want to approve {{ product.name }}?</label>
+                                <!-- <input type="number" name="product_id" value="{{product.product_id}}" class="form-control" id="suspendProductForm" aria-describedby="productHelp" hidden> -->
+                              </div>
+                              <div class="row form-group" hidden>
+                                {{suspend_form.product_id.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{suspend_form.product_id(class="form-control selected-product-category is-invalid" if suspend_form.product_id.errors else "form-control selected-product-category")}}
+                                  {% for error in suspend_form.product_id.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              {{suspend_form.save(class="btn btn-outline-primary btn-block")}}
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div> 
+        </div>
+        
+        <div class="container row mt-3">
+          <div class=" col-md-12">
+            <div class="card rounded-0">
+              <div class="card-body">
+                <div id="details">
+                  <h4>Product details</h4>
+                  <p>{{ product.description }}</p>
+                  {% if product.served_with != 'none' %}
+                    <h3>Served With</h3>
+                    <p>
+                        {% set desc = product.served_with.split(",") %}
+                        <ul>
+                        {% for des in desc %}
+                            <li>{{ des }}</li>
+                        {% endfor %}
+                        </ul>
+                    </p>
+                  {%endif%}
+                </div>
+              </div>
+            </div>
+          </div>
+  
+        </div>
+        <div class="container-fluid mt-5">
+          <h3>Comment Section</h3>
+        </div>
+        
+        <div class="container-fluid overflow-auto pt-2 pb-5">
+        
+          {% if comments %}
+            {% for comment in comments %}
+              <div class="row mt-1">
+                <div class="col-md-12">
+                  <div class="card rounded-0">
+                    <div class="card-header d-flex flex-column flex-sm-row">
+                      <div><span class="font-weight-bold d-none d-sm-inline d-md-inline d-lg-inline">Posted by:</span> <i class="fa fa-user mr-2"></i>{{ comment.customer.name }}</div>
+                      <div class="ml-0 ml-sm-auto ml-md-auto"><span class="font-weight-bold d-none d-sm-inline d-md-inline d-lg-inline">Date:</span> <i class="fa fa-calendar mr-2"></i>{{ comment.date.strftime('%Y-%m-%d') }}</div>
+                    </div>
+                    <div class="card-body">
+                      <p class="card-text">
+                        {{ comment.comment }}
+                      </p>
+                      {% if comment.reply != None %}
+                      <p class="card-text">
+                        <b>Reply: <i class="fa fa-reply"></i></b>
+                        {{ comment.reply }}
+                      </p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%endfor%}
+            {%else%}
+              <div class="row">
+                <div class=" col-md-12">
+                  <div class=" card rounded-0">
+                    <!-- <div class="card-header"><i class="fa fa-user"></i> None</div> -->
+                    <div class="card-body">
+                      <p class="card-text text-muted">No comments available yet</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          {%endif%}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock%}

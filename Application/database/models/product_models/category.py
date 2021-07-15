@@ -28,8 +28,16 @@ class Category(Base):
     def read_category(self, id):
         return session.query(self).filter_by(category_id=id).first()
 
-    def read_categories(self):
-        return session.query(self).all()
+    @classmethod
+    def read_categories(cls):
+        return session.query(cls).all()
+
+    @classmethod
+    def read_all_categories_by_attr(cls,*args)->list:
+        query = session.query(*[getattr(cls, i) for i in args]).all()
+        if len(args) == 1 and query:
+            query = [i[0] for i in query]
+        return query
 
     
 

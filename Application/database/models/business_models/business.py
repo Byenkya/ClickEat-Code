@@ -4,8 +4,10 @@ from Application.database.sqlalchemy_imports import (
 
 from Application.database.initialize_database import Base, session, pwd_context
 from datetime import datetime
+from Application.utils import LazyLoader
 
 #lazy loading i.e some data will be intialized when its actually needed.
+pdts = LazyLoader("Application.database.models.product_models.products")
 
 class Resturant(Base):
     __tablename__ = "resturant"
@@ -72,6 +74,50 @@ class Resturant(Base):
             "admin_telephone": self.admin_telephone
         }
 
+    @property
+    def read_rest_total_products_count(self):
+        total = session.query(func.count(pdts.Products.product_id))\
+            .filter(pdts.Products.resturant_id==self.id).scalar()  
+        return total if total else 0
+
+    @property
+    def approved_products_count(self):
+        total = session.query(func.count(pdts.Products.product_id))\
+            .filter(pdts.Products.resturant_id==self.id, pdts.Products.approved==True).scalar()  
+        return total if total else 0
+    
+    @property
+    def not_approved_products_count(self):
+        total = session.query(func.count(pdts.Products.product_id))\
+                .filter(pdts.Products.resturant_id==self.id, pdts.Products.approved==False).scalar()
+        return total if total else 0
+
+    @property
+    def suspended_products_count(self):
+        total = session.query(func.count(pdts.Products.product_id))\
+                .filter(pdts.Products.resturant_id==self.id, pdts.Products.suspend==True).scalar()
+        return total if total else 0
+
+    @property
+    def read_all_rest_products(self):
+        products = session.query(pdts.Products).filter_by(resturant_id=self.id).all()
+        return products
+
+    @property
+    def read_all_approved_products(self):
+        products = session.query(pdts.Products).filter(pdts.Products.resturant_id==self.id, pdts.Products.approved==True).all()
+        return products
+
+    @property
+    def read_all_non_approved_products(self):
+        products = session.query(pdts.Products).filter(pdts.Products.resturant_id==self.id, pdts.Products.approved==False).all()
+        return products
+
+    @property
+    def read_all_suspended_products(self):
+        products = session.query(pdts.Products).filter(pdts.Products.resturant_id==self.id, pdts.Products.suspend==True).all()
+        return products
+
     @classmethod
     def read_restaurant(cls, id):
         try:
@@ -92,11 +138,31 @@ class Resturant(Base):
             session.rollback()
 
     @classmethod
+    def read_all_rests(cls):
+        try:
+            return cls.query.all()
+        except Exception as e:
+            session.rollback()
+
+    @classmethod
     def read_restaurants_count(cls):
         try:
             return session.query(func.count(cls.id)).scalar()
         except:
             session.rollback()
+
+    @classmethod
+    def read_all_restaurants_filter_by(cls,*args, **kwargs)->list:
+        """
+            returns tuple objects
+            tuples are made of attributes specified as args
+        """
+        query = session.query(*[getattr(cls,i) for i in args]).filter_by(**kwargs).all()
+        if len(args) == 1 and query:
+            query = [i[0] for i in query]
+        return query
+
+
 
 
     

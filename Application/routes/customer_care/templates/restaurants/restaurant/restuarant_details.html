@@ -1,60 +1,77 @@
 {% extends 'base_customer_care.html'%}
-{%from 'helper_customer_care.html' import sidebar %}
+{%from 'helper_customer_care.html' import sidebar, render_product, product_status %}
 {% block body%}
 
   <div class="container-fluid mt-2">
     <div class="row">
-        <div class="col-lg-3">
-        <!--
-        *** CUSTOMER MENU ***
-        _________________________________________________________
-        -->
+        <div class="col-lg-2">
         {{sidebar(page='shops')}}
-        <!-- /.col-lg-3-->
-        <!-- *** CUSTOMER MENU END ***-->
         </div>
-        <div class="col-lg-9">
-          <!-- breadcrumb-->
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="{{url_for('customer_care.custcare_shops', shop_state='all')}}">Restuarants</a></li>
-              <li class="breadcrumb-item">Restuarant</li>
-            </ol>
-          </nav>
+        <div class="col-lg-8">
           <div class="card rounded-0">
             <div class="card-body">
-              <div class="w-100 d-flex flex-row">
-                <div>
-                  <div class="h3">{{"Restuarant Name: "~restuarant.business_name|title}} <i class="fa fa-certificate"></i></div>
+              {{product_status(state, restuarant)}}
+            </div>
+          </div>
+          
+          <div class="card rounded-0">
+            <div class="card-body">
+              <div class="d-flex flex-row flex-wrap justify-content-around h6">
+                <div class="flex-fill"><b>All Products: </b>{{restuarant.read_rest_total_products_count}}</div>
+                <div class="flex-fill"><b>Approved: </b>{{restuarant.approved_products_count}}</div>
+                <div class="flex-fill"><b>Not Approved: </b>{{restuarant.not_approved_products_count}}</div>
+                <div class="flex-fill"><b>Suspended: </b>{{restuarant.suspended_products_count}}</div>
+              </div>
+              <hr/>
+              <div class="container-fluid d-flex flex-row  flex-wrap justify-content-between bg-white pt-2">
+                {% for pdt in products %}
+                  {{ render_product(pdt.product_id,shop_id,pdt.name,pdt.product_picture,pdt.price,pdt.brand.name,pdt.promotional_price,pdt.headsup,pdt.approved,pdt.suspend) }}
+                {% endfor %}
+              </div>
+  
+  
+              <div class="row justify-content-center mb-4">
+                <div class="pages">
+                  <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+                    <ul class="pagination">
+                      <li class="page-item"><a href="#" aria-label="Previous" class="page-link"><span aria-hidden="true">«</span><span class="sr-only">Previous</span></a></li>
+                      <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                      <li class="page-item"><a href="#" class="page-link">2</a></li>
+                      <li class="page-item"><a href="#" class="page-link">3</a></li>
+                      <li class="page-item"><a href="#" class="page-link">4</a></li>
+                      <li class="page-item"><a href="#" class="page-link">5</a></li>
+                      <li class="page-item"><a href="#" aria-label="Next" class="page-link"><span aria-hidden="true">»</span><span class="sr-only">Next</span></a></li>
+                    </ul>
+                  </nav>
                 </div>
-                <div class="ml-auto">
-                  <figure class="figure">
-                    <img src="{{url_for ('static', filename='business_profile_picture/' + restuarant.business_profile_picture )}}" alt="{{ restuarant.business_profile_picture }}" class="img-fluid img-thumbnail border-0" >
-                    <figcaption class="figure-caption">{{restuarant.business_name|title}}</figcaption>
-                  </figure>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2">
+          <div class="card">
+            <div class="card-body" style="font-size:xx-small;">
+              <div align=center>
+                <img class="img-fluid img-thumbnail"  style="height: 100px;width: 150px;"  src="{{url_for ('static', filename='business_profile_picture/' + restuarant.business_profile_picture )}}" alt="{{ restuarant.business_profile_picture }}">
+                <div><br>
+                  <div class="h6" style="font-size: small;">{{restuarant.business_name|title}}</div>
                 </div>
               </div>
               <hr>
               <div class="row">
-                  <div class="col-md-6 col-sm-6">
-                      <p class="text-muted">{{"Operational since: "~restuarant.date_of_registration.strftime('%m/%d/%Y')}}</p>
-                      <p><i class="fa fa-address-card-o"> </i> {{restuarant.address}}</p>
-                      <p><i class="fa fa-envelope"></i> {{restuarant.email}}</p>
-                      <p><i class="fa fa-phone"></i> {{restuarant.contact ~" /" ~restuarant.second_contact}}</p> 
-                  </div>
-                  
+                <div class="col-md-12 col-sm-12">
+                    <p class="text-muted">{{"Operational since: "~restuarant.date_of_registration.strftime('%m/%d/%Y')}}</p>
+                    <p><i class="fa fa-address-card-o"> </i> {{restuarant.address}}</p>
+                    <p><i class="fa fa-envelope"></i> {{restuarant.email}}</p>
+                    <p><i class="fa fa-phone"></i> {{restuarant.contact ~" /" ~restuarant.second_contact}}</p> 
+                    <p class="h6">Company Details</p>
+                    <div>
+                      <p><b>Name: </b>{{restuarant.business_name}}</p>
+                      <p><b>Location: </b>{{restuarant.location}}</p>
+                      <p><b>Description: </b>{{restuarant.description}}</p>
+                    </div>
+                </div>
               </div>
-              <div class="row mt-3">
-                  <div class="col-md-6 col-sm-6">
-                      <p class="h4">Company Details</p>
-                      <div class="mx-4">
-                        <p><b>Name: </b>{{restuarant.business_name}}</p>
-                        <p><b>Location: </b>{{restuarant.location}}</p>
-                        <p><b>Description: </b>{{restuarant.description}}</p>
-                      </div>
-                  </div>
-              </div>
-              <hr>
             </div>
           </div>
         </div>

@@ -50,6 +50,16 @@ class Comments(Base):
             return [comment.serialize() for comment in comments]
         except:
             session.rollback()
+
+    @classmethod
+    def product_comments(cls, product_id):
+        try:
+            comments = cls.query.filter_by(product_id=product_id).order_by(desc(cls.date)).all()
+
+            return comments
+        except:
+            session.rollback()
+
         
 
 

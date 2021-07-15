@@ -60,6 +60,12 @@ class Products(Base):
                 brand = brnd.Brand(name=brand_name)
                 self.brand = brand
 
+            self.buying_price = kwargs.get("buying_price",0)
+            self.selling_price = kwargs.get("selling_price",0)
+            self.served_with = kwargs.get("served_with", 'none')
+            self.commission_fee = kwargs.get("commission_fee",0.0)
+            self.headsup = kwargs.get("headsup","clickEat")
+
             session.add(self)
             session.commit()
             return True
@@ -151,7 +157,7 @@ class Products(Base):
         except:
             session.rollback()
 
-    @classmethod
+    @classmethod  
     def home_products(cls):
         try:
             #home products

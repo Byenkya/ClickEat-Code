@@ -5,9 +5,9 @@ from Application.flask_imports import (
 
 from Application.database.models import (StaffAccounts, Customer,
 Resturant, Products, Order, DeliveryMethods, Cart, Courier, DeliveryDetails,
-Courier, Sales)
+Courier, Sales, SubCategory, Category, Comments, Rate, ProductDiscounts, Brand)
 
-from .forms import LoginForm, ReasonForm, OrderReturnsForm, AccountSettingsForm, ChangePasswordForm
+from .forms import LoginForm, ReasonForm, OrderReturnsForm, AccountSettingsForm, ChangePasswordForm, ProductsVerificationForm, SetPromotionForm, SuspendProductForm, AddProductForm
 from Application.utils import employee_login_required, Paginate, DateUtil
 from Application.database.sqlalchemy_imports import and_
 from Application.database.initialize_database import session
@@ -220,17 +220,35 @@ def courier_details(courier_id):
 @employee_login_required
 def custcare_shops(shop_state):
 	if shop_state == "all":
-		restuarants = Resturant.read_restaurants()
+		restuarants = Resturant.read_all_rests()
 
 	return render_template('restaurants/customer_care_restaurants.html',restuarants=restuarants, shop_state=shop_state)
 
 
-@customer_care.route('/custcare-shop-detail/<int:shop_id>',methods=["GET"])
+@customer_care.route('/custcare-shop-detail/<int:shop_id>/<string:state>',methods=["GET"])
 @login_required
 @employee_login_required
-def shop_detail(shop_id):
+def shop_detail(shop_id, state):
 	restuarant  = Resturant.read_restaurant(id=shop_id)
-	return render_template('restaurants/restaurant/restuarant_details.html',restuarant=restuarant)
+	if state == "all_products":
+		products = restuarant.read_all_rest_products
+
+	elif state == "approved":
+		products = restuarant.read_all_approved_products
+
+	elif state == "not_approved":
+		products = restuarant.read_all_non_approved_products
+
+	elif state == "suspended":
+		products = restuarant.read_all_suspended_products
+
+	return render_template(
+		'restaurants/restaurant/restuarant_details.html',
+		restuarant=restuarant, 
+		shop_id=shop_id, 
+		products=products,
+		state=state
+		)
 
 @customer_care.route("/account_settings", methods=["GET", "POST"])
 @login_required
@@ -304,3 +322,264 @@ def terminate_order(order_id):
 		flash("Failed to terminate order", "danger")
 
 	return redirect(url_for(".customer_care_order_detail",order_id=order_id))
+
+@customer_care.route('/customer-care-add-product', methods=["GET", "POST"])
+@login_required
+@employee_login_required
+def add_product():
+	form = AddProductForm()
+	brands = Brand.read_all_bandss_filter_by("brand_id","name")
+	if request.method == "GET":
+		form.restaurant.choices = Resturant.read_all_restaurants_filter_by("id","business_name")
+		form.brand.choices = brands
+		form.sub_cat.choices = SubCategory.read_all_subcategories_filter_by("sub_category_id","name")
+		form.price.data = 0
+		form.buying_price.data = 0
+		form.selling_price.data = 0
+		form.served_with.data = "none"
+		form.commission_fee.data = 0.0
+		form.headsup.data = "clickEat"
+
+	if form.validate_on_submit():
+		try:
+			product_picture = save_picture(form.product_picture.data,None, "static/product_images", 250,250)
+			price = form.price.data
+			rest_id = form.restaurant.data
+			brand_name = [brand for brand in brands if brand[0] == form.brand.data][0][1]
+			if(Products()(
+				name=form.name.data,
+				product_picture=product_picture,
+				description=form.description.data,
+				price=form.price.data,
+				resturant_id=form.restaurant.data,
+				brand=brand_name,
+				sub_category_id=form.sub_cat.data,
+				buying_price=form.buying_price.data,
+				selling_price=form.selling_price.data,
+				served_with=form.served_with.data,
+				commission_fee=form.commission_fee.data,
+				headsup=form.headsup.data
+			)):
+				flash("Product added successfully","success")
+				return redirect(url_for("customer_care.add_product"))
+				
+		except Exception as e:
+			print("Error while trying to save product: ", e)
+			session.rollback()
+			flash("Error while trying to save product","danger")
+
+	
+	return render_template('restaurants/restaurant/product/add_product.html',form=form)
+
+@customer_care.route('/custcare-shop-product/<int:product_id>',methods=["GET","POST"])
+@login_required
+@employee_login_required
+def rest_product_detail(product_id):
+	product = Products.read_product(product_id)
+	comments = Comments.product_comments(product_id)
+	product_rating = Rate.read_product_rate(product_id)
+	restuarant  = Resturant.read_restaurant(id=product.resturant_id)
+	form = ProductsVerificationForm()
+	promotional_price_form = SetPromotionForm()
+	suspend_form = SuspendProductForm()
+	suspend_form.product_id.data = product_id
+
+	if request.method == "GET":
+		form = ProductsVerificationForm(obj=product)
+		form.sub_category.choices = SubCategory.read_all_subcategories_filter_by(
+			"sub_category_id","name",
+			category_id= product.sub_category.category_id)
+
+	# form.category.choices = Category.read_all_categories_by_attr("category_id","name")
+
+	if form.validate_on_submit():
+		if form.product_picture.data:
+			try:
+				product_pic = save_picture(form.product_picture.data,product.product_picture, "static/product_images", 250,250)
+				product.sub_category_id = form.sub_category.data
+				product.name = form.name.data
+				product.product_picture = product_pic
+				product.price = form.price.data
+				product.description = form.description.data
+				product.product = form.price.data
+				product.buying_price = form.buying_price.data
+				product.selling_price = form.selling_price.data
+				product.served_with = form.served_with.data
+				product.commission_fee = form.commission_fee.data
+				product.headsup = form.headsup.data
+				session.commit()
+				flash("Product updated successfully","success")
+				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+			except Exception as e:
+				print("Customer care updating product error:",e)
+				session.rollback()
+				flash("Internal server error failed to update product.", "danger")
+		else:
+			try:
+				product.sub_category_id = form.sub_category.data
+				product.name = form.name.data
+				product.price = form.price.data
+				product.description = form.description.data
+				product.product = form.price.data
+				product.buying_price = form.buying_price.data
+				product.selling_price = form.selling_price.data
+				product.served_with = form.served_with.data
+				product.commission_fee = form.commission_fee.data
+				product.headsup = form.headsup.data
+				session.commit()
+				flash("Product updated successfully","success")
+			except Exception as e:
+				print("Customer care updating product error:",e)
+				session.rollback()
+				flash("Internal server error failed to update product.", "danger")
+		return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+	
+
+	return render_template(
+		'restaurants/restaurant/product/product_details.html',
+		shop=restuarant,
+		product=product,
+		product_rating=product_rating,
+		comments=comments,
+		form=form,
+		promo_form=promotional_price_form,
+		suspend_form=suspend_form
+		)
+
+@customer_care.route('/custcare-set-promotion/<int:product_id>',methods=["GET","POST"])
+@login_required
+@employee_login_required
+def set_promotional_price(product_id):
+	promotional_price_form = SetPromotionForm()
+	if promotional_price_form.validate_on_submit():
+		try:
+			product = Products.read_product(product_id)
+			product.promotional_price_set = True
+			ProductDiscounts()(
+				product_id=product_id,
+				price=promotional_price_form.price.data,
+				from_date=promotional_price_form.from_date.data,
+				to_date=promotional_price_form.to_date.data,
+				is_scheduled=True
+			)
+			flash("Product promotional price set successfully","success")
+			return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+		except Exception as e:
+			session.rollback()
+			print("Error while retriving data: ", e)
+			flash("Internal server error failed to update product.", "danger")
+
+
+	return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+
+@customer_care.route('/custcare-remove-promotional-price/<int:product_id>',methods=["GET","POST"])
+@login_required
+@employee_login_required	
+def remove_promotion_price(product_id):
+	suspend_form = SuspendProductForm()
+	if suspend_form.validate_on_submit():
+		try:
+			if ProductDiscounts.remove_promotion_price(product_id):
+				flash("Product promotional price removed successfully","success")
+				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+			else:
+				flash("Product promotional price was not removed successfully","danger")
+				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+		except Exception as e:
+			session.rollback()
+			print("Error while retriving data: ", e)
+			flash("Internal server error failed to update product.", "danger")
+
+	return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+
+@customer_care.route('/custcare-suspend-product/<int:product_id>',methods=["GET","POST"])
+@login_required
+@employee_login_required
+def suspend_product(product_id):
+	suspend_form = SuspendProductForm()
+	if suspend_form.validate_on_submit():
+		try:
+			product = Products.read_product(product_id)
+			product.suspend = True
+			session.commit()
+			flash("Product suspended successfully","success")
+			return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+		except Exception as e:
+			session.rollback()
+			print("Error while retriving data: ", e)
+			flash("Internal server error failed to update product.", "danger")
+
+	return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+
+
+@customer_care.route('/custcare-remove-product-suspension/<int:product_id>',methods=["GET","POST"])
+@login_required
+@employee_login_required	
+def remove_product_suspension(product_id):
+	suspend_form = SuspendProductForm()
+	if suspend_form.validate_on_submit():
+		try:
+			product = Products.read_product(product_id)
+			product.suspend = False
+			session.commit()
+			flash("Product suspension removed successfully","success")
+			return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+		except Exception as e:
+			session.rollback()
+			print("Error while retriving data: ", e)
+			flash("Internal server error failed to update product.", "danger")
+
+	return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+
+@customer_care.route('/custcare-approve-product/<int:product_id>',methods=["GET","POST"])
+@login_required
+@employee_login_required	
+def approve_product(product_id):
+	suspend_form = SuspendProductForm()
+	if suspend_form.validate_on_submit():
+		try:
+			product = Products.read_product(product_id)
+			product.approved = True
+			session.commit()
+			flash("Product approved successfully","success")
+			return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+		except Exception as e:
+			session.rollback()
+			print("Error while retriving data: ", e)
+			flash("Internal server error failed to update product.", "danger") 
+
+	return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+
+
+
+
+import PIL
+from random import randint
+from werkzeug.utils import secure_filename
+import os
+from Application import app
+from Application.helpers.generators import ReferenceGenerator
+def save_picture(picture,previous_pic,directory,x,y):
+	try:
+		if previous_pic:
+			try:
+				file_path = os.path.join(os.path.join(app.root_path,directory), previous_pic)
+				if os.path.isfile(file_path):
+					os.remove(file_path)
+					print("successfully deleted product image!!!!!!!!!!!!!!")
+			except Exception as e:
+				print("Error while deleting previous product picture: ", e)
+
+		f_name, f_ext = os.path.splitext(picture.filename)
+		f_name = f_name.replace(" ","")
+		if len(f_name) > 10:
+			f_name = f_name[:10]
+		picture_fn = secure_filename("".join([f_name,ReferenceGenerator().unique_filename(),".jpg"]))
+		picture_path = os.path.join(app.root_path, directory , picture_fn)
+		image = PIL.Image.open(picture)
+		image = image.convert("RGB")
+		image = image.resize((x, y), PIL.Image.ANTIALIAS)
+		image.save(picture_path, "jpeg", quality=85)
+		return picture_fn
+	except Exception as e:
+		raise Exception("Failed to save image: ",e)

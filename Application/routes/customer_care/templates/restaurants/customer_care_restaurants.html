@@ -17,23 +17,16 @@
         <div class="col-md-9">
         <div class="card rounded-0">
             <div class="card-body">
-                {{shops_nav(shop_state)}}
-                <h1 class="text-center text-success mb-2">{{restuarants|length ~ " Restaurant(s)"}}</h1>
                 <div class="card rounded-0">
                     <div class="row card-body">
-                        <div class="col-md-4">  
-                            <input type="text" class="form-control" placeholder="Restaurant Id"> 
-                        </div>
-                        <div class=" col-md-4">
-                            <input type="text" class="form-control" placeholder="Restaurant Name"> 
-                        </div>
-                        <div class="col-md-4">
-                            <a href="#" class="btn btn-secondary w-100">Find Restaurant</a>
+                        <div class="col-md-12">  
+                            <input class="form-control form-control-lg" type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for restaurant..">
+                            <small class="form-text text-muted">{{" There are " ~ restuarants|length ~ " registered restaurants/hotels"}}</small>
                         </div>
                     </div>
                 </div>
                 <div class="table-responsive">
-                <table class="table table-hover">
+                <table id="myTable" class="table table-hover">
                     <thead>
                         <tr>
                             <th>#Id</th>
@@ -46,11 +39,31 @@
                         <tr>
                             <td>{{restuarant.id}}</td>
                             <td>{{restuarant.business_name}}</td>
-                            <td><a href="{{url_for('customer_care.shop_detail', shop_id=restuarant.id)}}" class="btn btn-primary btn-sm">View</a></td>
+                            <td><a href="{{url_for('customer_care.shop_detail', shop_id=restuarant.id, state='all_products')}}" class="btn btn-primary btn-sm">View</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <script>
+                    function myFunction(){
+                      var input, filter, table, tr, td, i, txtValue;
+                      input = document.getElementById("myInput");
+                      filter = input.value.toUpperCase();
+                      table = document.getElementById("myTable")
+                      tr = table.getElementsByTagName("tr");
+                      for(i=0; i<tr.length;i++){
+                        td = tr[i].getElementsByTagName("td")[1];
+                        if(td){
+                          txtValue = td.textContent || td.innerText;
+                          if(txtValue.toUpperCase().indexOf(filter) > -1){
+                            tr[i].style.display = "";
+                          }else{
+                            tr[i].style.display = "none";
+                          }
+                        }
+                      }
+                    }
+                </script>
                 </div>
                 <div class="pages">
                     <nav aria-label="Page navigation example" class="d-flex justify-content-center">

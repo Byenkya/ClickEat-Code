@@ -48,4 +48,15 @@ class SubCategory(Base):
         except:
             session.rollback()
 
+    @classmethod
+    def read_all_subcategories_filter_by(cls,*args, **kwargs)->list:
+        """
+            returns tuple objects
+            tuples are made of attributes specified as args
+        """
+        query = session.query(*[getattr(cls,i) for i in args]).filter_by(**kwargs).all()
+        if len(args) == 1 and query:
+            query = [i[0] for i in query]
+        return query
+
     

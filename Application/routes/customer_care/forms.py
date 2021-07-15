@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms import (StringField, PasswordField, SubmitField, TextAreaField,
-HiddenField, RadioField, BooleanField, SelectField, IntegerField)
+HiddenField, RadioField, BooleanField, SelectField, FloatField)
+from wtforms.fields.html5 import DateField, IntegerField, SearchField
 from wtforms.validators import InputRequired, DataRequired, Length, NumberRange, ValidationError, EqualTo
 from Application.helpers.generators import generate_tuple_list
 from Application.flask_imports import current_user
@@ -50,3 +52,51 @@ class ChangePasswordForm(FlaskForm):
     def validate_current_password(self, current_password):
         if not current_user.verify_password(current_password.data):
             raise ValidationError("current password is incorrect")
+
+class CustomSelectField(SelectField):
+    def pre_validate(self, form):
+        if self.validate_choice:
+            if self.data != "" or self.data != None:
+                return True
+            else:
+                raise ValueError(self.gettext("Not a valid choice"))
+
+class ProductsVerificationForm(FlaskForm):
+    # category = SelectField("Category", coerce=int, validators=[InputRequired("Category is needed"), DataRequired()])
+    sub_category = CustomSelectField("Sub Category", coerce=int, validators=[InputRequired("Sub Category is needed"), DataRequired()])
+    name = StringField("Name", validators=[InputRequired(), DataRequired()])
+    product_picture = FileField('Product Picture', validators=[FileAllowed(['jpg', 'png'])])
+    description = TextAreaField('Description',render_kw=dict(placeholder="talk about your product in a few words"), validators=[ InputRequired(),DataRequired(), Length(min=10, max=500, message="description should be between 10 to 500 characters.")])
+    price = IntegerField('Price', render_kw=dict(min=0), validators=[ InputRequired(), NumberRange(min=0)])
+    buying_price = IntegerField('Buying Price', render_kw=dict(min=0), validators=[ InputRequired(), NumberRange(min=0)])
+    selling_price = IntegerField('Selling Price', render_kw=dict(min=0), validators=[ InputRequired(), NumberRange(min=0)])
+    served_with =  TextAreaField('Served With',render_kw=dict(placeholder="additional items added to the main product"), validators=[ InputRequired(),DataRequired(), Length(min=1, max=500, message="description should be between 10 to 500 characters and separated with commas")])
+    commission_fee = FloatField("Commission Fee", validators=[InputRequired("Commission fee needed"),NumberRange(min=0.0)])
+    headsup =  StringField("Delivery Time", render_kw=dict(placeholder="e.g 30-40 MINS"),validators=[InputRequired(), DataRequired()])
+    submit = SubmitField("UPDATE")
+
+class AddProductForm(FlaskForm):
+    restaurant = CustomSelectField("Restaurant", coerce=int, validators=[InputRequired("Restaurant is needed"), DataRequired()])
+    brand = CustomSelectField("Brand", coerce=int, validators=[InputRequired("Brand needed"), DataRequired()])
+    sub_cat = CustomSelectField("Sub Category", coerce=int, validators=[InputRequired("Sub Category is needed"), DataRequired()])
+    name = StringField("Name", validators=[InputRequired(), DataRequired()])
+    description = TextAreaField('Description',render_kw=dict(placeholder="talk about your product in a few words"), validators=[ InputRequired(),DataRequired(), Length(min=10, max=500, message="description should be between 10 to 500 characters.")])
+    price = IntegerField('Price', render_kw=dict(min=0), validators=[ InputRequired(), NumberRange(min=0)])
+    buying_price = IntegerField('Buying Price', render_kw=dict(min=0), validators=[ InputRequired(), NumberRange(min=0)])
+    selling_price = IntegerField('Selling Price', render_kw=dict(min=0), validators=[ InputRequired(), NumberRange(min=0)])
+    served_with =  TextAreaField('Served With',render_kw=dict(placeholder="additional items added to the main product"), validators=[ InputRequired(),DataRequired(), Length(min=1, max=500, message="description should be between 10 to 500 characters and separated with commas")])
+    commission_fee = FloatField("Commission Fee", validators=[InputRequired("Commission fee needed"),NumberRange(min=0.0)])
+    headsup =  StringField("Delivery Time", render_kw=dict(placeholder="e.g 30-40 MINS"),validators=[InputRequired(), DataRequired()])
+    product_picture = FileField('Product Picture', validators=[DataRequired(),FileAllowed(['jpg', 'png', 'jpeg'])])
+    submit = SubmitField("SAVE PRODUCT")
+
+
+class SetPromotionForm(FlaskForm):
+    price = IntegerField("Promotional Price",  render_kw=dict(min=0), validators=[InputRequired(), NumberRange(min=0)])
+    from_date = DateField("From", validators=[DataRequired(), InputRequired()])
+    to_date = DateField("To", validators=[DataRequired(), InputRequired()])
+    save_price = SubmitField("Save Changes")
+
+class SuspendProductForm(FlaskForm):
+    product_id = IntegerField("Product ID",  render_kw=dict(min=0), validators=[InputRequired(), NumberRange(min=0)])
+    save = SubmitField("Save Changes")
