@@ -69,6 +69,13 @@ class Order(Base):
             "order_items": [item.serialize() for item in self.cart]
         }
 
+    @property
+    def delivery_address(self):
+        try:
+            return delivery_detials.DeliveryDetails.get_order_delivery_address(self.id)
+        except:
+            session.rollback()
+
     @classmethod
     def customer_order_count(cls, customer_id):
         try:

@@ -47,6 +47,10 @@ class DeliveryDetails(Base):
         order.courier_id = courier_id
         session.commit()
 
+    @classmethod
+    def get_order_delivery_address(cls, order_id):
+        return cls.query.filter_by( order_id=order_id).first()
+
 
 
 

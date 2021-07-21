@@ -127,6 +127,25 @@
                     </table>
                   </div>
                   <!-- /.content-->
+                  <div align="center"><h4><b><Address>Delivery Address</Address></b></h4></div>
+                  <table class="table">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">County</th>
+                        <th scope="col">Sub County</th>
+                        <th scope="col">Village</th>
+                        <th scope="col">Other deatails</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ order.delivery_address.county }}</td>
+                        <td>{{ order.delivery_address.sub_county }}</td>
+                        <td>{{ order.delivery_address.village }}</td>
+                        <td>{{ order.delivery_address.other_details }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                   
               </div>
               
