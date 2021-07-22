@@ -100,12 +100,16 @@
                           <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(cart_items_sum)}}</th>
                         </tr>
                         <tr class="table-active">
+                          <th colspan="8" scope="row">Delivery Fee</th>
+                          <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(order.delivery_fee)}}</th>
+                        </tr>
+                        <tr class="table-active">
                           <th colspan="8" scope="row">Tax</th>
                           <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(0) }}</th>
                         </tr>
                         <tr class="table-active">
                           <th colspan="8" scope="row">Total</th>
-                          <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(cart_items_sum) }}</th>
+                          <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(cart_items_sum + order.delivery_fee) }}</th>
                         </tr>
                       </tfoot>
                     </table>
