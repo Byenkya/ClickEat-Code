@@ -392,12 +392,14 @@ class Order(Base):
                         else:
                             cash_on_delivery.status = "confirmed"
                         for pdt_ in order.cart:
-                            sales.Sales()(
-                                product_id=pdt_.product_id,
-                                quantity=pdt_.quantity,
-                                amount=pdt_.total,
-                                commission_amount=pdt_.commision_amount if pdt_.commision_amount else 0
-                                )
+                            product = session.query(pdts.Products).filter_by(product_id=pdt_.product_id).first()
+                            if product:
+                                sales.Sales()(
+                                    product_id=pdt_.product_id,
+                                    quantity=pdt_.quantity,
+                                    amount=pdt_.total,
+                                    commission_amount=product.commission_amount if product.commission_amount else 0
+                                    )
                         if order.customer.email:
                             mail_  = order_receipt_email
                             mail_.recipients = [order.customer.email]

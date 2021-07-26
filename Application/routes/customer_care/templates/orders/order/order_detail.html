@@ -2,7 +2,7 @@
 {%from 'helper_customer_care.html' import sidebar %}
 {%from 'form_helper.html' import renderformfield %}
 {% block body%}
-<div>
+  <div>
     <div>
       <div class="container-fluid mt-2">
         <div class="row">
@@ -65,7 +65,7 @@
                           <th scope="col">Product</th>
                           <th scope="col" class="text-nowrap">Hotel/Restaurant</th>
                           <th scope="col">Quantity</th>
-                          <th scope="col" colspan="2" class="text-nowrap">Served With</th>
+                          <th colspan="3" scope="row" class="text-nowrap">Served With</th>
                           <th scope="col" class="text-nowrap">Unit Price</th>
                           <th scope="col">Total</th>
                         </tr>
@@ -78,9 +78,9 @@
                             <td>{{item.read_item_shop_details|safe}}</td>
                             <td>{{item.quantity}}</td>
                             {% if item.served_with == "none" %}
-                              <td colspan="2">------</td>
+                              <td colspan="3" scope="row">------</td>
                             {% else %}
-                            <td colspan="2">
+                            <td colspan="3" scope="row">
                                 <ul>
                                   {% for item in item.served_with.split(",")%}
                                     <li>{{item}}</li>

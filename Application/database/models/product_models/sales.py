@@ -24,7 +24,7 @@ class Sales(Base):
             self.product_id = kwargs.get("product_id")
             self.quantity = kwargs.get("quantity")
             self.amount = kwargs.get("amount")
-            self.commision_amount = kwargs.get("commission_amount",self.amount)
+            self.commision_amount = kwargs.get("commission_amount",0)
             session.add(self)
             return True 
 

@@ -89,7 +89,7 @@
 </div>
 {%endmacro%}
 
-{%macro product_status(page, rest)%}
+{%macro product_status(page,rest)%}
 <div>
 	<nav class="nav nav-pills justify-content-around">
 		<a class="nav-link {% if page=='all_products'%}active{%endif%}" href="{{ url_for('customer_care.shop_detail', shop_id=rest.id, state='all_products') }}">All Products</a>

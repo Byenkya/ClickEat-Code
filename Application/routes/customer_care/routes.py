@@ -69,6 +69,13 @@ def dashboard():
 		Sales.sales_month==DateUtil().current_date.month,
 		Sales.sales_year==DateUtil().current_date.year,
 		)
+
+	commission_sales_today = Sales.read_sales_sum(
+		Sales.commision_amount,
+		Sales.sales_day == DateUtil().current_date.day,
+		Sales.sales_month == DateUtil().current_date.month,
+		Sales.sales_year == DateUtil().current_date.year,
+	)
 	customer_count = Customer.read_customer_count()
 	vendors_count = Resturant.read_restaurants_count()
 	products_count = Products.read_products_count()
@@ -77,7 +84,7 @@ def dashboard():
 
 	context = dict(
 		product_sales_today=product_sales_today,
-		commission_sales_today=0,
+		commission_sales_today=commission_sales_today,
 		total_revenue=total_revenue,
 		shipping_sales_today=0,
 		standard_shipping_sales_td=0,
@@ -212,7 +219,7 @@ def courier_details(courier_id):
 	orders = Order.read_all_orders_delivery_details_filter(
 		DeliveryDetails.courier_id == courier_id
 	)
-	return render_template('courier_detail.html', courier=courier,orders=orders)
+	return render_template('courier_detail.html', courier=courier,orders=orders, order_count=len(orders))
 
 
 @customer_care.route('/custcare-shops/<string:shop_state>',methods=["GET"])
