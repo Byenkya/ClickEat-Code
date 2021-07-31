@@ -5,7 +5,7 @@ from Application.flask_imports import (
 
 from Application.database.models import (StaffAccounts, Customer,
 Resturant, Products, Order, DeliveryMethods, Cart, Courier, DeliveryDetails,
-Courier, Sales, SubCategory, Category, Comments, Rate, ProductDiscounts, Brand)
+Courier, Sales, SubCategory, Category, Comments, Rate, ProductDiscounts, Brand, TopSellingProducts)
 
 from .forms import LoginForm, ReasonForm, OrderReturnsForm, AccountSettingsForm, ChangePasswordForm, ProductsVerificationForm, SetPromotionForm, SuspendProductForm, AddProductForm
 from Application.utils import employee_login_required, Paginate, DateUtil
@@ -383,6 +383,7 @@ def add_product():
 @employee_login_required
 def rest_product_detail(product_id):
 	product = Products.read_product(product_id)
+	top_selling_status = TopSellingProducts.read_top_most_selling_product(product_id)
 	comments = Comments.product_comments(product_id)
 	product_rating = Rate.read_product_rate(product_id)
 	restuarant  = Resturant.read_restaurant(id=product.resturant_id)
@@ -450,7 +451,8 @@ def rest_product_detail(product_id):
 		comments=comments,
 		form=form,
 		promo_form=promotional_price_form,
-		suspend_form=suspend_form
+		suspend_form=suspend_form,
+		top_selling_status=top_selling_status
 		)
 
 @customer_care.route('/custcare-set-promotion/<int:product_id>',methods=["GET","POST"])
@@ -557,6 +559,41 @@ def approve_product(product_id):
 
 	return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
 
+@customer_care.route('/customer_care-add-to-top-selling-products/<int:product_id>', methods=["GET","POST"])
+@login_required
+@employee_login_required
+def addToTopSelling(product_id):
+	suspend_form = SuspendProductForm()
+	if suspend_form.validate_on_submit():
+		try:
+			if TopSellingProducts()(product_id=product_id):
+				flash("Product added to top most selling products successfully!!", "success")
+				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+			else:
+				flash("Product already added to Top most selling", "danger")
+				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+		except Exception as e:
+			session.rollback()
+			print("Error while retriving data: ", e)
+			flash("Internal server error failed to update product.", "danger") 
+
+@customer_care.route('/customer_care-delete-from-top-selling-products/<int:product_id>', methods=["GET","POST"])
+@login_required
+@employee_login_required
+def deleteFromTopSelling(product_id):
+	suspend_form = SuspendProductForm()
+	if suspend_form.validate_on_submit():
+		try:
+			if(TopSellingProducts.delete_pdt_from_top_selling(product_id)):
+				flash("Product was removed successfully!!", "success")
+				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+			else:
+				flash("Error while trying to delete product from top selling", "danger")
+				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
+		except Exception as e:
+			session.rollback()
+			print("Error while retriving data: ", e)
+			flash("Internal server error failed to update product.", "danger") 
 
 
 

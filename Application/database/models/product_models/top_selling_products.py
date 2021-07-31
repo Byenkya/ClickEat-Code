@@ -11,6 +11,49 @@ class TopSellingProducts(Base):
     product_id = Column(Integer, ForeignKey("products.product_id"), index=True, nullable=False)
     products = relationship("Products", backref="top_selling_products")
 
+    def __repr__(self):
+        return str(self.product_id)
+
+    def __call__(self, **kwargs):
+        try:
+            product = self.query.filter_by(product_id=kwargs.get("product_id")).first()
+            if product:
+                return False
+            else:
+                self.product_id = kwargs.get("product_id")
+                session.add(self)
+                session.commit()
+                return True
+        except Exception as e:
+            print("Error while adding product to top most selling product: ", e)
+            session.rollback()
+            return False
+
+    @classmethod
+    def read_top_most_selling_product(cls, product_id):
+        try:
+            product = cls.query.filter_by(product_id=product_id).first()
+            if product:
+                return True
+            else:
+                return False
+                
+        except Exception as e:
+            print("Error while reading top selling product", e)
+            session.rollback()
+            return False
+
+    @classmethod
+    def delete_pdt_from_top_selling(cls, product_id):
+        try:
+            cls.query.filter_by(product_id=product_id).delete()
+            session.commit()
+            return True
+        except Exception as e:
+            print("Error while deleting product from top selling product", e)
+            session.rollback()
+            return False
+
     @classmethod
     def read_all_top_discount_products(cls):
         try:

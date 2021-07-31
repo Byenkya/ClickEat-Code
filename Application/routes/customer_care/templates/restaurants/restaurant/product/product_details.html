@@ -210,15 +210,28 @@
                   <br><hr>
                   <div class="row">
                     {% if not product.approved %}
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#approveProductModal">
                           Approve Product
                         </button>
                       </div>
                     {% else %}
-                     <div class="col-md-4"></div>
+                     <div class="col-md-3"></div>
                     {% endif %}
-                    <div class="col-md-4">
+                    {% if top_selling_status %}
+                      <div class="col-md-3">
+                        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#removeFromTopSelling">
+                          Delete From Top Selling
+                        </button>
+                      </div>
+                    {%else%}
+                      <div class="col-md-3">
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#addToTopSelling">
+                          Add To Top Selling
+                        </button>
+                      </div>
+                    {%endif%}
+                    <div class="col-md-3">
                       {% if product.promotional_price_set %}
                         <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#removePromotionModal">
                           Remove Promotion
@@ -229,7 +242,7 @@
                         </button>
                       {% endif %}
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       {% if product.suspend %}
                         <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#removeSuspensionModal">
                           Remove Suspension
@@ -413,6 +426,75 @@
                               {{suspend_form.hidden_tag()}}
                               <div class="form-group">
                                 <label for="suspendProductForm">Are you sure you  want to approve {{ product.name }}?</label>
+                                <!-- <input type="number" name="product_id" value="{{product.product_id}}" class="form-control" id="suspendProductForm" aria-describedby="productHelp" hidden> -->
+                              </div>
+                              <div class="row form-group" hidden>
+                                {{suspend_form.product_id.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{suspend_form.product_id(class="form-control selected-product-category is-invalid" if suspend_form.product_id.errors else "form-control selected-product-category")}}
+                                  {% for error in suspend_form.product_id.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              {{suspend_form.save(class="btn btn-outline-primary btn-block")}}
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Add to top selling products -->
+                    <div class="modal fade" id="addToTopSelling" tabindex="-1" role="dialog" aria-labelledby="addToTopSelling" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add To Top Selling Products</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form method="POST" action="{{ url_for('customer_care.addToTopSelling', product_id=product.product_id) }}">
+                              {{suspend_form.hidden_tag()}}
+                              <div class="form-group">
+                                <label for="suspendProductForm">Are you sure you  want to add {{ product.name }} to Top selling Products?</label>
+                                <!-- <input type="number" name="product_id" value="{{product.product_id}}" class="form-control" id="suspendProductForm" aria-describedby="productHelp" hidden> -->
+                              </div>
+                              <div class="row form-group" hidden>
+                                {{suspend_form.product_id.label(class="col-form-label col-5")}}
+                                <div class="col-7">
+                                  {{suspend_form.product_id(class="form-control selected-product-category is-invalid" if suspend_form.product_id.errors else "form-control selected-product-category")}}
+                                  {% for error in suspend_form.product_id.errors %}
+                                  <div class="invalid-feedback">
+                                    {{error}}
+                                  </div>
+                                {% endfor%}
+                                </div>
+                              </div>
+                              {{suspend_form.save(class="btn btn-outline-primary btn-block")}}
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Delete from top selling products -->
+                    <div class="modal fade" id="removeFromTopSelling" tabindex="-1" role="dialog" aria-labelledby="removeFromTopSelling" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add To Top Selling Products</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form method="POST" action="{{ url_for('customer_care.deleteFromTopSelling', product_id=product.product_id) }}">
+                              {{suspend_form.hidden_tag()}}
+                              <div class="form-group">
+                                <label for="suspendProductForm">Are you sure you  want to delete {{ product.name }} from Top selling Products?</label>
                                 <!-- <input type="number" name="product_id" value="{{product.product_id}}" class="form-control" id="suspendProductForm" aria-describedby="productHelp" hidden> -->
                               </div>
                               <div class="row form-group" hidden>
