@@ -191,7 +191,7 @@ class Order(Base):
             if self.customer.email:
                 mail_ = order_cancelled_email
                 mail_.recipients = [self.customer.email]
-                mail_.text = reason
+                mail_.text = "You have cancelled the following order:{order}, because of this reason: \n{reason}".format(order=self.order_ref_simple_version, reason=reason)
                 mail_.send()
                 session.commit()
                 return True
