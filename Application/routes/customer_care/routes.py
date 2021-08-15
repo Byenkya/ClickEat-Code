@@ -104,8 +104,8 @@ def customer_care_orders():
 	page = int(request.args.get("page", 1))
 	orders = Order.read_all_orders()
 	pagination = Paginate(orders, page,8)
-	next_url = url_for(".customer_care", page=pagination.next_page) if pagination.has_next else None
-	prev_url = url_for(".customer_care", page=pagination.previous_page) if pagination.has_previous else None
+	next_url = url_for(".customer_care_orders", page=pagination.next_page) if pagination.has_next else None
+	prev_url = url_for(".customer_care_orders", page=pagination.previous_page) if pagination.has_previous else None
 	return render_template(
 		'orders/orders.html', 
 		orders=orders,
@@ -119,44 +119,53 @@ def customer_care_orders():
 @login_required
 @employee_login_required
 def all_orders():
-    state = request.args.get("state","need_preparing_orders")
+	state = request.args.get("state","need_preparing_orders")
 
-    if state == "need_preparing_orders":
-        page= "Need Preparing Orders"
-        orders=Order.read_all_orders_filter(
-            and_(
-                Order.is_prepared == False,
-                Order.is_terminated == False
-            )
-        )
-    elif state == "prepared_orders":
-        page = "Prepared Orders"
-        orders =Order.read_all_orders_filter(
-            Order.is_prepared == True
-        )
+	if state == "need_preparing_orders":
+		page= "Need Preparing Orders"
+		orders=Order.read_all_orders_filter(
+			and_(
+				Order.is_prepared == False,
+				Order.is_terminated == False
+			)
+		)
+	elif state == "pre_orders":
+		page= "Pre Orders"
+		orders=Order.read_all_orders_filter(
+			and_(
+				Order.is_prepared == False,
+				Order.is_terminated == False,
+				Order.pre_order == True
+			)
+		)
+	elif state == "prepared_orders":
+		page = "Prepared Orders"
+		orders =Order.read_all_orders_filter(
+			Order.is_prepared == True
+		)
 
-    elif state == "received_orders":
-        page = "Recieved Orders"
-        orders =Order.read_all_orders_filter(
-            Order.customer_received == True
-        )
+	elif state == "received_orders":
+		page = "Recieved Orders"
+		orders =Order.read_all_orders_filter(
+			Order.customer_received == True
+		)
 
-    elif state == "need_transporting":
-    	page = "Need Transporting"
-    	orders = Order.read_all_orders_filter(
-    		Order.customer_received == False,
-    		Order.is_prepared == True,
-            Order.is_terminated == False
-    	)
-    
+	elif state == "need_transporting":
+		page = "Need Transporting"
+		orders = Order.read_all_orders_filter(
+			Order.customer_received == False,
+			Order.is_prepared == True,
+			Order.is_terminated == False
+		)
 
-            
-    return render_template(
-        'orders/all_orders_base_1.html',
-        orders=orders,
-        page = page,
-        state = state
-        )
+
+			
+	return render_template(
+		'orders/all_orders_base_1.html',
+		orders=orders,
+		page = page,
+		state = state
+		)
 
 @customer_care.route('/cancelled-orders',methods=["GET"])
 @login_required
@@ -349,7 +358,7 @@ def add_product():
 
 	if form.validate_on_submit():
 		try:
-			product_picture = save_picture(form.product_picture.data,None, "static/product_images", 250,250)
+			product_picture = save_picture(form.product_picture.data,None, "static/product_images", 500,500)
 			price = form.price.data
 			rest_id = form.restaurant.data
 			brand_name = [brand for brand in brands if brand[0] == form.brand.data][0][1]
@@ -403,7 +412,7 @@ def rest_product_detail(product_id):
 	if form.validate_on_submit():
 		if form.product_picture.data:
 			try:
-				product_pic = save_picture(form.product_picture.data,product.product_picture, "static/product_images", 250,250)
+				product_pic = save_picture(form.product_picture.data,product.product_picture, "static/product_images", 500,500)
 				product.sub_category_id = form.sub_category.data
 				product.name = form.name.data
 				product.product_picture = product_pic
@@ -415,6 +424,7 @@ def rest_product_detail(product_id):
 				product.served_with = form.served_with.data
 				product.commission_fee = form.commission_fee.data
 				product.headsup = form.headsup.data
+				product.free_delivery = form.free_delivery.data
 				session.commit()
 				flash("Product updated successfully","success")
 				return redirect(url_for("customer_care.rest_product_detail",product_id=product_id))
@@ -434,6 +444,7 @@ def rest_product_detail(product_id):
 				product.served_with = form.served_with.data
 				product.commission_fee = form.commission_fee.data
 				product.headsup = form.headsup.data
+				product.free_delivery = form.free_delivery.data
 				session.commit()
 				flash("Product updated successfully","success")
 			except Exception as e:

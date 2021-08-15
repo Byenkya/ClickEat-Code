@@ -5,13 +5,14 @@ from Application.database.sqlalchemy_imports import (
 )
 from Application.flask_imports import current_app, flash, abort, jsonify
 from Application.utils import LazyLoader
-from Application.utils.email import order_cancelled_email, order_placed_email, order_receipt_email
+from Application.utils.email import order_cancelled_email, order_placed_email, order_receipt_email, customer_care_email
 from Application.helpers import ReferenceGenerator
 
 from datetime import datetime
 
 #lazy laoding of dependencies
 customer = LazyLoader("Application.database.models.customer_models.customer")
+customer_addresses = LazyLoader("Application.database.models.customer_models.customer_addresses")
 pym = LazyLoader("Application.database.models.payment_models")
 pdts = LazyLoader("Application.database.models.product_models")
 delivery_detials = LazyLoader("Application.database.models.order_models.delivery_details")
@@ -37,6 +38,8 @@ class Order(Base):
     delivery_fee = Column(BigInteger, default=0)
     customer_id = Column(Integer, ForeignKey("customer.id"), index=True, nullable=False)
     customer = relationship("Customer", backref="orders")
+    pre_order = Column(Boolean, default=False, nullable=False)
+    pre_order_time = Column(DateTime, default=datetime(2021,1,30,00,00,00), nullable=False)
 
     def __repr__(self):
         return self.order_ref_simple_version
@@ -247,6 +250,12 @@ class Order(Base):
                 customer_id = kwargs.get("customer_id")
                 delivery_contact = kwargs.get("delivery_contact")
                 delivery_fee = kwargs.get("delivery_fee")
+                pre_order = kwargs.get("pre_order")
+                pre_order_time = kwargs.get("pre_order_time")
+                county=kwargs.get("county"),
+                sub_county=kwargs.get("sub_county"),
+                village=kwargs.get("village"),
+                other_details=kwargs.get("other_details"),
                 customer_object = customer.Customer.read_customer(id=customer_id)
                 payment_method = pym.PaymentMethods.read_method(method=method)
 
@@ -255,76 +264,104 @@ class Order(Base):
                     order_ref = new_ref.unique_id
                     order_ref_simple_version = new_ref.simple_version
 
-                    if not cls.customer_order_exists(customer_id):
-                        order_ = Order(
+                    order_ = Order(
                                     order_ref=order_ref,
                                     order_ref_simple_version=order_ref_simple_version,
                                     delivery_contact=delivery_contact,
                                     delivery_fee=delivery_fee,
-                                    customer_id=customer_id
+                                    customer_id=customer_id,
+                                    pre_order=pre_order,
+                                    pre_order_time=pre_order_time
                                 )
 
-                        items = session.query(pdts.Cart).filter_by(customer_id=customer_id, is_ordered=False).all()
+                    items = session.query(pdts.Cart).filter_by(customer_id=customer_id, is_ordered=False).all()
 
-                        for item in items:
-                            item.is_ordered = True  
-                            item.order = order_
+                    for item in items:
+                        item.is_ordered = True  
+                        item.order = order_
 
-                        delivery = delivery_detials.DeliveryDetails(
-                            county=kwargs.get("county"),
-                            sub_county=kwargs.get("sub_county"),
-                            village=kwargs.get("village"),
-                            other_details=kwargs.get("other_details"),
-                            customer_id=customer_id,
-                            order=order_
-                        )
-                        session.add(delivery)
+                    delivery = delivery_detials.DeliveryDetails(
+                        county=county,
+                        sub_county=sub_county,
+                        village=village,
+                        other_details=other_details,
+                        customer_id=customer_id,
+                        order=order_
+                    )
+                    session.add(delivery)
 
-                        payment = pym.Payment(
-                            payment_method_id = payment_method.id,
-                            order = order_
-                        )
+                    # customer_addresses.CustomerAddress()(
+                    #     county=county,
+                    #     sub_county=sub_county,
+                    #     village=village,
+                    #     other_details=other_details,
+                    #     is_default=False,
+                    #     customer_id=customer_id
+                    # )
 
-                        session.add(payment)   
-                        if payment_method.method == "Cash on delivery":
-                            cash_on_delivery = pym.CashOnDelivery(payment=payment, transaction_ref=order_ref, status="pending")
-                            session.add(cash_on_delivery)
-                        
-                        else:
-                            session.rollback()  
-                            return False
+                    payment = pym.Payment(
+                        payment_method_id = payment_method.id,
+                        order = order_
+                    )
 
-                        if customer_object.email:
-                            mail_ = order_placed_email
-                            mail_.recipients = [customer_object.email]
-                            mail_.text = "You have placed the following order with reference number: {order_ref_simple_version}".format(
-                                order_ref_simple_version=order_ref_simple_version
-                            )
-                            mail_.send()
-
-                            #customer_care email
-
-                            customer_care_mail_ = order_placed_email
-                            customer_care_mail_.recipients = ["nelsonnahabwe95@gmail.com", "tayebwaian0@gmail.com", "willbrodmutesi@gmail.com"]
-                            customer_care_mail_.text = "The following customer: {customer} has placed an order with reference number: {order_ref_simple_version}.\nCustomer contact: {contact}".format(
-                                customer=customer_object.name,
-                                order_ref_simple_version=order_ref_simple_version,
-                                contact=customer_object.contact
-                            )
-                            customer_care_mail_.send()
-                            session.commit()
-                            return True
-                        
-                        else:
-                            session.commit()
-                            return True
-
+                    session.add(payment)   
+                    if payment_method.method == "Cash on delivery":
+                        cash_on_delivery = pym.CashOnDelivery(payment=payment, transaction_ref=order_ref, status="pending")
+                        session.add(cash_on_delivery)
+                    
                     else:
-                        session.rollback()
+                        session.rollback()  
                         return False
+
+                    #customer_care email
+                    customer_care_mail_ = customer_care_email
+                    customer_care_mail_.recipients = ["tayebwaian0@gmail.com", "willbrodmutesi@gmail.com", "imutyaba11@gmail.com"]
+                    customer_care_mail_.context = dict(
+                        customer_name=customer_object.name,
+                        customer_contact=customer_object.contact,
+                        order_ref=order_ref_simple_version,
+                        order_date="{: %d/%m/%Y}".format(datetime.now()),
+                        items=[i.serialize() for i in items],
+                        delivery_method="Home delivery",
+                        delivery_fee=delivery_fee,
+                        payment_method=payment_method.method,
+                        delivery_address= f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
+                    )
+                    # customer_care_mail_.text = "The following customer: {customer} has placed an order with reference number: {order_ref_simple_version}.\nCustomer contact: {contact}".format(
+                    #     customer=customer_object.name,
+                    #     order_ref_simple_version=order_ref_simple_version,
+                    #     contact=customer_object.contact
+                    # )
+                    customer_care_mail_.send()
+
+                    if customer_object.email:
+                        mail_ = order_placed_email
+                        mail_.recipients = [customer_object.email]
+                        mail_.context = dict(
+                            customer_name=customer_object.name,
+                            customer_contact=customer_object.contact,
+                            order_ref=order_ref_simple_version,
+                            order_date="{: %d/%m/%Y}".format(datetime.now()),
+                            items=[i.serialize() for i in items],
+                            delivery_method="Home delivery",
+                            delivery_fee=delivery_fee,
+                            payment_method=payment_method.method,
+                            delivery_address= f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
+                        )
+                        # mail_.text = "You have placed the following order with reference number: {order_ref_simple_version}".format(
+                        #     order_ref_simple_version=order_ref_simple_version
+                        # )
+                        mail_.send()
+                        session.commit()
+                        return True
+                    
+                    else:
+                        session.commit()
+                        return True
 
                 else:
                     print("No payment method")
+                    return False
                         
             except Exception as e:
                 print("Placing Order Error: ", e)
@@ -406,8 +443,9 @@ class Order(Base):
                             mail_.context = dict(
                                 items = [i.serialize() for i in order.cart],
                                 order_ref = order.order_ref_simple_version,
+                                order_date="{: %d/%m/%Y}".format(order.order_date),
                                 user_name = order.customer.name,
-                                delivery_fees = "2000",
+                                delivery_fees = order.delivery_fee,
                                 payment_method = order.payment[0].payment_method.serialize(),
                                 customer_received = order.customer_received
                             )

@@ -2,7 +2,8 @@ from Application.database.initialize_database import Base, session
 from Application.database.sqlalchemy_imports import *
 from Application.utils import LazyLoader
 pdts = LazyLoader("Application.database.models.product_models.products")
-
+from datetime import datetime
+import pytz
 
 class TopSellingProducts(Base):
     __tablename__ = "top_selling_products"
@@ -57,6 +58,8 @@ class TopSellingProducts(Base):
     @classmethod
     def read_all_top_discount_products(cls):
         try:
+            time_zone = pytz.timezone("Africa/Kampala")
+            current_time = time_zone.localize(datetime.now())
             products = []
             top_discounts_ids = cls.query.all()
 
@@ -65,9 +68,20 @@ class TopSellingProducts(Base):
                     pdt = pdts.Products.read_product(id=product.product_id)
                     if pdt:
                         if pdt.approved and pdt.suspend != True:
-                            products.append(pdt)
+                            if current_time.hour >= pdt.resturant.operation_start_time.hour and current_time.hour <= pdt.resturant.operation_stop_time.hour:
+                                try:
+                                    pdt = pdt.serialize()
+                                    pdt["available"] = True
+                                    products.append(pdt)
+                                except Exception as e:
+                                    print(e)
+                            else:
+                                try:
+                                    products.append(pdt.serialize())
+                                except Exception as e:
+                                    print(e)
 
-                return [product.serialize() for product in products]
+                return products
 
             else:
                 return None

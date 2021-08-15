@@ -6,6 +6,8 @@ from random import sample
 from Application.flask_imports import jsonify
 from Application.database.models import HomeImages
 import math
+from datetime import datetime
+import pytz
 
 #lazy loading dependencies.
 brnd = LazyLoader("Application.database.models.product_models.brand")
@@ -36,6 +38,7 @@ class Products(Base):
     approved = Column(Boolean, nullable=False, default=False)
     suspend = Column(Boolean, nullable=False, default=False)
     headsup = Column(String(100), nullable=False, default="clickEat") 
+    free_delivery = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return str(self.name)
@@ -91,7 +94,9 @@ class Products(Base):
                 "promotional_price_set": self.promotional_price_set,
                 "promotional_price": self.promotional_price,
                 "headsup": self.headsup,
-                "served_with": self.served_with
+                "served_with": self.served_with,
+                "free_delivery": self.free_delivery,
+                "available": False
             }
 
     @property
@@ -161,12 +166,49 @@ class Products(Base):
     def home_products(cls):
         try:
             #home products
+            time_zone = pytz.timezone("Africa/Kampala")
+            current_time = time_zone.localize(datetime.now())
             home_products = []
-            products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite and product.approved and product.suspend != True], 2)
-            drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all() if product.approved and product.suspend != True], 2)
+            products = []
+            drinks = []
+            for product in cls.query.all():
+                if product.resturant.favourite and product.approved and product.suspend != True:
+                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                        try:
+                            pdt = product.serialize()
+                            pdt["available"] = True
+                            products.append(pdt)
+                        except Exception as e:
+                            print(e)
 
-            home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":products})
-            home_products.append({"id":2,"title":"Drinks & Beverages", "products":drinks })
+                    else:
+                        try:
+                            products.append(product.serialize())
+                        except Exception as e:
+                            print(e)
+
+            for product in cls.query.filter_by(sub_category_id=6).all():
+                if product.approved and product.suspend != True:
+                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                        try:
+                            pdt = product.serialize()
+                            pdt["available"] = True
+                            drinks.append(pdt)
+                        except Exception as e:
+                            print(e)
+                    else:
+                        try:
+                            drinks.append(product.serialize())
+                        except Exception as e:
+                            print(e)
+
+
+
+            # products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite and product.approved and product.suspend != True], 2)
+            # drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all() if product.approved and product.suspend != True], 2)
+
+            home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":sample(products, 2)})
+            home_products.append({"id":2,"title":"Drinks & Beverages", "products": sample(drinks, 2) })
 
             return home_products
 
@@ -189,6 +231,8 @@ class Products(Base):
                 session.rollback()
         else:
             try:
+                time_zone = pytz.timezone("Africa/Kampala")
+                current_time = time_zone.localize(datetime.now())
                 products_based_on_sub_cat_dict = {}
                 product_based_on_sub_cat_list = []
                 restaurant_products = [product for product in cls.query.filter_by(**kwargs).all() if product.approved and product.suspend != True]
@@ -196,10 +240,31 @@ class Products(Base):
                 for product in restaurant_products:
                     if f"{product.sub_category}" in products_based_on_sub_cat_dict:
                         if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
-                            products_based_on_sub_cat_dict[f"{product.sub_category}"] += [product.serialize()] #Add the product to is group
-
+                            if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                                try:
+                                    pdt = product.serialize()
+                                    pdt["available"] = True
+                                    products_based_on_sub_cat_dict[f"{product.sub_category}"] += [pdt] #Add the product to this group
+                                except Exception as e:
+                                    print(e)
+                            else:
+                                try:
+                                    products_based_on_sub_cat_dict[f"{product.sub_category}"] += [product.serialize()]
+                                except Exception as e:
+                                    print(e)
                     else:
-                        products_based_on_sub_cat_dict[f"{product.sub_category}"] = [product.serialize()]
+                        if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                            try:
+                                pdt = product.serialize()
+                                pdt["available"] = True
+                                products_based_on_sub_cat_dict[f"{product.sub_category}"] = [pdt]
+                            except Exception as e:
+                                print(e)
+                        else:
+                            try:
+                                products_based_on_sub_cat_dict[f"{product.sub_category}"] = [product.serialize()]
+                            except Exception as e:
+                                print(e)
 
                 for sub_cat,products in products_based_on_sub_cat_dict.items():
                     banch = {"sub_category": sub_cat, "products": products}

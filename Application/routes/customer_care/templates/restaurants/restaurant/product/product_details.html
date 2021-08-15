@@ -205,6 +205,17 @@
                       {% endfor%}
                       </div>
                     </div>
+                    <div class="row form-group">
+                      {{form.free_delivery.label(class="col-form-label col-5")}}
+                      <div class="col-7 input-group">
+                        {{form.free_delivery(class="form-control is-invalid" if form.free_delivery.errors else "form-control")}}
+                        {% for error in form.free_delivery.errors %}
+                        <div class="invalid-feedback">
+                          {{error}}
+                        </div>
+                      {% endfor%}
+                      </div>
+                    </div>
                     {{form.submit(class="btn-outline-primary btn-block")}}
                   </form>
                   <br><hr>

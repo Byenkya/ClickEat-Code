@@ -1,0 +1,45 @@
+{% extends 'emails/email_base.html' %}
+
+{% block body %}
+    <div>
+        {% include 'emails/address.html' %}
+        <div style="color: black;">
+            {% set ns = namespace(amount=0)%}
+            <h2 style="text-decoration: underline;">Order Invoice</h2>
+            <p>Dear {{customer_name|title}},</p>
+            <p>You have successfully made an order for the following items.</p>
+            <p><b>Order Reference: {{order_ref}}</b></p>
+            <p><b>Order Date: {{order_date}}</b></p>
+            <ul style="list-style-type: none;font-weight: bold;padding: 5px 10px;overflow: hidden;">
+                <li style="float: left;width: 50%;">Item</li>
+                <li style="float: right;width: 50%;text-align: right;">SubTotal</li>
+            </ul>
+            <hr>
+            {% for item in items %}
+            {% set ns.amount = ns.amount + (item["unit_price"]*item["quantity"]) %}
+            <ul style="list-style-type: none;display: block;width: 100%;padding: 0px 10px;overflow: hidden;">
+                <li style="float: left;width: 50%;">
+                    <b>{{item["product_name"]}} from {{item["restaurant"]}}</b><br>
+                    {{item["quantity"]}} item(s) at {{"{:,} Ugx".format(item["unit_price"])}} @<br/>
+                </li>
+                <li style="float: right;width: 50%;text-align: right;">{{"{:,} Ugx".format(item["unit_price"]*item["quantity"])}}</li>
+            </ul>
+            {% endfor %}
+            
+            <ul style="list-style-type: none;font-weight: bold;padding: 5px 10px;width: 100%;margin-top: 20px;border: 1px solid black;overflow: hidden;">
+                <li style="float: left;width: 50%;">Items Total</li>
+                <li style="float: right;width: 50%;text-align: right;">{{"{:,} Ugx".format(ns.amount)}}</li>
+            </ul>
+          
+            <p><b>Payment Method:</b> {{ payment_method["method"]|title}}</p>
+            <p><b>Delivery Price:</b> {{"{:,} Ugx".format(delivery_fee)}}</p>
+            <p><b>Total:</b> {{"{:,} Ugx".format(ns.amount+delivery_fee)}}</p>
+            {% if payment_method["method"] == "cash on delivery" %}
+            <p><b>Status: </b>Not yet paid and not yet received</p>
+            {% endif %}
+            <p><b>Delivery Address: </b>{{delivery_address}}</p>
+        </div>
+        {% include 'emails/footer.html' %}
+    </div>
+
+{% endblock %}

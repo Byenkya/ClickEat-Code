@@ -80,6 +80,7 @@
 <div>
 	<nav class="nav nav-pills justify-content-around">
 		<a class="nav-link {% if page=='all_orders'%}active{%endif%}" href="{{url_for('customer_care.customer_care_orders')}}">All orders</a>
+		<a class="nav-link {% if page=='pre_orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='pre_orders')}}">Pre Orders</a>
 		<a class="nav-link {% if page=='need_preparing_orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='need_preparing_orders')}}">Need Preparing</a>
 		<a class="nav-link {% if page=='Need Transporting'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='need_transporting')}}">Need Transporting</a>
 		<a class="nav-link {% if page=='prepared_orders'%}active{%endif%}" href="{{url_for('customer_care.all_orders', state='prepared_orders')}}">Prepared</a>

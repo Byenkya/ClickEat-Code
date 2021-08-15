@@ -2,7 +2,9 @@ from flask_restful import Resource, fields, marshal_with, reqparse
 from Application.flask_imports import request, jsonify
 from Application.database.models import Products, Cart, Customer, SubCategory, Brand, HomeImages, TopSellingProducts, Category
 from Application.database.initialize_database import session
-from random import sample
+from random import sample, shuffle
+import pytz
+from datetime import datetime  
 
 product_fields = {
     "product_id": fields.Integer,
@@ -41,6 +43,19 @@ class AddToCartApi(Resource):
         served_with = "none"
         if "served_with" in request.json:
             served_with = request.json["served_with"]
+        
+        try:
+            if "free_delivery" in request.json:
+                free_delivery = request.json["free_delivery"]
+        except:
+            free_delivery = False
+
+        try:
+            if "restaurant" in request.json:
+                restaurant = request.json["restaurant"]
+        except:
+            restaurant = "clickEat"
+
         customer = Customer.read_customer(id=customer_id)
 
         if customer:
@@ -51,7 +66,9 @@ class AddToCartApi(Resource):
                 product_image=product_image,
                 unit_price=unit_price,
                 quantity=quantity,
-                served_with=served_with
+                served_with=served_with,
+                free_delivery=free_delivery,
+                restaurant=restaurant
             )
 
             if cart_item:
@@ -99,14 +116,38 @@ class DrinksSubCatApi(Resource):
     def get(self):
         return jsonify(drinksSubCat = [sub_cat.serialize() for sub_cat in SubCategory.read_drink_sub_categories()])
 
+#shuffle all products function
+def shuffle_all_prodcuts(all_products):
+    shuffle(all_products)
+    return all_products
+
 #Home products
 class HomeProductsResource(Resource):
     def get(self):
-        fruits_vegetables = sample([product.serialize() for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all()], 2)
+        time_zone = pytz.timezone("Africa/Kampala")
+        current_time = time_zone.localize(datetime.now())
+        fruits_vegetables = []
+        for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all():
+            if product.approved and product.suspend != True:
+                if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                    try:
+                        pdt = product.serialize()
+                        pdt["available"] = True
+                        fruits_vegetables.append(pdt)
+                    except Exception as e:
+                        print(e)
+                else:
+                    try:
+                        fruits_vegetables.append(product.serialize())
+                    except Exception as e:
+                        print(e)
+
+
         home_products = Products.home_products()
-        home_products.append({"id": 3, "title":"Fruits & Vegetables", "products": fruits_vegetables})
+        home_products.append({"id": 3, "title":"Fruits & Vegetables", "products": sample(fruits_vegetables, 2)})
         home_sub_cats_list = []
         sub_cats = SubCategory.read_sub_cat()
+        all_products = []
 
         for sub in sub_cats:
             product_image = Products.read_product_by_sub_cat(sub["sub_category_id"])
@@ -117,13 +158,29 @@ class HomeProductsResource(Resource):
                 home_sub_cats['name'] = sub["name"]
                 home_sub_cats_list.append(home_sub_cats)
 
-        all_products = [product.serialize() for product in Products.read_products() if product.approved and product.suspend != True]
+        for product in Products.read_products():
+            if product.approved and product.suspend != True:
+                if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                    try:
+                        pdt = product.serialize()
+                        pdt["available"] = True
+                        all_products.append(pdt)
+                    except Exception as e:
+                        print(e)
+                else:
+                    try:
+                        all_products.append(product.serialize())
+                    except Exception as e:
+                        print(e)
+
+
+        # shuffle(all_products)
         top_selling_products = TopSellingProducts.read_all_top_discount_products()    
         return {
                 "home_images_products": home_products,
                 "home_images": HomeImages.home_images(), 
                 "sub_cats": home_sub_cats_list,
-                "all_products": all_products,
+                "all_products": shuffle_all_prodcuts(all_products),
                 "top_selling_products": top_selling_products
             }
 
@@ -149,8 +206,11 @@ searchStringsArgs = reqparse.RequestParser()
 searchStringsArgs.add_argument("searchString", type=str)
 class SearchedProductsResource(Resource):
     def get(self):
+        time_zone = pytz.timezone("Africa/Kampala")
+        current_time = time_zone.localize(datetime.now())
         args = searchStringsArgs.parse_args()
         products = []
+        searched_pdts = []
         if args.get("searchString", None):
             search_item = args["searchString"]
             products = session.query(Products).filter(
@@ -168,25 +228,55 @@ class SearchedProductsResource(Resource):
                     .filter(
                         SubCategory.name.like(f"%{search_item}%")
                     ).order_by(Products.product_id).all()
-        return [product.serialize() for product in products]
+
+            for product in products:
+                if product.approved and product.suspend != True:
+                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                        pdt = product.serialize()
+                        pdt["available"] = True
+                        searched_pdts.append(pdt)
+                    else:
+                        searched_pdts.append(product.serialize())
+        return product.serialize()
 
 #products based on category
 categoryProductsStringsArgs = reqparse.RequestParser()
 categoryProductsStringsArgs.add_argument("categoryName", type=str)
 class CategoryProductsApI(Resource):
     def get(self):
+        time_zone = pytz.timezone("Africa/Kampala")
+        current_time = time_zone.localize(datetime.now())
         args = categoryProductsStringsArgs.parse_args()
+        products = []
         if args.get("categoryName", None):
             categoryName = args["categoryName"]
-            products = [product.serialize() for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all()]
+            for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all():
+                if product.approved and product.suspend != True:
+                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                        pdt = product.serialize()
+                        pdt["available"] = True
+                        products.append(pdt)
+                    else:
+                        products.append(product.serialize())
             return products
 
 #sub_category_products
 class SubCategoryProductsApI(Resource):
     def get(self, id):
+        time_zone = pytz.timezone("Africa/Kampala")
+        current_time = time_zone.localize(datetime.now())
+        sub_cat_pdts = []
         products = Products.read_products_based_on_sub_cat(id)
+        for product in products:
+            if product.approved and product.suspend != True:
+                if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                    pdt = product.serialize()
+                    pdt["available"] = True
+                    sub_cat_pdts.append(pdt)
+                else:
+                    sub_cat_pdts.append(product.serialize())
     
-        return [product.serialize() for product in products]
+        return sub_cat_pdts
 
 #other products
 class AllProductsAPI(Resource):

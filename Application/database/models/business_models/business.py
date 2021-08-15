@@ -29,6 +29,8 @@ class Resturant(Base):
     date_of_registration = Column(DateTime, default=datetime.now(), nullable=False)
     favourite = Column(Boolean, nullable=False, default=False)
     approved = Column(Boolean, nullable=False, default=False)
+    operation_start_time = Column(DateTime, default=datetime.now(), nullable=False)
+    operation_stop_time = Column(DateTime, default=datetime.now(), nullable=False)
 
     def __repr__(self):
         return self.business_name
@@ -58,6 +60,30 @@ class Resturant(Base):
             return False
 
     def serialize(self):
+        start_hour = ""
+        start_mins = ""
+        stop_hour = ""
+        stop_mins = ""
+        if len(str(self.operation_start_time.hour)) == 1:
+            start_hour = "0" + str(self.operation_start_time.hour) 
+        else:
+            start_hour = self.operation_start_time.hour
+
+        if len(str(self.operation_start_time.minute)) == 1:
+            start_mins = "0" + str(self.operation_start_time.minute) 
+        else:
+            start_mins = self.operation_start_time.minute
+
+        if len(str(self.operation_stop_time.hour)) == 1:
+            stop_hour = "0" + str(self.operation_stop_time.hour) 
+        else:
+            stop_hour = self.operation_stop_time.hour
+
+        if len(str(self.operation_stop_time.minute)) == 1:
+            stop_mins = "0" + str(self.operation_stop_time.minute)
+        else:
+            stop_mins = self.operation_stop_time.minute
+
         return {
             "id": self.id,
             "business_name": self.business_name,
@@ -71,7 +97,10 @@ class Resturant(Base):
             "admin_names": self.admin_names,
             "admin_username": self.admin_username,
             "admin_email": self.admin_email,
-            "admin_telephone": self.admin_telephone
+            "admin_telephone": self.admin_telephone,
+            "operation_start_time": "{hour}:{minute} AM".format(hour=start_hour,minute=start_mins),
+            "operation_stop_time": "{hour}:{minute} PM".format(hour=stop_hour,minute=stop_mins),
+            "operational_status": False
         }
 
     @property

@@ -28,6 +28,8 @@ class Cart(Base):
     customer = relationship("Customer", backref="cart")
     order_id = Column(Integer, ForeignKey("order.id"), index=True)
     order = relationship("Order", backref="cart")
+    free_delivery = Column(Boolean, nullable=False, default=False)
+    restaurant = Column(String(100), nullable=False, default="clickEat")
 
     def __repr__(self):
         return self.product_name
@@ -41,6 +43,8 @@ class Cart(Base):
             self.unit_price = kwargs.get("unit_price")
             self.quantity = kwargs.get("quantity")
             self.served_with = kwargs.get("served_with", "none")
+            self.free_delivery = kwargs.get("free_delivery", False)
+            self.restaurant = kwargs.get("restaurant", "clickEat")
             item_exists = self.query.filter_by(
                 customer_id = self.customer_id,
                 product_id = self.product_id,
@@ -76,7 +80,9 @@ class Cart(Base):
             "served_with": self.served_with,
             "total": self.total,
             "total_quantity": int(self.cart_total_quantity_or_item_count(self.customer_id)),
-            "cart_total_amount": int(self.cart_total_amount(self.customer_id))
+            "cart_total_amount": int(self.cart_total_amount(self.customer_id)),
+            "free_delivery": self.free_delivery,
+            "restaurant": self.restaurant
         }
 
     @hybrid_property

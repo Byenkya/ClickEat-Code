@@ -73,6 +73,7 @@ class ProductsVerificationForm(FlaskForm):
     served_with =  TextAreaField('Served With',render_kw=dict(placeholder="additional items added to the main product"), validators=[ InputRequired(),DataRequired(), Length(min=1, max=500, message="description should be between 10 to 500 characters and separated with commas")])
     commission_fee = FloatField("Commission Fee", validators=[InputRequired("Commission fee needed"),NumberRange(min=0.0)])
     headsup =  StringField("Delivery Time", render_kw=dict(placeholder="e.g 30-40 MINS"),validators=[InputRequired(), DataRequired()])
+    free_delivery = BooleanField("Free Delivery")
     submit = SubmitField("UPDATE")
 
 class AddProductForm(FlaskForm):

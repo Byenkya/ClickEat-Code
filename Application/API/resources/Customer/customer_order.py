@@ -1,6 +1,14 @@
 from flask_restful import Resource, marshal_with, fields
 from Application.flask_imports import request
 from Application.database.models import Order
+from datetime import datetime
+
+def check_for_pre_order_date(date):
+    if date != "":
+        date_ = date.split("-")
+        return datetime(int(date_[0]),int(date_[1]),int(date_[2]),int(date_[3]),int(date_[4]))
+    else:
+        return datetime.now()
 
 class OrdersApi(Resource):
     def post(self):
@@ -13,6 +21,8 @@ class OrdersApi(Resource):
         sub_county = address['sub_county']
         village = address['village']
         other_details = address['other_details']
+        pre_order = request.json["pre_order"]
+        pre_order_time = check_for_pre_order_date(request.json["pre_order_date"])
 
         if(
             Order.place_customer_order(
@@ -23,7 +33,9 @@ class OrdersApi(Resource):
             village=village,
             other_details=other_details,
             delivery_contact=delivery_contact,
-            delivery_fee=delivery_fee
+            delivery_fee=delivery_fee,
+            pre_order=pre_order,
+            pre_order_time=pre_order_time
             )):
             response = {
                 "status":"success",
@@ -37,7 +49,7 @@ class OrdersApi(Resource):
 
             response = {
                 "status": "error",
-                "message": "Please clear or terminate current order under your orders before placing another order.",
+                "message": "No payment Method was selected",
                 "data": 0
             }
 

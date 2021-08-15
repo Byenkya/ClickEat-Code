@@ -95,25 +95,34 @@
                         </tr>
                       </tbody>
                       <tfoot>
-                        <tr class="table-active">
+                        <tr class="">
                           <th colspan="8" scope="row">Sub Total</th>
                           <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(cart_items_sum)}}</th>
                         </tr>
-                        <tr class="table-active">
+                        <tr class="">
                           <th colspan="8" scope="row">Delivery Fee</th>
                           <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(order.delivery_fee)}}</th>
                         </tr>
-                        <tr class="table-active">
+                        {% if order.pre_order %}
+                          <tr class="">
+                            <th colspan="8" scope="row"><b>Pre Order Delivery Date Details</b></th>
+                            <th scope="row" class="text-nowrap text-right">
+                              <span class="badge badge-pill badge-danger"><h6>{{ order.pre_order_time.strftime('%Y-%h-%d %H:%M:%S') }}</h6></span>
+                            </th>
+                          </tr>
+                        {% endif %}
+                        <tr class="">
                           <th colspan="8" scope="row">Tax</th>
                           <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(0) }}</th>
                         </tr>
-                        <tr class="table-active">
+                        <tr class="">
                           <th colspan="8" scope="row">Total</th>
                           <th scope="row" class="text-nowrap text-right">{{ "{:,} Ugx".format(cart_items_sum + order.delivery_fee) }}</th>
                         </tr>
                       </tfoot>
                     </table>
                   </div>
+                  <hr/>
                   <div class="table-responsive">
                     <table class="table">
                       <thead class="thead-dark">
@@ -125,11 +134,11 @@
                       <tbody>
                         <tr>
                           <td class="text-nowrap">{{order.payment[0].payment_method.method|title}}</td>
-                          <td>{{ order.order_date.strftime('%m/%d/%Y')}}</td>
+                          <td>{{ order.order_date.strftime('%h/%d/%Y')}}</td>
                         </tr>
                       </tbody>
                     </table>
-                  </div>
+                  </div><hr/>
                   <!-- /.content-->
                   <div align="center"><h4><b><Address>Delivery Address</Address></b></h4></div>
                   <table class="table">
@@ -149,7 +158,7 @@
                         <td>{{ order.delivery_address.other_details }}</td>
                       </tr>
                     </tbody>
-                  </table>
+                  </table><hr/>
                   
               </div>
               
