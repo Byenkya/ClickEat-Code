@@ -413,7 +413,7 @@ def rest_product_detail(product_id):
 		if form.product_picture.data:
 			try:
 				product_pic = save_picture(form.product_picture.data,product.product_picture, "static/product_images", 500,500)
-				product.sub_category_id = form.sub_category.data
+				# product.sub_category_id = form.sub_category.data
 				product.name = form.name.data
 				product.product_picture = product_pic
 				product.price = form.price.data
@@ -434,7 +434,7 @@ def rest_product_detail(product_id):
 				flash("Internal server error failed to update product.", "danger")
 		else:
 			try:
-				product.sub_category_id = form.sub_category.data
+				# product.sub_category_id = form.sub_category.data
 				product.name = form.name.data
 				product.price = form.price.data
 				product.description = form.description.data
