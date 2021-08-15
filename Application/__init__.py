@@ -225,30 +225,30 @@ def set_new_password(token):
 
 app.config['LOG_FILE'] = 'application.log'
 
-RECEPIENTS = ['jbyenkyaaaron@gmail.com', 'tayebwaian0@gmail.com', 'willbrodmutesi@gmail.com', 'charlitrix1@gmail.com']
+RECEPIENTS = ['jbyenkyaaaron@gmail.com', 'tayebwaian0@gmail.com', 'willbrodmutesi@gmail.com']
 
-# if not app.debug:
-#     import os
-#     import logging
-#     from logging import FileHandler, Formatter
-#     from logging.handlers import SMTPHandler
-#     file_handler = FileHandler(app.config['LOG_FILE'])
-#     file_handler.setLevel(logging.INFO)
-#     app.logger.addHandler(file_handler)
+if not app.debug:
+    import os
+    import logging
+    from logging import FileHandler, Formatter
+    from logging.handlers import SMTPHandler
+    file_handler = FileHandler(app.config['LOG_FILE'])
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
 
-#     mail_handler = SMTPHandler(
-#         ("smtp.gmail.com", 587), os.environ["MAIL_USERNAME"], RECEPIENTS,
-#         'Error occurred in your ClickEat application',
-#         (os.environ["MAIL_USERNAME"], os.environ['MAIL_PASSWORD']), secure=()
-#     )
+    mail_handler = SMTPHandler(
+        ("smtp.gmail.com", 587), os.environ["MAIL_USERNAME"], RECEPIENTS,
+        'Error occurred in your ClickEat application',
+        (os.environ["MAIL_USERNAME"], os.environ['MAIL_PASSWORD']), secure=()
+    )
 
-#     mail_handler.setLevel(logging.ERROR)
-#     app.logger.addHandler(mail_handler)
+    mail_handler.setLevel(logging.ERROR)
+    app.logger.addHandler(mail_handler)
 
-#     for handler in [file_handler, mail_handler]:
-#         handler.setFormatter(
-#             Formatter(
-#                 '%(asctime)s %(levelname)s: %(message)s '
-#                 '[in %(pathname)s: %(lineno)d]'
-#             )
-#         )
+    for handler in [file_handler, mail_handler]:
+        handler.setFormatter(
+            Formatter(
+                '%(asctime)s %(levelname)s: %(message)s '
+                '[in %(pathname)s: %(lineno)d]'
+            )
+        )
