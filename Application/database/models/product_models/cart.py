@@ -88,7 +88,14 @@ class Cart(Base):
     @hybrid_property
     def total(self):
         return self.quantity * self.unit_price
-
+        
+    @classmethod
+    def customer_order_items_total(cls, order_id):
+        total = session.query(func.sum(cls.total))\
+            .filter_by(
+                order_id=order_id
+                ).scalar()
+        return total if total else 0
 
     @classmethod
     def read_customer_cart_items(cls, customer_id):

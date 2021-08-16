@@ -78,6 +78,9 @@ class Order(Base):
             return delivery_detials.DeliveryDetails.get_order_delivery_address(self.id)
         except:
             session.rollback()
+    @property
+    def read_order_total_amount(self):
+        return cart.Cart.customer_order_items_total(self.id)
 
     @classmethod
     def customer_order_count(cls, customer_id):
