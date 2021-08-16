@@ -124,8 +124,9 @@ def shuffle_all_prodcuts(all_products):
 #Home products
 class HomeProductsResource(Resource):
     def get(self):
-        time_zone = pytz.timezone("Africa/Kampala")
-        current_time = time_zone.localize(datetime.now())
+        timezone = pytz.timezone("Africa/Kampala")
+        _date = timezone.localize(datetime.now())
+        current_time = _date.astimezone(timezone)
         fruits_vegetables = []
         for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all():
             if product.approved and product.suspend != True:
@@ -206,8 +207,9 @@ searchStringsArgs = reqparse.RequestParser()
 searchStringsArgs.add_argument("searchString", type=str)
 class SearchedProductsResource(Resource):
     def get(self):
-        time_zone = pytz.timezone("Africa/Kampala")
-        current_time = time_zone.localize(datetime.now())
+        timezone = pytz.timezone("Africa/Kampala")
+        _date = timezone.localize(datetime.now())
+        current_time = _date.astimezone(timezone)
         args = searchStringsArgs.parse_args()
         products = []
         searched_pdts = []
@@ -244,8 +246,9 @@ categoryProductsStringsArgs = reqparse.RequestParser()
 categoryProductsStringsArgs.add_argument("categoryName", type=str)
 class CategoryProductsApI(Resource):
     def get(self):
-        time_zone = pytz.timezone("Africa/Kampala")
-        current_time = time_zone.localize(datetime.now())
+        timezone = pytz.timezone("Africa/Kampala")
+        _date = timezone.localize(datetime.now())
+        current_time = _date.astimezone(timezone)
         args = categoryProductsStringsArgs.parse_args()
         products = []
         if args.get("categoryName", None):
@@ -263,8 +266,9 @@ class CategoryProductsApI(Resource):
 #sub_category_products
 class SubCategoryProductsApI(Resource):
     def get(self, id):
-        time_zone = pytz.timezone("Africa/Kampala")
-        current_time = time_zone.localize(datetime.now())
+        timezone = pytz.timezone("Africa/Kampala")
+        _date = timezone.localize(datetime.now())
+        current_time = _date.astimezone(timezone)
         sub_cat_pdts = []
         products = Products.read_products_based_on_sub_cat(id)
         for product in products:

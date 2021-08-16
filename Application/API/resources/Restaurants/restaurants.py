@@ -6,8 +6,9 @@ import pytz
 
 class RestaurantApi(Resource):
     def get(self):
-        time_zone = pytz.timezone("Africa/Kampala")
-        current_time = time_zone.localize(datetime.now())
+        timezone = pytz.timezone("Africa/Kampala")
+        _date = timezone.localize(datetime.now())
+        current_time = _date.astimezone(timezone)
         rests = Resturant.read_restaurants()
         operational_restaurants = []
         for restaurant in rests:

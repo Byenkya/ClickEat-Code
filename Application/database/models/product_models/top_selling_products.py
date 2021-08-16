@@ -58,8 +58,9 @@ class TopSellingProducts(Base):
     @classmethod
     def read_all_top_discount_products(cls):
         try:
-            time_zone = pytz.timezone("Africa/Kampala")
-            current_time = time_zone.localize(datetime.now())
+            timezone = pytz.timezone("Africa/Kampala")
+            _date = timezone.localize(datetime.now())
+            current_time = _date.astimezone(timezone)
             products = []
             top_discounts_ids = cls.query.all()
 

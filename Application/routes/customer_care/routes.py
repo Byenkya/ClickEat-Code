@@ -11,6 +11,8 @@ from .forms import LoginForm, ReasonForm, OrderReturnsForm, AccountSettingsForm,
 from Application.utils import employee_login_required, Paginate, DateUtil
 from Application.database.sqlalchemy_imports import and_
 from Application.database.initialize_database import session
+from datetime import datetime
+import pytz
 
 customer_care = Blueprint(
     'customer_care',__name__,template_folder="templates/",
@@ -189,6 +191,9 @@ def customer_care_order_detail(order_id):
 
 	order_products = []
 	order_return_form.order_products.choices = order_products
+	timezone = pytz.timezone("Africa/Kampala")
+	_date = timezone.localize(order.pre_order_time)
+	order_date = _date.astimezone(timezone).strftime("%a %b %d %H:%M:%S %Z %Y")
 	for item in order.cart:
 		order_products.append(
 			(
@@ -206,6 +211,7 @@ def customer_care_order_detail(order_id):
 
 	return render_template(
 		'orders/order/order_detail.html',
+		order_date=order_date,
 		order=order,
 		cart_items_sum=cart_items_sum,
 		districts=courier_districts,

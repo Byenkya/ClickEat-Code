@@ -314,40 +314,105 @@ class Order(Base):
                         return False
 
                     #customer_care email
+                    items_str = ""
+                    item_string = ""
+                    for i in items:
+                        item = i.serialize()
+                        item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n"
+                        items_str+=item_string
+                    total = items[0].serialize()
+                    items_total = total["cart_total_amount"]
+                    subject_customer_care = """
+                                            The following customer: {customer_name} has placed an order with the following details:
+                                            Order Reference: {order_ref}
+                                            Order Date: {order_date}
+                                            Contact: {contact}
+                                        --------------------------------------------------------------------------------------
+                                            {items_str}
+                                        --------------------------------------------------------------------------------------
+                                            Items Total: {total}
+                                        --------------------------------------------------------------------------------------
+                                            Payment Method: {payment_method}
+                                            Delivery Price: {delivery_fee}
+                                            Total: {order_total}
+                                            Delivery Address: {delivery_address}
+                    """.format(
+                                        customer_name=customer_object.name,
+                                        order_ref=order_ref_simple_version, 
+                                        order_date="{: %d/%m/%Y}".format(datetime.now()),
+                                        contact=customer_object.contact,
+                                        items_str=items_str,
+                                        total='{:,} Ugx'.format(items_total),
+                                        payment_method=payment_method.method,
+                                        delivery_fee='{:,} Ugx'.format(delivery_fee),
+                                        order_total='{:,} Ugx'.format(delivery_fee+items_total),
+                                        delivery_address=f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
+                    )
                     customer_care_mail_ = customer_care_email
                     customer_care_mail_.recipients = ["tayebwaian0@gmail.com", "willbrodmutesi@gmail.com", "imutyaba11@gmail.com"]
-                    customer_care_mail_.context = dict(
-                        customer_name=customer_object.name,
-                        customer_contact=customer_object.contact,
-                        order_ref=order_ref_simple_version,
-                        order_date="{: %d/%m/%Y}".format(datetime.now()),
-                        items=[i.serialize() for i in items],
-                        delivery_method="Home delivery",
-                        delivery_fee=delivery_fee,
-                        payment_method=payment_method.method,
-                        delivery_address= f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
-                    )
-                    # customer_care_mail_.text = "The following customer: {customer} has placed an order with reference number: {order_ref_simple_version}.\nCustomer contact: {contact}".format(
-                    #     customer=customer_object.name,
-                    #     order_ref_simple_version=order_ref_simple_version,
-                    #     contact=customer_object.contact
+                    # customer_care_mail_.context = dict(
+                    #     customer_name=customer_object.name,
+                    #     customer_contact=customer_object.contact,
+                    #     order_ref=order_ref_simple_version,
+                    #     order_date="{: %d/%m/%Y}".format(datetime.now()),
+                    #     items=[i.serialize() for i in items],
+                    #     delivery_method="Home delivery",
+                    #     delivery_fee=delivery_fee,
+                    #     payment_method=payment_method.method,
+                    #     delivery_address= f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
                     # )
+                    customer_care_mail_.text = subject_customer_care
                     customer_care_mail_.send()
 
                     if customer_object.email:
+                        subject_customer = """
+                                        ---------------------------------------------------------------------
+                                            Written by customercare.clickeat@gmail.com
+                                                Office Address:
+                                                Afra Road,<br>
+                                                Near Hindu Temple,<br>
+                                                Room 08,<br>
+                                                Arua City, Uganda.
+                                        ---------------------------------------------------------------------
+                                            You have successfully made an order for the following items.
+                                            Order Reference: {order_ref}
+                                            Order Date: {order_date}
+                                        ---------------------------------------------------------------------
+                                            {items_str}
+                                        ---------------------------------------------------------------------
+                                            Items Total: {total}
+                                        ---------------------------------------------------------------------
+                                            Payment Method: {payment_method}
+                                            Delivery Price: {delivery_fee}
+                                            Total: {order_total}
+                                            Delivery Address: {delivery_address}
+                                        ---------------------------------------------------------------------
+                                            You have received this email because you are a member of ClickEat.
+                                            For any help please contact us by clicking 0785857000/0777758880
+                        """.format(
+                                        order_ref=order_ref_simple_version, 
+                                        order_date="{: %d/%m/%Y}".format(datetime.now()),
+                                        items_str=items_str,
+                                        total='{:,} Ugx'.format(items_total),
+                                        payment_method=payment_method.method,
+                                        delivery_fee='{:,} Ugx'.format(delivery_fee),
+                                        order_total='{:,} Ugx'.format(delivery_fee+items_total),
+                                        delivery_address=f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
+                        )
                         mail_ = order_placed_email
                         mail_.recipients = [customer_object.email]
-                        mail_.context = dict(
-                            customer_name=customer_object.name,
-                            customer_contact=customer_object.contact,
-                            order_ref=order_ref_simple_version,
-                            order_date="{: %d/%m/%Y}".format(datetime.now()),
-                            items=[i.serialize() for i in items],
-                            delivery_method="Home delivery",
-                            delivery_fee=delivery_fee,
-                            payment_method=payment_method.method,
-                            delivery_address= f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
-                        )
+                        mail_.text = subject_customer
+                        # mail_.context = dict(
+                        #     customer_name=customer_object.name,
+                        #     customer_contact=customer_object.contact,
+                        #     order_ref=order_ref_simple_version,
+                        #     order_date="{: %d/%m/%Y}".format(datetime.now()),
+                        #     items=[i.serialize() for i in items],
+                        #     delivery_method="Home delivery",
+                        #     delivery_fee=delivery_fee,
+                        #     payment_method=payment_method.method,
+                        #     delivery_address= f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
+                        # )
                         # mail_.text = "You have placed the following order with reference number: {order_ref_simple_version}".format(
                         #     order_ref_simple_version=order_ref_simple_version
                         # )
@@ -438,17 +503,65 @@ class Order(Base):
                                     commission_amount=product.commission_amount if product.commission_amount else 0
                                     )
                         if order.customer.email:
+                            items_str = ""
+                            item_string = ""
+                            for i in items:
+                                item = i.serialize()
+                                item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n"
+                                items_str+=item_string
+                            total = items[0].serialize()
+                            items_total = total["cart_total_amount"]
+                            subject_customer = """
+                                        ------------------------------------------------------------------
+                                            Written by customercare.clickeat@gmail.com
+                                                Office Address:
+                                                Afra Road,<br>
+                                                Near Hindu Temple,<br>
+                                                Room 08,<br>
+                                            Arua City, Uganda.
+                                        ------------------------------------------------------------------
+                                            Dear {user_name},
+                                            You have made a payment for the following items.
+                                            Order Reference: {order_ref}
+                                            Order Date: {order_date}
+                                        ------------------------------------------------------------------
+                                            {items_str}
+                                        ------------------------------------------------------------------
+                                            Items Total: {total}
+                                        ------------------------------------------------------------------
+                                            Payment Method: {payment_method}
+                                            Delivery Price: {delivery_fee}
+                                            Total: {order_total}
+                                            Status: Paid
+                                        ------------------------------------------------------------------
+
+                                            Thank you for buying on ClickEat, please come gain :)
+                                        ------------------------------------------------------------------
+                                        You have received this email because you are a member of ClickEat.
+                                        For any help please contact us by clicking 0785857000/0777758880
+                                        ------------------------------------------------------------------
+                            """.format(
+                                            user_name=order.customer.name,
+                                            order_ref=order.order_ref_simple_version, 
+                                            order_date="{: %d/%m/%Y}".format(order.order_date),
+                                            items_str=items_str,
+                                            total='{:,} Ugx'.format(items_total),
+                                            payment_method=order.payment[0].payment_method.serialize(),
+                                            delivery_fee='{:,} Ugx'.format(order.delivery_fee),
+                                            order_total='{:,} Ugx'.format(order.delivery_fee+items_total)
+                            )
                             mail_  = order_receipt_email
                             mail_.recipients = [order.customer.email]
-                            mail_.context = dict(
-                                items = [i.serialize() for i in order.cart],
-                                order_ref = order.order_ref_simple_version,
-                                order_date="{: %d/%m/%Y}".format(order.order_date),
-                                user_name = order.customer.name,
-                                delivery_fees = order.delivery_fee,
-                                payment_method = order.payment[0].payment_method.serialize(),
-                                customer_received = order.customer_received
-                            )
+                            mail_.text = subject_customer
+                            # mail_.context = dict(
+                            #     items = [i.serialize() for i in order.cart],
+                            #     order_ref = order.order_ref_simple_version,
+                            #     order_date="{: %d/%m/%Y}".format(order.order_date),
+                            #     user_name = order.customer.name,
+                            #     delivery_fees = order.delivery_fee,
+                            #     payment_method = order.payment[0].payment_method.serialize(),
+                            #     customer_received = order.customer_received
+                            # )
                             mail_.send()
                             session.commit()
                             flash("Order status has been set to paid", "success")

@@ -166,8 +166,9 @@ class Products(Base):
     def home_products(cls):
         try:
             #home products
-            time_zone = pytz.timezone("Africa/Kampala")
-            current_time = time_zone.localize(datetime.now())
+            timezone = pytz.timezone("Africa/Kampala")
+            _date = timezone.localize(datetime.now())
+            current_time = _date.astimezone(timezone)
             home_products = []
             products = []
             drinks = []
@@ -231,8 +232,9 @@ class Products(Base):
                 session.rollback()
         else:
             try:
-                time_zone = pytz.timezone("Africa/Kampala")
-                current_time = time_zone.localize(datetime.now())
+                timezone = pytz.timezone("Africa/Kampala")
+                _date = timezone.localize(datetime.now())
+                current_time = _date.astimezone(timezone)
                 products_based_on_sub_cat_dict = {}
                 product_based_on_sub_cat_list = []
                 restaurant_products = [product for product in cls.query.filter_by(**kwargs).all() if product.approved and product.suspend != True]

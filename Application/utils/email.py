@@ -67,23 +67,27 @@ order_cancelled_email = SendEmails (
     context=None
 )
 
+# template = "emails/orders/order_invoice.html"
+# template = "emails/orders/customer_care_email.html"
+# template= "emails/orders/order_receipt.html"
+
 order_placed_email = SendEmails(
     title = "ClickEat Customer Placed Order",
     recipients = None,
-    template = "emails/orders/order_invoice.html",
+    template = None,
     context = None
 )
 
 customer_care_email = SendEmails(
     title = "ClickEat Orders",
     recipients = None,
-    template = "emails/orders/customer_care_email.html",
+    template = None,
     context = None
 )
 
 order_receipt_email = SendEmails(
     title="ClickEat Orders",
     recipients=None,
-    template= "emails/orders/order_receipt.html",
+    template= None,
     context=None
 )
