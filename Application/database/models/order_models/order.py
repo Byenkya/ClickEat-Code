@@ -139,7 +139,7 @@ class Order(Base):
             session.rollback()
 
     @property
-    def read_order_total_amount(self):
+    def read_cart_items_total_amount(self):
         try:
             return pdts.Cart.customer_order_items_total(self.id)
         except:
@@ -191,7 +191,7 @@ class Order(Base):
             if self.customer.email:
                 mail_ = order_cancelled_email
                 mail_.recipients = [self.customer.email]
-                mail_.text = "You have cancelled the following order:{order}, because of this reason: \n{reason}".format(order=self.order_ref_simple_version, reason=reason)
+                mail_.text = "We have cancelled the following order:{order}, because of the following reason: \n{reason}".format(order=self.order_ref_simple_version, reason=reason)
                 mail_.send()
                 session.commit()
                 return True
@@ -314,14 +314,16 @@ class Order(Base):
                         return False
 
                     #customer_care email
+                    cart_items_total = []
                     items_str = ""
                     item_string = ""
                     for i in items:
                         item = i.serialize()
-                        item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n"
+                        item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n\t\t\t"
                         items_str+=item_string
+                        cart_items_total.append(item['total'])
                     total = items[0].serialize()
-                    items_total = total["cart_total_amount"]
+                    items_total = sum(cart_items_total)
                     subject_customer_care = """
                                             The following customer: {customer_name} has placed an order with the following details:
                                             Order Reference: {order_ref}
@@ -346,7 +348,7 @@ class Order(Base):
                                         payment_method=payment_method.method,
                                         delivery_fee='{:,} Ugx'.format(delivery_fee),
                                         order_total='{:,} Ugx'.format(delivery_fee+items_total),
-                                        delivery_address=f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
+                                        delivery_address=f"County: {county},Sub County: {sub_county},Village: {village},Other_details: {other_details}"
                     )
                     customer_care_mail_ = customer_care_email
                     customer_care_mail_.recipients = ["tayebwaian0@gmail.com", "willbrodmutesi@gmail.com", "imutyaba11@gmail.com"]
@@ -397,7 +399,7 @@ class Order(Base):
                                         payment_method=payment_method.method,
                                         delivery_fee='{:,} Ugx'.format(delivery_fee),
                                         order_total='{:,} Ugx'.format(delivery_fee+items_total),
-                                        delivery_address=f"County: {county}\n,Sub County: {sub_county}\n,Village: {village}\n,Other_details: {other_details}"
+                                        delivery_address=f"County: {county},Sub County: {sub_county},Village: {village},Other_details: {other_details}"
                         )
                         mail_ = order_placed_email
                         mail_.recipients = [customer_object.email]
@@ -503,14 +505,16 @@ class Order(Base):
                                     commission_amount=product.commission_amount if product.commission_amount else 0
                                     )
                         if order.customer.email:
+                            cart_items_total = []
                             items_str = ""
                             item_string = ""
                             for i in items:
                                 item = i.serialize()
-                                item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n"
+                                item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n\t\t\t"
                                 items_str+=item_string
+                                cart_items_total.append(item['total'])
                             total = items[0].serialize()
-                            items_total = total["cart_total_amount"]
+                            items_total = sum(cart_items_total)
                             subject_customer = """
                                         ------------------------------------------------------------------
                                             Written by customercare.clickeat@gmail.com

@@ -49,7 +49,7 @@ class OrdersApi(Resource):
 
             response = {
                 "status": "error",
-                "message": "No payment Method was selected",
+                "message": "There was a problem while trying to place your order. Please try again",
                 "data": 0
             }
 
