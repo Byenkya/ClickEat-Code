@@ -9,7 +9,7 @@ timezone = pytz.timezone("Africa/Kampala")
 
 class RestaurantApi(Resource):
     def get(self):
-        _date = ni_timezone.localize(datetime.now())
+        _date = datetime.now(ni_timezone)
         current_time = _date.astimezone(timezone)
         rests = Resturant.read_restaurants()
         operational_restaurants = []
