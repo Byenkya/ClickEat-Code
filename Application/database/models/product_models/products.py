@@ -174,7 +174,11 @@ class Products(Base):
             drinks = []
             for product in cls.query.all():
                 if product.resturant.favourite and product.approved and product.suspend != True:
-                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                    start_date = timezone.localize(product.resturant.operation_start_time)
+                    end_date = timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = start_date.astimezone(timezone)
+                    operation_stop_time = end_date.astimezone(timezone)
+                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         try:
                             pdt = product.serialize()
                             pdt["available"] = True
@@ -190,7 +194,11 @@ class Products(Base):
 
             for product in cls.query.filter_by(sub_category_id=6).all():
                 if product.approved and product.suspend != True:
-                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                    start_date = timezone.localize(product.resturant.operation_start_time)
+                    end_date = timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = start_date.astimezone(timezone)
+                    operation_stop_time = end_date.astimezone(timezone)
+                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         try:
                             pdt = product.serialize()
                             pdt["available"] = True
@@ -242,7 +250,11 @@ class Products(Base):
                 for product in restaurant_products:
                     if f"{product.sub_category}" in products_based_on_sub_cat_dict:
                         if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
-                            if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                            start_date = timezone.localize(product.resturant.operation_start_time)
+                            end_date = timezone.localize(product.resturant.operation_stop_time)
+                            operation_start_time = start_date.astimezone(timezone)
+                            operation_stop_time = end_date.astimezone(timezone)
+                            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                                 try:
                                     pdt = product.serialize()
                                     pdt["available"] = True
@@ -255,7 +267,11 @@ class Products(Base):
                                 except Exception as e:
                                     print(e)
                     else:
-                        if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                        start_date = timezone.localize(product.resturant.operation_start_time)
+                        end_date = timezone.localize(product.resturant.operation_stop_time)
+                        operation_start_time = start_date.astimezone(timezone)
+                        operation_stop_time = end_date.astimezone(timezone)
+                        if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                             try:
                                 pdt = product.serialize()
                                 pdt["available"] = True

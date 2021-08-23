@@ -69,7 +69,11 @@ class TopSellingProducts(Base):
                     pdt = pdts.Products.read_product(id=product.product_id)
                     if pdt:
                         if pdt.approved and pdt.suspend != True:
-                            if current_time.hour >= pdt.resturant.operation_start_time.hour and current_time.hour <= pdt.resturant.operation_stop_time.hour:
+                            start_date = timezone.localize(pdt.resturant.operation_start_time)
+                            end_date = timezone.localize(pdt.resturant.operation_stop_time)
+                            operation_start_time = start_date.astimezone(timezone)
+                            operation_stop_time = end_date.astimezone(timezone)
+                            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                                 try:
                                     pdt = pdt.serialize()
                                     pdt["available"] = True

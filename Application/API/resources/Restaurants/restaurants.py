@@ -13,7 +13,11 @@ class RestaurantApi(Resource):
         operational_restaurants = []
         for restaurant in rests:
             if restaurant.approved:
-                if current_time.hour >= restaurant.operation_start_time.hour and current_time.hour <= restaurant.operation_stop_time.hour:
+                start_date = timezone.localize(restaurant.operation_start_time)
+                end_date = timezone.localize(restaurant.operation_stop_time)
+                operation_start_time = start_date.astimezone(timezone)
+                operation_stop_time = end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                     rest = restaurant.serialize()
                     rest["operational_status"] = True
                     operational_restaurants.append(rest)

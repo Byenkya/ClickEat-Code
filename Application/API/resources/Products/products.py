@@ -130,7 +130,11 @@ class HomeProductsResource(Resource):
         fruits_vegetables = []
         for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all():
             if product.approved and product.suspend != True:
-                if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                start_date = timezone.localize(product.resturant.operation_start_time)
+                end_date = timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = start_date.astimezone(timezone)
+                operation_stop_time = end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                     try:
                         pdt = product.serialize()
                         pdt["available"] = True
@@ -161,7 +165,11 @@ class HomeProductsResource(Resource):
 
         for product in Products.read_products():
             if product.approved and product.suspend != True:
-                if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                start_date = timezone.localize(product.resturant.operation_start_time)
+                end_date = timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = start_date.astimezone(timezone)
+                operation_stop_time = end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                     try:
                         pdt = product.serialize()
                         pdt["available"] = True
@@ -233,7 +241,11 @@ class SearchedProductsResource(Resource):
 
             for product in products:
                 if product.approved and product.suspend != True:
-                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                    start_date = timezone.localize(product.resturant.operation_start_time)
+                    end_date = timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = start_date.astimezone(timezone)
+                    operation_stop_time = end_date.astimezone(timezone)
+                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         pdt = product.serialize()
                         pdt["available"] = True
                         searched_pdts.append(pdt)
@@ -255,7 +267,11 @@ class CategoryProductsApI(Resource):
             categoryName = args["categoryName"]
             for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all():
                 if product.approved and product.suspend != True:
-                    if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                    start_date = timezone.localize(product.resturant.operation_start_time)
+                    end_date = timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = start_date.astimezone(timezone)
+                    operation_stop_time = end_date.astimezone(timezone)
+                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         pdt = product.serialize()
                         pdt["available"] = True
                         products.append(pdt)
@@ -273,7 +289,11 @@ class SubCategoryProductsApI(Resource):
         products = Products.read_products_based_on_sub_cat(id)
         for product in products:
             if product.approved and product.suspend != True:
-                if current_time.hour >= product.resturant.operation_start_time.hour and current_time.hour <= product.resturant.operation_stop_time.hour:
+                start_date = timezone.localize(product.resturant.operation_start_time)
+                end_date = timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = start_date.astimezone(timezone)
+                operation_stop_time = end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                     pdt = product.serialize()
                     pdt["available"] = True
                     sub_cat_pdts.append(pdt)
