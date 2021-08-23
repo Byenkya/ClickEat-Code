@@ -169,7 +169,7 @@ class Products(Base):
     def home_products(cls):
         try:
             #home products
-            _date = ni_timezone.localize(datetime.now())
+            _date = datetime.now(ni_timezone)
             current_time = _date.astimezone(timezone)
             home_products = []
             products = []
@@ -242,7 +242,7 @@ class Products(Base):
                 session.rollback()
         else:
             try:
-                _date = ni_timezone.localize(datetime.now())
+                _date = datetime.now(ni_timezone)
                 current_time = _date.astimezone(timezone)
                 products_based_on_sub_cat_dict = {}
                 product_based_on_sub_cat_list = []

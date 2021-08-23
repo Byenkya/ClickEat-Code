@@ -127,7 +127,7 @@ def shuffle_all_prodcuts(all_products):
 #Home products
 class HomeProductsResource(Resource):
     def get(self):
-        _date = ni_timezone.localize(datetime.now())
+        _date = datetime.now(ni_timezone)
         current_time = _date.astimezone(timezone)
         fruits_vegetables = []
         for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all():
@@ -217,7 +217,7 @@ searchStringsArgs = reqparse.RequestParser()
 searchStringsArgs.add_argument("searchString", type=str)
 class SearchedProductsResource(Resource):
     def get(self):
-        _date = ni_timezone.localize(datetime.now())
+        _date = datetime.now(ni_timezone)
         current_time = _date.astimezone(timezone)
         args = searchStringsArgs.parse_args()
         products = []
@@ -259,7 +259,7 @@ categoryProductsStringsArgs = reqparse.RequestParser()
 categoryProductsStringsArgs.add_argument("categoryName", type=str)
 class CategoryProductsApI(Resource):
     def get(self):
-        _date = ni_timezone.localize(datetime.now())
+        _date = datetime.now(ni_timezone)
         current_time = _date.astimezone(timezone)
         args = categoryProductsStringsArgs.parse_args()
         products = []
@@ -282,7 +282,7 @@ class CategoryProductsApI(Resource):
 #sub_category_products
 class SubCategoryProductsApI(Resource):
     def get(self, id):
-        _date = ni_timezone.localize(datetime.now())
+        _date = datetime.now(ni_timezone)
         current_time = _date.astimezone(timezone)
         sub_cat_pdts = []
         products = Products.read_products_based_on_sub_cat(id)
