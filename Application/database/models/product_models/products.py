@@ -9,6 +9,9 @@ import math
 from datetime import datetime
 import pytz
 
+ni_timezone = pytz.timezone('Africa/Nairobi')
+timezone = pytz.timezone("Africa/Kampala")
+
 #lazy loading dependencies.
 brnd = LazyLoader("Application.database.models.product_models.brand")
 pdtds = LazyLoader("Application.database.models.product_models.product_discounts")
@@ -166,18 +169,17 @@ class Products(Base):
     def home_products(cls):
         try:
             #home products
-            timezone = pytz.timezone("Africa/Kampala")
-            _date = timezone.localize(datetime.now())
+            _date = ni_timezone.localize(datetime.now())
             current_time = _date.astimezone(timezone)
             home_products = []
             products = []
             drinks = []
             for product in cls.query.all():
                 if product.resturant.favourite and product.approved and product.suspend != True:
-                    start_date = timezone.localize(product.resturant.operation_start_time)
-                    end_date = timezone.localize(product.resturant.operation_stop_time)
-                    operation_start_time = start_date.astimezone(timezone)
-                    operation_stop_time = end_date.astimezone(timezone)
+                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = _start_date.astimezone(timezone)
+                    operation_stop_time = _end_date.astimezone(timezone)
                     if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         try:
                             pdt = product.serialize()
@@ -194,10 +196,10 @@ class Products(Base):
 
             for product in cls.query.filter_by(sub_category_id=6).all():
                 if product.approved and product.suspend != True:
-                    start_date = timezone.localize(product.resturant.operation_start_time)
-                    end_date = timezone.localize(product.resturant.operation_stop_time)
-                    operation_start_time = start_date.astimezone(timezone)
-                    operation_stop_time = end_date.astimezone(timezone)
+                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = _start_date.astimezone(timezone)
+                    operation_stop_time = _end_date.astimezone(timezone)
                     if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         try:
                             pdt = product.serialize()
@@ -240,8 +242,7 @@ class Products(Base):
                 session.rollback()
         else:
             try:
-                timezone = pytz.timezone("Africa/Kampala")
-                _date = timezone.localize(datetime.now())
+                _date = ni_timezone.localize(datetime.now())
                 current_time = _date.astimezone(timezone)
                 products_based_on_sub_cat_dict = {}
                 product_based_on_sub_cat_list = []
@@ -250,10 +251,10 @@ class Products(Base):
                 for product in restaurant_products:
                     if f"{product.sub_category}" in products_based_on_sub_cat_dict:
                         if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
-                            start_date = timezone.localize(product.resturant.operation_start_time)
-                            end_date = timezone.localize(product.resturant.operation_stop_time)
-                            operation_start_time = start_date.astimezone(timezone)
-                            operation_stop_time = end_date.astimezone(timezone)
+                            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                            operation_start_time = _start_date.astimezone(timezone)
+                            operation_stop_time = _end_date.astimezone(timezone)
                             if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                                 try:
                                     pdt = product.serialize()
@@ -267,10 +268,10 @@ class Products(Base):
                                 except Exception as e:
                                     print(e)
                     else:
-                        start_date = timezone.localize(product.resturant.operation_start_time)
-                        end_date = timezone.localize(product.resturant.operation_stop_time)
-                        operation_start_time = start_date.astimezone(timezone)
-                        operation_stop_time = end_date.astimezone(timezone)
+                        _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                        _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                        operation_start_time = _start_date.astimezone(timezone)
+                        operation_stop_time = _end_date.astimezone(timezone)
                         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                             try:
                                 pdt = product.serialize()

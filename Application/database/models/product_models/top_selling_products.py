@@ -5,6 +5,9 @@ pdts = LazyLoader("Application.database.models.product_models.products")
 from datetime import datetime
 import pytz
 
+ni_timezone = pytz.timezone('Africa/Nairobi')
+timezone = pytz.timezone("Africa/Kampala")
+
 class TopSellingProducts(Base):
     __tablename__ = "top_selling_products"
 
@@ -58,8 +61,7 @@ class TopSellingProducts(Base):
     @classmethod
     def read_all_top_discount_products(cls):
         try:
-            timezone = pytz.timezone("Africa/Kampala")
-            _date = timezone.localize(datetime.now())
+            _date = ni_timezone.localize(datetime.now())
             current_time = _date.astimezone(timezone)
             products = []
             top_discounts_ids = cls.query.all()
@@ -69,10 +71,10 @@ class TopSellingProducts(Base):
                     pdt = pdts.Products.read_product(id=product.product_id)
                     if pdt:
                         if pdt.approved and pdt.suspend != True:
-                            start_date = timezone.localize(pdt.resturant.operation_start_time)
-                            end_date = timezone.localize(pdt.resturant.operation_stop_time)
-                            operation_start_time = start_date.astimezone(timezone)
-                            operation_stop_time = end_date.astimezone(timezone)
+                            _start_date = ni_timezone.localize(pdt.resturant.operation_start_time)
+                            _end_date = ni_timezone.localize(pdt.resturant.operation_stop_time)
+                            operation_start_time = _start_date.astimezone(timezone)
+                            operation_stop_time = _end_date.astimezone(timezone)
                             if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                                 try:
                                     pdt = pdt.serialize()

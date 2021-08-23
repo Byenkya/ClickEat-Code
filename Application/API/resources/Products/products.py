@@ -6,6 +6,9 @@ from random import sample, shuffle
 import pytz
 from datetime import datetime  
 
+timezone = pytz.timezone("Africa/Kampala")
+ni_timezone = pytz.timezone('Africa/Nairobi')
+
 product_fields = {
     "product_id": fields.Integer,
     "name": fields.String,
@@ -124,16 +127,15 @@ def shuffle_all_prodcuts(all_products):
 #Home products
 class HomeProductsResource(Resource):
     def get(self):
-        timezone = pytz.timezone("Africa/Kampala")
-        _date = timezone.localize(datetime.now())
+        _date = ni_timezone.localize(datetime.now())
         current_time = _date.astimezone(timezone)
         fruits_vegetables = []
         for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all():
             if product.approved and product.suspend != True:
-                start_date = timezone.localize(product.resturant.operation_start_time)
-                end_date = timezone.localize(product.resturant.operation_stop_time)
-                operation_start_time = start_date.astimezone(timezone)
-                operation_stop_time = end_date.astimezone(timezone)
+                _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = _start_date.astimezone(timezone)
+                operation_stop_time = _end_date.astimezone(timezone)
                 if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                     try:
                         pdt = product.serialize()
@@ -165,10 +167,10 @@ class HomeProductsResource(Resource):
 
         for product in Products.read_products():
             if product.approved and product.suspend != True:
-                start_date = timezone.localize(product.resturant.operation_start_time)
-                end_date = timezone.localize(product.resturant.operation_stop_time)
-                operation_start_time = start_date.astimezone(timezone)
-                operation_stop_time = end_date.astimezone(timezone)
+                _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = _start_date.astimezone(timezone)
+                operation_stop_time = _end_date.astimezone(timezone)
                 if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                     try:
                         pdt = product.serialize()
@@ -215,8 +217,7 @@ searchStringsArgs = reqparse.RequestParser()
 searchStringsArgs.add_argument("searchString", type=str)
 class SearchedProductsResource(Resource):
     def get(self):
-        timezone = pytz.timezone("Africa/Kampala")
-        _date = timezone.localize(datetime.now())
+        _date = ni_timezone.localize(datetime.now())
         current_time = _date.astimezone(timezone)
         args = searchStringsArgs.parse_args()
         products = []
@@ -241,10 +242,10 @@ class SearchedProductsResource(Resource):
 
             for product in products:
                 if product.approved and product.suspend != True:
-                    start_date = timezone.localize(product.resturant.operation_start_time)
-                    end_date = timezone.localize(product.resturant.operation_stop_time)
-                    operation_start_time = start_date.astimezone(timezone)
-                    operation_stop_time = end_date.astimezone(timezone)
+                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = _start_date.astimezone(timezone)
+                    operation_stop_time = _end_date.astimezone(timezone)
                     if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         pdt = product.serialize()
                         pdt["available"] = True
@@ -258,8 +259,7 @@ categoryProductsStringsArgs = reqparse.RequestParser()
 categoryProductsStringsArgs.add_argument("categoryName", type=str)
 class CategoryProductsApI(Resource):
     def get(self):
-        timezone = pytz.timezone("Africa/Kampala")
-        _date = timezone.localize(datetime.now())
+        _date = ni_timezone.localize(datetime.now())
         current_time = _date.astimezone(timezone)
         args = categoryProductsStringsArgs.parse_args()
         products = []
@@ -267,10 +267,10 @@ class CategoryProductsApI(Resource):
             categoryName = args["categoryName"]
             for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all():
                 if product.approved and product.suspend != True:
-                    start_date = timezone.localize(product.resturant.operation_start_time)
-                    end_date = timezone.localize(product.resturant.operation_stop_time)
-                    operation_start_time = start_date.astimezone(timezone)
-                    operation_stop_time = end_date.astimezone(timezone)
+                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = _start_date.astimezone(timezone)
+                    operation_stop_time = _end_date.astimezone(timezone)
                     if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                         pdt = product.serialize()
                         pdt["available"] = True
@@ -282,17 +282,16 @@ class CategoryProductsApI(Resource):
 #sub_category_products
 class SubCategoryProductsApI(Resource):
     def get(self, id):
-        timezone = pytz.timezone("Africa/Kampala")
-        _date = timezone.localize(datetime.now())
+        _date = ni_timezone.localize(datetime.now())
         current_time = _date.astimezone(timezone)
         sub_cat_pdts = []
         products = Products.read_products_based_on_sub_cat(id)
         for product in products:
             if product.approved and product.suspend != True:
-                start_date = timezone.localize(product.resturant.operation_start_time)
-                end_date = timezone.localize(product.resturant.operation_stop_time)
-                operation_start_time = start_date.astimezone(timezone)
-                operation_stop_time = end_date.astimezone(timezone)
+                _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = _start_date.astimezone(timezone)
+                operation_stop_time = _end_date.astimezone(timezone)
                 if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                     pdt = product.serialize()
                     pdt["available"] = True
