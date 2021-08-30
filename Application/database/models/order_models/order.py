@@ -344,6 +344,7 @@ class Order(Base):
                                                 <p>Payment Method: <b>{payment_method}</b></p>
                                                 <p>Delivery Price: <b>{delivery_fee}</b></p>
                                                 <p>Total: <b>{order_total}</b></p>
+                                                <hr>
                                                 <p>Delivery Address: {delivery_address}</p>
                                             </html>
                     """.format(
@@ -356,7 +357,7 @@ class Order(Base):
                                         payment_method=payment_method.method,
                                         delivery_fee='{:,} Ugx'.format(delivery_fee),
                                         order_total='{:,} Ugx'.format(delivery_fee+items_total),
-                                        delivery_address=f"County: {county}<br>,Sub County: {sub_county}<br>,Village: {village}<br>,Other_details: {other_details}<br>"
+                                        delivery_address=f"<br>County: {county}<br>,Sub County: {sub_county}<br>,Village: {village}<br>,Other_details: {other_details}<br>"
                     )
                     customer_care_mail_ = customer_care_email
                     customer_care_mail_.recipients = ["tayebwaian0@gmail.com", "willbrodmutesi@gmail.com", "imutyaba11@gmail.com"]
@@ -377,8 +378,8 @@ class Order(Base):
                     if customer_object.email:
                         subject_customer = """
                                         <html>
-                                            <p>Written by customercare.clickeat@gmail.com<br>
-                                                Office Address:<br>
+                                            <p>Written by: customercare.clickeat@gmail.com<br>
+                                                <b>Office Address:</b><br>
                                                 Afra Road,<br>
                                                 Near Hindu Temple,<br>
                                                 Room 08,<br>
@@ -392,15 +393,15 @@ class Order(Base):
                                                 {items_str}
                                             </ul>
                                             <hr>
-                                            <p>Items Total: {total}</p>
+                                            <p>Items Total: <b>{total}</b></p>
                                             <hr>
                                             <p>Payment Method: <b>{payment_method}</b></p>
                                             <p>Delivery Price: <b>{delivery_fee}</b></p>
                                             <p>Total: <b>{order_total}</b></p>
                                             <p>Delivery Address: {delivery_address}</p>
-                                    
+                                            <hr>
                                             <p>You have received this email because you are a registered customer of ClickEat.</p>
-                                            <p>For any help please contact us by clicking 0785857000/0777758880</p>
+                                            <p>For any help please contact us on: <b>0785857000/0777758880</b></p>
                                         </html>
                         """.format(
                                         order_ref=order_ref_simple_version, 
@@ -410,7 +411,7 @@ class Order(Base):
                                         payment_method=payment_method.method,
                                         delivery_fee='{:,} Ugx'.format(delivery_fee),
                                         order_total='{:,} Ugx'.format(delivery_fee+items_total),
-                                        delivery_address=f"County: {county}<br>,Sub County: {sub_county}<br>,Village: {village}<br>,Other_details: {other_details}<br>"
+                                        delivery_address=f"<br>County: {county}<br>,Sub County: {sub_county}<br>,Village: {village}<br>,Other_details: {other_details}<br>"
                         )
                         mail_ = order_placed_email
                         mail_.recipients = [customer_object.email]
@@ -549,6 +550,7 @@ class Order(Base):
                                             <p>Delivery Price: {delivery_fee}</p>
                                             <p>Total: {order_total}</p>
                                             <p>Status: <b>Paid</b></p>
+                                            <hr>
 
                                             <p><b>Thank you for buying on ClickEat, please come gain :)</b></p>
                                             <p>You have received this email because you are a member of ClickEat.</p>
