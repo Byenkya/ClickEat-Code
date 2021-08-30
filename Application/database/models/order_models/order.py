@@ -322,25 +322,30 @@ class Order(Base):
                     item_string = ""
                     for i in items:
                         item = i.serialize()
-                        item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n\t\t\t"
+                        item_string = f"<li>Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} <b>SubTotal: {'{:,} Ugx'.format(item['total'])}</b></li>"
                         items_str+=item_string
                         cart_items_total.append(item['total'])
                     total = items[0].serialize()
                     items_total = sum(cart_items_total)
                     subject_customer_care = """
-                                            The following customer: {customer_name} has placed an order with the following details:
-                                            Order Reference: {order_ref}
-                                            Order Date: {order_date}
-                                            Contact: {contact}
-                                        --------------------------------------------------------------------------------------
-                                            {items_str}
-                                        --------------------------------------------------------------------------------------
-                                            Items Total: {total}
-                                        --------------------------------------------------------------------------------------
-                                            Payment Method: {payment_method}
-                                            Delivery Price: {delivery_fee}
-                                            Total: {order_total}
-                                            Delivery Address: {delivery_address}
+                                            <html>
+                                                <p>The following customer: <b>{customer_name}</b> has placed an order with the following details:</p>
+                                                <p>Order Reference: {order_ref}</p>
+                                                <p>Order Date: {order_date}</p>
+                                                <p>Contact: {contact}</p>
+                                                <hr>
+                                                <ul style='list-style-type: none;display: block;width: 100%;padding: 0px 10px;overflow: hidden;'>    
+                                                    {items_str}
+                                                </ul>
+                                                <hr>
+                                                <p>Items Total: {total}</p>
+                                                <hr>
+                                        
+                                                <p>Payment Method: <b>{payment_method}</b></p>
+                                                <p>Delivery Price: <b>{delivery_fee}</b></p>
+                                                <p>Total: <b>{order_total}</b></p>
+                                                <p>Delivery Address: {delivery_address}</p>
+                                            </html>
                     """.format(
                                         customer_name=customer_object.name,
                                         order_ref=order_ref_simple_version, 
@@ -351,7 +356,7 @@ class Order(Base):
                                         payment_method=payment_method.method,
                                         delivery_fee='{:,} Ugx'.format(delivery_fee),
                                         order_total='{:,} Ugx'.format(delivery_fee+items_total),
-                                        delivery_address=f"County: {county},Sub County: {sub_county},Village: {village},Other_details: {other_details}"
+                                        delivery_address=f"County: {county}<br>,Sub County: {sub_county}<br>,Village: {village}<br>,Other_details: {other_details}<br>"
                     )
                     customer_care_mail_ = customer_care_email
                     customer_care_mail_.recipients = ["tayebwaian0@gmail.com", "willbrodmutesi@gmail.com", "imutyaba11@gmail.com"]
@@ -371,29 +376,32 @@ class Order(Base):
 
                     if customer_object.email:
                         subject_customer = """
-                                        ---------------------------------------------------------------------
-                                            Written by customercare.clickeat@gmail.com
-                                                Office Address:
+                                        <html>
+                                            <p>Written by customercare.clickeat@gmail.com<br>
+                                                Office Address:<br>
                                                 Afra Road,<br>
                                                 Near Hindu Temple,<br>
                                                 Room 08,<br>
                                                 Arua City, Uganda.
-                                        ---------------------------------------------------------------------
-                                            You have successfully made an order for the following items.
-                                            Order Reference: {order_ref}
-                                            Order Date: {order_date}
-                                        ---------------------------------------------------------------------
-                                            {items_str}
-                                        ---------------------------------------------------------------------
-                                            Items Total: {total}
-                                        ---------------------------------------------------------------------
-                                            Payment Method: {payment_method}
-                                            Delivery Price: {delivery_fee}
-                                            Total: {order_total}
-                                            Delivery Address: {delivery_address}
-                                        ---------------------------------------------------------------------
-                                            You have received this email because you are a member of ClickEat.
-                                            For any help please contact us by clicking 0785857000/0777758880
+                                            </p>
+                                            <p>You have successfully made an order for the following items.</p>
+                                            <p>Order Reference: <b>{order_ref}</b></p>
+                                            <p>Order Date: <b>{order_date}</b></p>
+                                            <hr>
+                                            <ul style='list-style-type: none;display: block;width: 100%;padding: 0px 10px;overflow: hidden;'>
+                                                {items_str}
+                                            </ul>
+                                            <hr>
+                                            <p>Items Total: {total}</p>
+                                            <hr>
+                                            <p>Payment Method: <b>{payment_method}</b></p>
+                                            <p>Delivery Price: <b>{delivery_fee}</b></p>
+                                            <p>Total: <b>{order_total}</b></p>
+                                            <p>Delivery Address: {delivery_address}</p>
+                                    
+                                            <p>You have received this email because you are a registered customer of ClickEat.</p>
+                                            <p>For any help please contact us by clicking 0785857000/0777758880</p>
+                                        </html>
                         """.format(
                                         order_ref=order_ref_simple_version, 
                                         order_date="{: %d/%m/%Y}".format(datetime.now()),
@@ -402,7 +410,7 @@ class Order(Base):
                                         payment_method=payment_method.method,
                                         delivery_fee='{:,} Ugx'.format(delivery_fee),
                                         order_total='{:,} Ugx'.format(delivery_fee+items_total),
-                                        delivery_address=f"County: {county},Sub County: {sub_county},Village: {village},Other_details: {other_details}"
+                                        delivery_address=f"County: {county}<br>,Sub County: {sub_county}<br>,Village: {village}<br>,Other_details: {other_details}<br>"
                         )
                         mail_ = order_placed_email
                         mail_.recipients = [customer_object.email]
@@ -513,40 +521,39 @@ class Order(Base):
                             item_string = ""
                             for i in items:
                                 item = i.serialize()
-                                item_string = f"Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} SubTotal: {'{:,} Ugx'.format(item['total'])}\n\t\t\t"
+                                item_string = f"<li>Item: {item['product_name']} from {item['restaurant']} Quantity: {item['quantity']} <b>SubTotal: {'{:,} Ugx'.format(item['total'])}</b></li>"
                                 items_str+=item_string
                                 cart_items_total.append(item['total'])
                             total = items[0].serialize()
                             items_total = sum(cart_items_total)
                             subject_customer = """
-                                        ------------------------------------------------------------------
-                                            Written by customercare.clickeat@gmail.com
-                                                Office Address:
+                                        <html>
+                                            <p>Written by customercare.clickeat@gmail.com<br>
+                                                Office Address:<br>
                                                 Afra Road,<br>
                                                 Near Hindu Temple,<br>
                                                 Room 08,<br>
-                                            Arua City, Uganda.
-                                        ------------------------------------------------------------------
-                                            Dear {user_name},
-                                            You have made a payment for the following items.
-                                            Order Reference: {order_ref}
-                                            Order Date: {order_date}
-                                        ------------------------------------------------------------------
-                                            {items_str}
-                                        ------------------------------------------------------------------
-                                            Items Total: {total}
-                                        ------------------------------------------------------------------
-                                            Payment Method: {payment_method}
-                                            Delivery Price: {delivery_fee}
-                                            Total: {order_total}
-                                            Status: Paid
-                                        ------------------------------------------------------------------
+                                                Arua City, Uganda.
+                                            </p>
+                                            <p>Dear <b>{user_name}</b></p>,
+                                            <p>You have made a payment for the following items.</p>
+                                            <p>Order Reference: <b>{order_ref}</b></p>
+                                            <p>Order Date: {order_date}</p>
+                                            <hr>
+                                            <ul style='list-style-type: none;display: block;width: 100%;padding: 0px 10px;overflow: hidden;'>
+                                                {items_str}
+                                            </ul>
+                                            <hr>
+                                            <p>Items Total: <b>{total}</b></p>
+                                            <p>Payment Method: {payment_method}</p>
+                                            <p>Delivery Price: {delivery_fee}</p>
+                                            <p>Total: {order_total}</p>
+                                            <p>Status: <b>Paid</b></p>
 
-                                            Thank you for buying on ClickEat, please come gain :)
-                                        ------------------------------------------------------------------
-                                        You have received this email because you are a member of ClickEat.
-                                        For any help please contact us by clicking 0785857000/0777758880
-                                        ------------------------------------------------------------------
+                                            <p><b>Thank you for buying on ClickEat, please come gain :)</b></p>
+                                            <p>You have received this email because you are a member of ClickEat.</p>
+                                            <p>For any help please contact us by clicking 0785857000/0777758880</p>
+                                        </html>
                             """.format(
                                             user_name=order.customer.name,
                                             order_ref=order.order_ref_simple_version, 

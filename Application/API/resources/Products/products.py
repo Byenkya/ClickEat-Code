@@ -137,17 +137,11 @@ class HomeProductsResource(Resource):
                 operation_start_time = _start_date.astimezone(timezone)
                 operation_stop_time = _end_date.astimezone(timezone)
                 if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                    try:
-                        pdt = product.serialize()
-                        pdt["available"] = True
-                        fruits_vegetables.append(pdt)
-                    except Exception as e:
-                        print(e)
+                    pdt = product.serialize()
+                    pdt["available"] = True
+                    fruits_vegetables.append(pdt)
                 else:
-                    try:
-                        fruits_vegetables.append(product.serialize())
-                    except Exception as e:
-                        print(e)
+                    fruits_vegetables.append(product.serialize())
 
 
         home_products = Products.home_products()
@@ -172,17 +166,11 @@ class HomeProductsResource(Resource):
                 operation_start_time = _start_date.astimezone(timezone)
                 operation_stop_time = _end_date.astimezone(timezone)
                 if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                    try:
-                        pdt = product.serialize()
-                        pdt["available"] = True
-                        all_products.append(pdt)
-                    except Exception as e:
-                        print(e)
+                    pdt = product.serialize()
+                    pdt["available"] = True
+                    all_products.append(pdt)
                 else:
-                    try:
-                        all_products.append(product.serialize())
-                    except Exception as e:
-                        print(e)
+                    all_products.append(product.serialize())
 
 
         # shuffle(all_products)

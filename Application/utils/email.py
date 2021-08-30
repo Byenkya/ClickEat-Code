@@ -26,7 +26,7 @@ def send_email_text(title, recipients, text):
             message = Message(
                 subject=title,
                 recipients=recipients,
-                body=text
+                html=text
             )
             mail.send(message)
     except Exception as e:

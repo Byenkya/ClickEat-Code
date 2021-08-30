@@ -181,18 +181,12 @@ class Products(Base):
                     operation_start_time = _start_date.astimezone(timezone)
                     operation_stop_time = _end_date.astimezone(timezone)
                     if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                        try:
-                            pdt = product.serialize()
-                            pdt["available"] = True
-                            products.append(pdt)
-                        except Exception as e:
-                            print(e)
+                        pdt = product.serialize()
+                        pdt["available"] = True
+                        products.append(pdt)
 
                     else:
-                        try:
-                            products.append(product.serialize())
-                        except Exception as e:
-                            print(e)
+                        products.append(product.serialize())
 
             for product in cls.query.filter_by(sub_category_id=6).all():
                 if product.approved and product.suspend != True:
@@ -201,17 +195,11 @@ class Products(Base):
                     operation_start_time = _start_date.astimezone(timezone)
                     operation_stop_time = _end_date.astimezone(timezone)
                     if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                        try:
-                            pdt = product.serialize()
-                            pdt["available"] = True
-                            drinks.append(pdt)
-                        except Exception as e:
-                            print(e)
+                        pdt = product.serialize()
+                        pdt["available"] = True
+                        drinks.append(pdt)
                     else:
-                        try:
-                            drinks.append(product.serialize())
-                        except Exception as e:
-                            print(e)
+                        drinks.append(product.serialize())
 
 
 
@@ -246,44 +234,29 @@ class Products(Base):
                 current_time = _date.astimezone(timezone)
                 products_based_on_sub_cat_dict = {}
                 product_based_on_sub_cat_list = []
-                restaurant_products = [product for product in cls.query.filter_by(**kwargs).all() if product.approved and product.suspend != True]
+                restaurant_products = [product for product in cls.query.filter_by(**kwargs).all()]
 
                 for product in restaurant_products:
-                    if f"{product.sub_category}" in products_based_on_sub_cat_dict:
-                        if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
-                            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-                            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-                            operation_start_time = _start_date.astimezone(timezone)
-                            operation_stop_time = _end_date.astimezone(timezone)
-                            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                                try:
+                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = _start_date.astimezone(timezone)
+                    operation_stop_time = _end_date.astimezone(timezone)
+                    if product.approved and product.suspend != True:
+                        if f"{product.sub_category}" in products_based_on_sub_cat_dict:
+                            if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
+                                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                                     pdt = product.serialize()
                                     pdt["available"] = True
                                     products_based_on_sub_cat_dict[f"{product.sub_category}"] += [pdt] #Add the product to this group
-                                except Exception as e:
-                                    print(e)
-                            else:
-                                try:
+                                else:
                                     products_based_on_sub_cat_dict[f"{product.sub_category}"] += [product.serialize()]
-                                except Exception as e:
-                                    print(e)
-                    else:
-                        _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-                        _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-                        operation_start_time = _start_date.astimezone(timezone)
-                        operation_stop_time = _end_date.astimezone(timezone)
-                        if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                            try:
+                        else:
+                            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                                 pdt = product.serialize()
                                 pdt["available"] = True
                                 products_based_on_sub_cat_dict[f"{product.sub_category}"] = [pdt]
-                            except Exception as e:
-                                print(e)
-                        else:
-                            try:
+                            else:
                                 products_based_on_sub_cat_dict[f"{product.sub_category}"] = [product.serialize()]
-                            except Exception as e:
-                                print(e)
 
                 for sub_cat,products in products_based_on_sub_cat_dict.items():
                     banch = {"sub_category": sub_cat, "products": products}

@@ -76,17 +76,11 @@ class TopSellingProducts(Base):
                             operation_start_time = _start_date.astimezone(timezone)
                             operation_stop_time = _end_date.astimezone(timezone)
                             if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                                try:
-                                    pdt = pdt.serialize()
-                                    pdt["available"] = True
-                                    products.append(pdt)
-                                except Exception as e:
-                                    print(e)
+                                pdt = pdt.serialize()
+                                pdt["available"] = True
+                                products.append(pdt)
                             else:
-                                try:
-                                    products.append(pdt.serialize())
-                                except Exception as e:
-                                    print(e)
+                                products.append(pdt.serialize())
 
                 return products
 
