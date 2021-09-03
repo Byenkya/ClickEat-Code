@@ -293,15 +293,6 @@ class Order(Base):
                     )
                     session.add(delivery)
 
-                    # customer_addresses.CustomerAddress()(
-                    #     county=county,
-                    #     sub_county=sub_county,
-                    #     village=village,
-                    #     other_details=other_details,
-                    #     is_default=False,
-                    #     customer_id=customer_id
-                    # )
-
                     payment = pym.Payment(
                         payment_method_id = payment_method.id,
                         order = order_
@@ -480,7 +471,7 @@ class Order(Base):
                         session.commit()
                         flash("Order status 'Prepared' has been set", "success")
                     else:
-                        flash("Order status 'Prepared' was already set","info")   
+                        flash("Order status 'Prepared' was already set", "info")   
 
                 elif "courier_id" in data:
                     if order.is_prepared == False:
@@ -517,6 +508,7 @@ class Order(Base):
                                     commission_amount=product.commission_amount if product.commission_amount else 0
                                     )
                         if order.customer.email:
+                            items = order.cart
                             cart_items_total = []
                             items_str = ""
                             item_string = ""
