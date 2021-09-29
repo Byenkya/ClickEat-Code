@@ -121,8 +121,9 @@ class DrinksSubCatApi(Resource):
 
 #shuffle all products function
 def shuffle_all_prodcuts(all_products):
-    shuffle(all_products)
-    return all_products
+    products = sample(all_products, len(all_products))
+    # shuffle(all_products)
+    return products
 
 #Home products
 class HomeProductsResource(Resource):
