@@ -63,8 +63,8 @@ class TopSellingProducts(Base):
         try:
             _date = datetime.now(ni_timezone)
             current_time = _date.astimezone(timezone)
-            products = []
-            top_discounts_ids = cls.query.all()
+            products = [] #cls.query.order_by(Order.id.desc())
+            top_discounts_ids = cls.query.order_by(TopSellingProducts.id.desc())
 
             if top_discounts_ids:
                 for product in top_discounts_ids:
