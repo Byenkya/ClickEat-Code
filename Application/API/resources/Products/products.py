@@ -123,7 +123,7 @@ class DrinksSubCatApi(Resource):
 def shuffle_all_prodcuts(all_products):
     products = sample(all_products, len(all_products))
     # shuffle(all_products)
-    return products
+    return sample(all_products, len(all_products))
 
 #Home products
 class HomeProductsResource(Resource):
@@ -241,7 +241,7 @@ class SearchedProductsResource(Resource):
                         searched_pdts.append(pdt)
                     else:
                         searched_pdts.append(product.serialize())
-        return product.serialize()
+        return searched_pdts
 
 #products based on category
 categoryProductsStringsArgs = reqparse.RequestParser()
