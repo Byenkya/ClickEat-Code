@@ -23,6 +23,7 @@
             },
 
             spinnerModal: new bootstrap.Modal(document.getElementById('spinnerModal')),
+            loadModal: new bootstrap.Modal(document.getElementById('loadModal')),
             cartProductsLoaded: false,
         },
         created: function() {
@@ -65,6 +66,7 @@
             },
 
             removeFromCart(product){
+                this.loadModal.show()
                 fetch(`/api/v1/cart_operations/${product.product_id}?platform=web`, {
                     method: "DELETE",
                     headers: {
@@ -81,9 +83,13 @@
 
                     }
                 })
+                .then(()=>{
+                    this.loadModal.hide()
+                })
             },
 
             updateCartProductQuantity(product, increase=true){
+                this.loadModal.show()
                 product.quantity = increase ? product.quantity+1 : product.quantity-1
                 data = {
                         "product_id": product.product_id,
@@ -105,6 +111,9 @@
                         })
 
                     }
+                })
+                .then(()=>{
+                    this.loadModal.hide()
                 })
             }
         }
