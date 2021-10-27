@@ -1,0 +1,61 @@
+<div v-show="phase==3">
+    <h5 class="card-title"><strong>Delivery Address</strong></h5>
+    <table class="table" v-if="address">
+        <tr>
+            <td>County</td>
+            <td><strong>{{'{{address.county}}'}}</strong></td>
+        </tr>
+        <tr>
+            <td>Subcounty</td>
+            <td><strong>{{'{{address.sub_county}}'}}</strong></td>
+        </tr>
+        <tr>
+            <td>Village</td>
+            <td><strong>{{'{{address.village}}'}}</strong></td>
+        </tr>
+        <tr>
+            <td>More</td>
+            <td><strong>{{'{{address.other_details}}'}}</strong></td>
+        </tr>
+        <tr>
+            <td>Delivery Fee</td>
+            <td><strong>{{'{{deliveryFee}}'}}</strong></td>
+        </tr>
+    </table>
+
+    <h5 class="card-title"><strong>Items</strong></h5>
+    <table class="table" v-if="cartProducts.length">
+        <tr v-for="product in cartProducts">
+            <td>
+                <img data-loader="#imageLoader1" class="width-50 card-img-top" v-bind:src="static+product.product_image" @load="product.imgLoaded=true" v-show="product.imgLoaded"/>
+            </td>
+            <td>
+                <p class="card-text skeleton-loader">{{'{{product.product_name}}'}}</p>
+                <p><strong class="skeleton-loader">UGX {{'{{product.unit_price*product.quantity}}'}}</strong></p>   
+                <input id="numberInput" class="number-input" type="number" name="number" min="1" max="10" data-target="#numberDisplay" hidden />
+            </td>
+        </tr>
+        <tr>
+            <td>Items</td>
+            <td>UGX {{'{{total}}'}}</td>
+        </tr>
+        <tr>
+            <td>Delivery fee</td>
+            <td>UGX {{'{{deliveryFee}}'}}</td>
+        </tr>
+        <tr>
+            <td>Total</td>
+            <td><strong>UGX {{'{{total+deliveryFee}}'}}</strong> (Payment by {{'{{paymentMethod}}'}})</td>
+        </tr>
+    </table>
+
+    <div class="text-warning p-2" align="center">
+        <button class="btn btn-link nav-link text-warning d-inline" @click="goToPhase(2)">
+            <strong><span class="fa fa-angle-left"></span> BACK</strong>
+        </button>
+        <button class="btn btn-warning d-inline" @click="placeOrder()">
+            <strong>PLACE ORDER <span class="fa fa-check"></span></strong>
+        </button>
+    </div>
+</div>
+			

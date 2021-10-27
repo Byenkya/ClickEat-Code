@@ -1,0 +1,33 @@
+<nav class="d-flex px-1 justify-content-between navbar navbar-dark navbar-expand-lg bg-dark">
+	<div class="flex-fill">
+		<a class="navbar-brand" href="/">
+			<img class="rounded-circle" src="{{url_for('static', filename='images/logo-yellow.jpg')}}" alt="" width="50">
+		</a>
+	</div>
+
+	<a href="{{url_for('cart_bp.get_cart')}}" class="px-1 btn btn-dark">
+		<span class="text-light fa fa-shopping-basket fa-2x"></span>
+		<span v-if="cartCount" class="translate-middle badge rounded-pill bg-danger">
+		{{'{{cartCount}}'}}
+		</span>
+	</a>
+	<button class="px-1 btn btn-dark" data-bs-toggle="dropdown" aria-expanded="false"><span class="text-light fa fa-user fa-2x"></span></button>
+
+	<ul class="dropdown-menu dropdown-menu-end p-0 rounded-0 shadow border-1 border-dark my-2 mx-1" style="z-index: 1040">
+		{% if current_user.is_authenticated %}
+			<div class="bg-light p-2 font-weight-bold">
+				<h3>Hi, {{current_user.name}}</h3>
+			</div>
+			<div class="py-2">
+				<li><a class="dropdown-item" href="{{url_for('order_bp.get_orders')}}"><span class="fa fa-check-square-o"></span> Orders</a></li>
+				<li>
+					<a class="dropdown-item" href="{{url_for('customer_bp.get_customer')}}"><span class="fa fa-user-o"></span> Account</a></li>
+				<li><a class="dropdown-item" href="{{url_for('index_bp.logout')}}"><span class="fa fa-power-off"></span> Logout</a></li>
+			</div>
+		{% else %}
+			<div class="bg-light py-2">
+				<li><a class="dropdown-item" href="{{url_for('index_bp.signin_signup')}}">Login | Signin</a></li>
+			</div>
+		{% endif %}
+	</ul>
+</nav>

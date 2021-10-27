@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% from 'bs5-forms.html' import render_string_field, render_telephone_field %}
+
+{% block body %}
+
+<style>
+html,
+body {
+  height: 100%;
+}
+
+body {
+    /*display: flex;*/
+    /*align-items: center;*/
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    /*background:  linear-gradient(to bottom, #ff572299, white);*/
+    background-image: url("{{url_for('static', filename='images/poster1.png')}}");
+    background-size: 100%;
+    background-repeat: no-repeat;
+
+}
+</style>
+
+<main class="form-signin border bg-light rounded shadow">
+    <img class="mb-4 rounded-circle" src="{{url_for('static', filename='images/logo-yellow.jpg')}}" alt="" width="70">
+
+    <ul class="d-flex justify-content-center nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if show_login %}active{% endif %}" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">LOGIN</button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {% if show_signup %}active{% endif %}" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">SIGN UP</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent" style="transition: height 1s ease-out;">
+        <div class="tab-pane fade {% if show_login %}show active{% endif %}" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+            <form method="POST" action="{{ url_for('index_bp.login') }}">
+                {{ login_form.csrf_token() }}
+                {{ render_string_field(login_form.username) }}
+                {{ render_string_field(login_form.password) }}
+                {{ login_form.next_() }}
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+            </form>
+        </div>
+        <div class="tab-pane fade {% if show_signup %}show active{% endif %}" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+            <form method="POST" action="{{ url_for('index_bp.signup') }}">
+                {{ signup_form.csrf_token() }}
+                {{ render_string_field(signup_form.name) }}
+                {{ render_string_field(signup_form.email) }}
+                {{ render_telephone_field(signup_form.telephone, signup_form.telephone_code) }}
+                {{ render_string_field(signup_form.password) }}
+                {{ render_string_field(signup_form.confirm_password) }}
+                {{ signup_form.next_() }}
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+            </form>
+        </div>
+        <p class="mt-5 mb-3 text-muted text-center">&copy; AMOBIT TECHNOLOGIES</p>
+    </div>
+
+</main>
+{% endblock %}
+
+
+{% block footer %}
+{% endblock %}

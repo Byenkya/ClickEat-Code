@@ -1,0 +1,17 @@
+<section class="d-flex pb-1 text-center container-fluid sticky-top rounded mb-4 shadow form-signin" style="background-image: linear-gradient(white, #f8f9fa);">
+	<form id="searchProductForm" method="GET" action="{{url_for('product_bp.get_products')}}">
+		<div class="input-group input-group-lg">
+			<!-- <span class="input-group-text" id="inputGroup-sizing-lg">Search</span> -->
+			<input type="text" name="search" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" placeholder="Search Meal">
+			<button class="btn btn-warning" type="button"><span class="fa fa-search"></span></button>
+		</div>
+	</form>
+	<div class="py-2">
+		<a href="{{url_for('cart_bp.get_cart')}}" class="text-warning nav-link mx-2 my-auto">
+			<span class="fa fa-shopping-basket"></span>
+			<span v-if="cartCount" class="translate-middle badge rounded-pill bg-danger">
+			{{'{{cartCount}}'}}
+			</span>
+		</a>
+	</div>
+</section>

@@ -1,0 +1,131 @@
+{% macro render_string_field(field) %}
+	<div class="form-floating my-2">
+		{% if field.errors %}
+			{{ field(id=field.id, class="form-control is-invalid", placeholder=field.label.text, **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+        {% else %}
+			{{ field(id=field.id, class="form-control", placeholder=field.label.text, **kwargs)|safe }}
+        {% endif %}
+        <label for={{field.id}}>
+        	{{ field.label.text }} 
+        	{% if field|is_required %}<span class="text-danger">*</span>{% endif %}
+        </label>
+    </div>
+{% endmacro %}
+
+{% macro render_textarea_field(field) %}
+	<div class="form-floating my-2">
+		{% if field.errors %}
+			{{ field(id=field.id, class="form-control is-invalid", placeholder=field.label.text, **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+        {% else %}
+			{{ field(id=field.id, class="form-control", placeholder=field.label.text, **kwargs)|safe }}
+        {% endif %}
+        <label for={{field.id}}>
+        	{{ field.label.text }} 
+        	{% if field|is_required %}<span class="text-danger">*</span>{% endif %}
+        </label>
+    </div>
+{% endmacro %}
+
+
+{% macro render_telephone_field(field, code_field=None) %}
+	<div class="row">
+		<div class="col-4 m-auto">
+			{% if code_field %}
+		        {{ code_field(id=field.id, class="form-control m-auto", placeholder=field.label.text) }}
+				<label for={{code_field.id}}>
+		        	{% if code_field|is_required %}<span class="text-danger">*</span>{% endif %}
+		        </label>
+			{% endif %}
+		</div>
+
+		<div class="col-8">
+			<div class="form-floating">
+				{% if field.errors %}
+			        {{ field(id=field.id, class="form-control is-invalid", placeholder=field.label.text, type="number", min="1", max="999999999", **kwargs)|safe }}
+		        {% else %}
+		        	{{ field(id=field.id, class="form-control", placeholder=field.label.text, type="number", min="1", max="999999999", **kwargs)|safe }}
+		        {% endif %}
+				<label for={{field.id}}>
+		        	{{ field.label.text }} 
+		        	{% if field|is_required %}<span class="text-danger">*</span>{% endif %}
+		        </label>
+			</div>
+		</div>
+		<input type="hidden" class="is-invalid" />
+        <div class="invalid-feedback">
+			{% for error in field.errors %}
+				{{ error }}
+			{% endfor %}
+		</div>
+	</div>
+{% endmacro %}
+
+
+{% macro render_select_field(field) %}
+	<div class='form-group'>
+		<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+		{% if field.errors %}
+			{{ field(class="form-select is-invalid", **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+		{{ field(class="form-select", **kwargs)|safe }}
+	{% endif %} 
+	</div>
+{% endmacro %}
+
+
+{% macro render_radio_field(field) %}
+	<div class='form-group'>
+		<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+		{% if field.errors %}
+			<ul class="list-group list-group-horizontal">
+			{% for subfield in field %}
+				<li class="list-group-item my-auto">{{subfield}} {{subfield.label}}</li>
+			{% endfor %}
+			</ul>
+
+			<div class="text-danger">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+			<ul class="list-group list-group-horizontal">
+			{% for subfield in field %}
+				<li class="list-group-item my-auto">{{subfield}} {{subfield.label}}</li>
+			{% endfor %}
+			</ul>
+		{% endif %} 
+	</div>
+{% endmacro %}
+
+
+{% macro render_boolean_field(field) %}
+	<div class='form-group'>
+		{% if field.errors %}
+			{{ field(class="is-invalid", **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+			{{ field(**kwargs) }} 
+			<label for="{{field.id}}">{{field.label.text}}</label>
+		{% endif %} 
+	</div>
+{% endmacro %}

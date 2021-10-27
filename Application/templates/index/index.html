@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div id="body" v-show="showSpinnerModal">
+    	{% include 'index/header.html' %}
+    	{% include 'index/product-search.html' %}
+    	{% include 'index/banner.html' %}
+    	{% include 'product/products.html' %}
+    </div>
+{% endblock %}
+
+{% block vue %}
+<script type="text/javascript">
+    var vue = new Vue({
+        el: '#body',
+        data: {
+            customer: {
+                id: parseInt('{{current_user.id or 0}}'),
+                contact: '{{current_user.contact}}',
+                token: '{{current_user.token}}',
+            },
+            products: [],
+            subCategories: [],
+            product: null,
+            cartCount: null,
+            static: "/static/images/",
+            spinnerModal: new bootstrap.Modal(document.getElementById('spinnerModal')),
+            loadModal: new bootstrap.Modal(document.getElementById('loadModal')),
+            productsLoaded: false,
+            subCategoriesLoaded: false,
+        },
+        created: function() {
+            this.getProducts()
+            this.getSubCatgories()
+        },
+        computed: {
+            showSpinnerModal(){
+                if (this.productsLoaded && this.subCategoriesLoaded){
+                    this.spinnerModal.hide()
+                    return true
+                }
+                this.spinnerModal.show()
+                return false
+            }
+        },
+        methods: {
+            getProducts(){
+                fetch("/api/v1/all_products?platform=web")
+                .then(r => r.json())
+                .then(data => {
+                    this.products=data.map((product)=>{
+                        product['imgLoaded'] = false
+                        return product
+                    })
+                })
+                .then(()=>{
+                    this.productsLoaded = true
+                })
+            },
+
+            getProductsBySubCategoery(subCategory){
+                fetch(`/api/v1/sub_cat_products/${subCategory.id}?platform=web`)
+                .then(r => r.json())
+                .then(data => {
+                    this.products=data.map((product)=>{
+                        product['imgLoaded'] = false
+                        return product
+                    })
+                })
+            },
+
+            getSubCatgories(){
+                fetch("/api/v1/fetch_all_subcats?platform=web")
+                .then(r => r.json())
+                .then(data => {
+                    console.log(data[0])
+                    this.subCategories = data
+                })
+                .then(()=>{
+                    this.subCategoriesLoaded = true
+                })
+            },
+
+            addToCart(product, quantity=1, served_with=null){
+                this.loadModal.show()
+            	this.product = product
+            	if (product.served_with) {
+                	
+            	}
+                if (this.customer.id){
+                	data = {
+                		product_id: product.product_id,
+    			        customer_id: this.customer.id,
+    			        product_name: product.name,
+    			        product_image: product.product_picture,
+    			        unit_price: product.price,
+    			        quantity: quantity,
+    			        served_with: served_with,
+    			        free_delivery: product.free_delivery,
+    			        restaurant: product.resturant,
+                	}
+                	fetch('/api/v1/addToCart?platform=web', {
+                		method: "POST",
+                		headers: {
+                			"Content-Type": 'application/json',
+                		},
+                		body: JSON.stringify(data),
+                	})
+                	.then(response=>response.json())
+                	.then(data=>{
+                        if(data.status=='success'){
+                            this.cartCount = data.data
+                        }
+                        this.loadModal.hide()
+                    })
+                }
+                else{
+                    location.replace("{{url_for('index_bp.signin_signup')}}"+`?next=/product/${product.product_id}`)
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block body %}
+	<div id="body">
+		{% include 'index/header.html' %}
+		<div class="container py-2">
+    <h3>Cart</h3>
+    <div v-if="orders.length">
+        <table class="table">
+            <tr v-for="product in orders">
+                <td>
+                    <img data-loader="#imageLoader1" class="width-50 card-img-top" v-bind:src="static+product.product_image" @load="product.imgLoaded=true"/>
+                </td>
+                <td>
+                    <p class="card-text skeleton-loader">{{'{{product.product_name}}'}}</p>
+                    <p><strong class="skeleton-loader">UGX {{'{{product.unit_price*product.quantity}}'}}</strong></p>   
+                    <input id="numberInput" class="number-input" type="number" name="number" min="1" max="10" data-target="#numberDisplay" hidden />
+                    <div class="input-group mb-3">
+                        <button class="btn btn-outline-secondary number-input-minus" data-number-input="#numberInput" type="button" @click="updateCartProductQuantity(product, false)" :disabled="product.quantity==1">-</button>
+                        <div id="numberDisplay" class="number-input-display border border-dark text-center p-2 w-25">{{'{{product.quantity}}'}}</div>
+                        <button class="btn btn-outline-secondary number-input-plus" data-number-input="#numberInput" type="button" @click="updateCartProductQuantity(product)">+</button>
+                    </div>
+                </td>
+                <td>
+                    <button class="btn btn-danger" @click="removeFromCart(product)"><span class="fa fa-close"></span></button>
+                </td>
+            </tr>
+        </table>
+        <div class="d-flex bg-white">
+            <label class="flex-fill">Total</label>
+            <strong class="flex-fill">{{'{{total}}'}}</strong>
+            <a href="{{url_for('checkout.checkout')}}" class="flex-fill btn btn-warning">Checkout</a>
+        </div>
+    </div>
+    <div v-show="!orders.length">
+        <p class="text-muted"><span class="fa fa-shopping-basket"></span> Nothing in cart</p>
+        <a class="nav-link" href="{{url_for('index_bp.index')}}">Add stuff</a>
+    </div>
+</div>
+
+	</div>
+{% endblock %}
+
+{% block vue %}
+<script type="text/javascript">
+    var vue = new Vue({
+        el: '#body',
+        data: {
+            orders: [],
+            order: null,
+            cartCount: null,
+            static: "/static/images/",
+            customer: {
+                id: {{current_user.id}},
+                contact: '{{current_user.contact}}'
+            },
+        },
+        created: function() {
+        	this.getCartProducts()
+        },
+        computed: {
+            total() {
+                total = 0
+                for (var i=0; i<this.orders.length; i++) {
+                    order = this.orders[i]
+                    total += order.unit_price * order.quantity
+                }
+                return total
+            }
+        },
+        methods: {
+            getCartProducts(){
+                fetch(`/api/v1/cart_operations/${this.customer.id}`)
+                .then(r => r.json())
+                .then(data => {
+                	if(data.cart_items){
+	                    this.orders=data.cart_items.map((product)=>{
+	                        product['imgLoaded'] = false
+	                        return product
+	                    })
+
+                	}
+                })
+            },
+
+            removeFromCart(product){
+                fetch(`/api/v1/cart_operations/${product.product_id}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": 'application/json',
+                    }
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.cart_items){
+                        this.orders=data.cart_items.map((product)=>{
+                            product['imgLoaded'] = false
+                            return product
+                        })
+
+                    }
+                })
+            },
+
+            updateCartProductQuantity(product, increase=true){
+                product.quantity = increase ? product.quantity+1 : product.quantity-1
+                data = {
+                        "product_id": product.product_id,
+                        "quantity": product.quantity,
+                    }
+                fetch(`/api/v1/cart_operations/${this.customer.id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.cart_items){
+                        this.orders=data.cart_items.map((product)=>{
+                            product['imgLoaded'] = false
+                            return product
+                        })
+
+                    }
+                })
+            }
+        }
+    });
+</script>
+{% endblock %}

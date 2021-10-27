@@ -16,9 +16,10 @@ app = Flask(
 login_manager = ext.login_manager
 login_manager.init_app(app)
 login_manager.login = "info"
+login_manager.login_view = "index_bp.signin_signup"
 
 
-app.config.from_object(config.ProductionConfig)
+app.config.from_object(config.DevelopmentConfig)
 
 #flask mail
 mail = ext.mail
@@ -66,6 +67,9 @@ admin.init_app(
 #load manager user loader
 
 login_manager.user_loader(load_user)
+
+# load template filters
+from Application import template_filters
 
 #register api routes
 from Application.API.resources.Products.products import (ProductsApi, 
@@ -121,6 +125,21 @@ api.add_resource(ForgotPasswordResource, '/api/v1/forgot_password')
 from Application.routes.customer_care.routes import customer_care
 from Application.flask_imports import _session, request
 
+# load web app views
+from Application.views.index import index_bp
+from Application.views.product import product_bp
+from Application.views.cart import cart_bp
+from Application.views.customer import customer_bp
+from Application.views.order import order_bp
+from Application.views.checkout import checkout_bp
+
+app.register_blueprint(index_bp)
+app.register_blueprint(product_bp)
+app.register_blueprint(cart_bp)
+app.register_blueprint(customer_bp)
+app.register_blueprint(order_bp)
+app.register_blueprint(checkout_bp)
+
 app.register_blueprint(customer_care)
 
 @app.after_request
@@ -139,6 +158,8 @@ import base64
 from Application.helpers.generators import TokenGenerator
 @app.before_request
 def before_request_function():
+    if request.args.get("platform")=="web":
+        return
     if str(request.url_rule).startswith("/api/v1"):
         try:
             

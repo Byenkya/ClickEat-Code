@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>Clickeat</title>
+
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+		
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/signin.css') }}">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/app.css') }}">
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/skeleton-loader.css') }}">
+
+		<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/vue.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/vue-router.js') }}"></script>
+	</head>
+
+	<body>
+		{% block body %}{% endblock %}
+		<script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+		<!-- <script src="{{url_for('static', filename='js/popper.min.js')}}"></script> -->
+		<!-- <script src="{{url_for('static', filename='js/number-input.js')}}"></script> -->
+		<script src="{{url_for('static', filename='js/app.js')}}"></script>
+		<script type="text/javascript">
+		</script>
+		{% include 'index/spinner-modal.html' %}
+		
+		{% block vue %}{% endblock %}
+		
+		
+		{% block footer %}
+		{% include 'index/prefooter.html' %}
+		{% include 'index/footer.html' %}
+		{% endblock %}
+	</body>
+</html>

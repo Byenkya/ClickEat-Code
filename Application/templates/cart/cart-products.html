@@ -1,0 +1,40 @@
+<div class="container py-2">
+	<h4><span class="fa fa-shopping-basket"></span> Cart</h4>
+	<div class="d-flex bg-white p-2">
+		<label class="flex-fill m-auto">Cart</label>
+		<strong class="flex-fill m-auto">{{'{{total}}'}}</strong>
+		<a href="{{url_for('checkout_bp.checkout')}}" class="flex-fill btn btn-warning">Checkout</a>
+	</div>
+	<hr>
+	<div v-if="cartProducts.length">
+		<table class="table">
+			<tr v-for="product in cartProducts">
+				<td>
+	                <img data-loader="#imageLoader1" class="width-50 card-img-top" v-bind:src="static+product.product_image" @load="product.imgLoaded=true"/>
+				</td>
+				<td>
+					<p class="card-text skeleton-loader">{{'{{product.product_name}}'}}</p>
+		            <p><strong class="skeleton-loader">UGX {{'{{product.unit_price*product.quantity}}'}}</strong></p>	
+		            <input id="numberInput" class="number-input" type="number" name="number" min="1" max="10" data-target="#numberDisplay" hidden />
+					<div class="input-group mb-3">
+						<button class="btn btn-outline-secondary number-input-minus" data-number-input="#numberInput" type="button" @click="updateCartProductQuantity(product, false)" :disabled="product.quantity==1">-</button>
+						<div id="numberDisplay" class="number-input-display border border-dark text-center p-2 w-25">{{'{{product.quantity}}'}}</div>
+						<button class="btn btn-outline-secondary number-input-plus" data-number-input="#numberInput" type="button" @click="updateCartProductQuantity(product)">+</button>
+					</div>
+				</td>
+				<td>
+					<button class="btn btn-danger" @click="removeFromCart(product)"><span class="fa fa-close"></span></button>
+				</td>
+			</tr>
+		</table>
+		<div class="d-flex bg-white p-2">
+		<label class="flex-fill m-auto">Total</label>
+		<strong class="flex-fill m-auto">{{'{{total}}'}}</strong>
+		<a href="{{url_for('checkout_bp.checkout')}}" class="flex-fill btn btn-warning">Checkout</a>
+	</div>
+	</div>
+	<div v-show="!cartProducts.length">
+		<p class="text-muted"><span class="fa fa-shopping-basket"></span> Nothing in cart</p>
+		<a class="nav-link" href="{{url_for('index_bp.index')}}">Add stuff</a>
+	</div>
+</div>

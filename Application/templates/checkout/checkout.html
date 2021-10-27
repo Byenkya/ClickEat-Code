@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% from 'bs5-forms.html' import render_string_field, render_select_field, render_boolean_field, render_textarea_field, render_radio_field %}
+
+{% block body %}
+	<div id="body"  v-show="showSpinnerModal">
+		{% include 'index/header.html' %}
+		<div class="container">
+			<div class="d-flex justify-content-around my-2">
+				<div align="center">
+					<span class="border border-warning px-2 rounded-circle" :class="{'bg-warning':phase>=1}"><span class="fa fa-check" v-if="phase>1"></span><span v-if="phase<=1">1</span></span>
+					<button @click="goToPhase(1)" class="border border-warning px-1" :class="{'bg-warning':phase>=1}">Delivery</button>
+				</div>
+				
+				<div  align="center">
+					<span class="border border-warning px-2 rounded-circle" :class="{'bg-warning':phase>=2}"><span class="fa fa-check" v-if="phase>2"></span><span v-if="phase<=2">2</span></span>
+					<button @click="goToPhase(2)" class="border border-warning px-1" :class="{'bg-warning':phase>=2}">Payment</button>
+				</div>
+
+				<div  align="center">
+					<span class="border border-warning px-2 rounded-circle" :class="{'bg-warning':phase>=3}">3</span>
+					<button @click="goToPhase(3)" class="border border-warning px-1" :class="{'bg-warning':phase>=3}">Summary</button>	
+				</div>
+			</div>
+
+			<div class="card">	
+				<div class="card-body">
+					{% include 'checkout/checkout-delivery.html' %}
+					{% include 'checkout/checkout-payment.html' %}
+					{% include 'checkout/checkout-summary.html' %}
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+
+{% block vue %}
+<script type="text/javascript">
+    var vue = new Vue({
+        el: '#body',
+        data: {
+        	phase: 1,
+            places: [],
+            cartProducts: [],
+            addresses: [],
+            address: null,
+            cartCount: null,
+            customer: {
+            	id: parseInt('{{current_user.id}}'),
+            	contact: '{{current_user.contact}}',
+                token: '{{current_user.token}}',
+            },
+            paymentMethods: [
+            	{
+            		id: "cash",
+            		name: "Cash on delivery",
+            		checked: true,
+            	},
+            ],
+            cartCount: null,
+            static: "/static/images/",
+
+            spinnerModal: new bootstrap.Modal(document.getElementById('spinnerModal')),
+            loadModal: new bootstrap.Modal(document.getElementById('loadModal')),
+
+            addressesLoaded: false,
+            placesLoaded: false,
+            cartProductsLoaded: false,
+        },
+        created: function() {
+        	this.getAddresses()
+        	this.getPlaces()
+        	this.getCartProducts()
+            this.paymentMethod = this.paymentMethods[0].name
+        },
+        computed: {
+            showSpinnerModal(){
+                if (this.addressesLoaded && this.placesLoaded && this.cartProductsLoaded){
+                    this.spinnerModal.hide()
+                    return true
+                }
+                this.spinnerModal.show()
+                return false
+            },
+            total() {
+                total = 0
+                for (var i=0; i<this.cartProducts.length; i++) {
+                    cartProduct = this.cartProducts[i]
+                    total += cartProduct.unit_price * cartProduct.quantity
+                }
+                return total
+            },
+            totalCartQuantity() {
+                total = 0
+                for (var i=0; i<this.cartProducts.length; i++) {
+                    cartProduct = this.cartProducts[i]
+                    total += cartProduct.quantity
+                }
+                return total
+            },
+            deliveryFee(){
+                filtered=this.places.filter(place=>place.village==this.address.village)
+                fee = 0
+                if(filtered.length){
+                    fee = filtered[0].fee 
+                }
+                remainderQuantity = this.totalCartQuantity - 3
+                if(remainderQuantity > 0){
+                    fee += (Math.ceil(remainderQuantity/3) * fee)
+                }
+                return fee
+            }
+        },
+        methods: {
+            getAddresses(){
+                fetch(`/api/v1/customer_addresses/${this.customer.id}?platform=web`)
+                .then(r => r.json())
+                .then(data => {
+                	if(data){
+	                    this.addresses = data
+	                    if (this.addresses.length){
+	                    	this.address = this.addresses[0]
+	                    }
+                	}
+                })
+                .then(()=>{
+                    this.addressesLoaded = true
+                })
+            },
+            getPlaces(){
+                fetch("/api/v1/arua_places?platform=web")
+                .then(r => r.json())
+                .then(data => {
+                	if(data){
+	                    this.places = data
+                	}
+                })
+                .then(()=>{
+                    this.placesLoaded = true
+                })
+            },
+            getCartProducts(){
+                fetch(`/api/v1/cart_operations/${this.customer.id}?platform=web`)
+                .then(r => r.json())
+                .then(data => {
+                	if(data.cart_items){
+	                    this.cartProducts=data.cart_items.map((product)=>{
+	                        product['imgLoaded'] = false
+	                        return product
+	                    })
+
+                	}
+                })
+                .then(()=>{
+                    this.cartProductsLoaded = true
+                })
+            },
+            changeAddress(event) {
+            	addressId = event.target.value
+            	filtered = this.addresses.filter(address=>address.id==addressId)
+            	if(filtered.length){
+            		this.address = filtered[0]
+            	}
+            },
+            goToPhase(phase){
+            	this.phase = phase
+            },
+            changePaymentMethod(paymentMethod){
+            	this.paymentMethod = paymentMethod
+            },
+            placeOrder(){
+                this.loadModal.show()
+                data = {
+                    payment_method: this.paymentMethod,
+                    customer_id: this.customer.id,
+                    deliveryContact: this.customer.contact,
+                    deliveryFee: this.deliveryFee,
+                    address: this.address,
+                    pre_order: false,
+                    pre_order_date: "",
+                }
+                fetch(`/api/v1/customer_order?platform=web`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    console.log(data)
+                    this.loadModal.hide()
+                })
+            }
+        }
+    });
+</script>
+{% endblock %}

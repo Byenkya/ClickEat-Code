@@ -1,0 +1,39 @@
+.product-image {
+	height: 250px;
+	width: 250px;
+}
+
+.width-300 {
+	width: 300px;
+}
+
+.width-200 {
+    width: 200px;
+}
+
+.width-100 {
+    width: 100px;
+}
+
+.width-50 {
+    width: 50px;
+}
+
+.hover-opaque:hover {
+  opacity: 75%;
+  cursor: hand;
+}
+
+.hover-scale:hover {
+    transform:scale(1.01,1.01);
+    -webkit-transform:scale(1.01,1.01);
+    -moz-transform:scale(1.01,1.01);
+    transition: all 0.2s ease-in-out;
+}
+
+.hover-scale-2:hover {
+    transform:scale(1.2,1.2);
+    -webkit-transform:scale(1.2,1.2);
+    -moz-transform:scale(1.2,1.2);
+    transition: all 0.2s ease-in-out;
+}

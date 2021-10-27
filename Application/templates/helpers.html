@@ -1,0 +1,194 @@
+{% macro render_string_field(field) %}
+	<div class='form-group'>
+		<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid", **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+		{{ field(class="form-control", **kwargs)|safe }}
+		{% endif %} 
+	</div>
+{% endmacro %}
+
+
+{% macro render_telephone_field(field, code_field=None) %}
+	<div class="form-group">
+		<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid", **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+		{% if code_field %}
+		<div class="input-group">
+			<div class="input-group-prepend">
+	          	{{ code_field }}
+	        </div>
+	        {% endif %}
+			{{ field(class="form-control", **kwargs)|safe }}
+			{% endif %} 
+		</div>
+	</div>
+{% endmacro %}
+
+
+{% macro render_radio_field(field) %}
+	<div class='form-group'>
+		<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+		{% if field.errors %}
+			<ul class="list-group list-group-horizontal">
+			{% for subfield in field %}
+				<li class="list-group-item my-auto">{{subfield}} {{subfield.label}}</li>
+			{% endfor %}
+			</ul>
+
+			<div class="text-danger">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+			<ul class="list-group list-group-horizontal">
+			{% for subfield in field %}
+				<li class="list-group-item my-auto">{{subfield}} {{subfield.label}}</li>
+			{% endfor %}
+			</ul>
+		{% endif %} 
+	</div>
+{% endmacro %}
+
+
+{% macro render_boolean_field(field) %}
+	<div class='form-group'>
+		{% if field.errors %}
+			{{ field(class="is-invalid", **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+			{{ field(**kwargs) }} 
+			<label for="{{field.id}}">{{field.label.text}}</label>
+		{% endif %} 
+	</div>
+{% endmacro %}
+
+
+{% macro render_datetime_field(field, datetimepicker_id, datetime_format="DD MMMM YYYY", inline=False, min_date=None, max_date=None) %}
+	<div class="form-group">
+		<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+		{% if field.errors %}
+			<div class="input-group date" id="{{datetimepicker_id}}" data-target-input="nearest"> 
+				{{ field(type="text", class="form-control is-invalid datetimepicker-input", data_target="#{{datetimepicker_id}}", **kwargs)|safe }}
+				<div class="input-group-append" data-target="#{{datetimepicker_id}}" data-toggle="datetimepicker"> 
+					<div class="input-group-text {% if kwargs.get('hidden') %}d-none{% endif %}">
+						<i class="fa fa-calendar"></i>
+					</div> 
+				</div>
+				<div class="invalid-feedback">
+					{% for error in field.errors %}
+						{{ error }}
+					{% endfor %}
+				</div>
+			</div>
+		{% else %}
+		<div class="input-group date" id="{{datetimepicker_id}}" data-target-input="nearest"> 
+			{{ field(type="text", class="form-control datetimepicker-input", data_target='#'+datetimepicker_id, **kwargs)|safe }}
+			<div class="input-group-append" data-target="#{{datetimepicker_id}}" data-toggle="datetimepicker"> 
+				<div class="input-group-text {% if kwargs.get('hidden') %}d-none{% endif %}">
+					<i class="fa fa-calendar"></i>
+				</div> 
+			</div> 
+		</div> 
+		{% endif %}
+	</div> 
+	{{ma}}
+	<script type="text/javascript"> 
+		$(function () {
+			$('#{{datetimepicker_id}}').datetimepicker({
+				"format":"{{datetime_format}}", 
+				"useCurrent":false,
+				{%if inline %}"inline":true,{%endif%}
+				{%if min_date %}"minDate":'{{min_date}}',{%endif%}
+				{%if max_date %}"maxDate":'{{max_date}}',{%endif%}
+			}); 
+		}); 
+	</script> 
+{% endmacro %}
+
+
+{% macro render_UTC_field(field, datetimepicker_id) %}
+	{{field(hidden="true")}}
+	<script type="text/javascript"> 
+		$(function () {
+			$('#UTC_offset').val(moment().format('Z').replace(":", "")); 
+		}); 
+	</script> 
+{% endmacro %}
+
+
+{% macro render_select_field(field) %}
+	<div class='form-group'>
+		<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid", **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+		{{ field(**kwargs)|safe }}
+	{% endif %} 
+	</div>
+{% endmacro %}
+
+
+{% macro render_file_field(field, file_label_id) %}
+	<small>{{field.label.text}} {% if field|is_required %}<span class="text-danger">*</span>{% endif %}</small>
+	<div class="custom-file form-group">
+		{% if field.errors %}
+			{{ field(class="form-control is-invalid", **kwargs)|safe }}
+			<div class="invalid-feedback">
+				{% for error in field.errors %}
+					{{ error }}
+				{% endfor %}
+			</div>
+		{% else %}
+		{{ field(class="custom-file-input", **kwargs)|safe }}
+		<label id="{{file_label_id}}" class="custom-file-label shadow-sm text-nowrap" for="customFile"></label>
+	{% endif %} 
+	</div>
+{% endmacro %}
+
+
+{% macro render_pagination(pagination, endpoint, args={}) %}
+	<nav aria-label="Page navigation example">
+		<ul class="pagination justify-content-end">
+			<!-- <li class="page-item"><a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li> -->
+			{% for page in pagination.iter_pages() %}
+				{% if page %}
+					{% if page != pagination.page %}
+						<li class="page-item"><a class="page-link" href="{{url_for(endpoint, page=page)}}{{args|build_query_string}}">{{page}}</a></li>
+					{% else %}
+						<li class="page-item active" aria-current="page"><span class="page-link">{{page}}<span class="sr-only">(current)</span></span></li>
+					{% endif %}
+				{% else %}
+					<span class="px-2 my-auto"> . . . </span>
+				{% endif %}
+			{% endfor %}
+			<!-- <li class="page-item"><a class="page-link" href="#" aria-label="Next">
+				<span aria-hidden="true">&raquo;</span>
+				</a>
+			</li> -->
+		</ul>
+	</nav>
+{% endmacro %}

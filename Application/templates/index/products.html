@@ -1,0 +1,59 @@
+<div class="album py-5 bg-light" id="products">
+    <div class="container">
+        <div class="d-flex justify-content-around flex-wrap">
+            <div class="width-300 my-2">
+                <div class="card shadow-sm">
+                    <a href="{{url_for('product_bp.get_product', product_id=1)}}">
+                        <img data-loader="#imageLoader1" class="product-image bd-placeholder-img card-img-top hover-scale hover-opaque" width="100%" src="{{url_for('static', filename='images/banner1.jpeg')}}"  hidden="true"/>
+                        <div id="imageLoader1" class="skeleton-loader-image"></div> 
+                    </a>
+
+                    <div class="card-body">
+                        <p class="card-text">Beef Burger - Town Grill</p>
+                        <strike class="text-warning">UGX 22,000</strike>
+                        <p><strong>UGX 16,000</strong></p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{url_for('product_bp.get_product', product_id=1)}}" class="btn btn-primary hover-scale-2">Order</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="width-300 my-2">
+                <div class="card shadow-sm">
+                    <a href="{{url_for('product_bp.get_product', product_id=1)}}">
+                        <img data-loader="#imageLoader2" class="product-image bd-placeholder-img card-img-top hover-scale hover-opaque" width="100%" src="{{url_for('static', filename='images/banner2.jpg')}}" hidden="true"/>
+                        <div id="imageLoader2" class="skeleton-loader-image"></div>
+                    </a>
+
+                    <div class="card-body">
+                        <p class="card-text">Beef Burger - Town Grill</p>
+                        <strike class="text-warning">UGX 22,000</strike>
+                        <p><strong>UGX 16,000</strong></p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{url_for('product_bp.get_product', product_id=1)}}" class="btn btn-primary hover-scale-2">Order</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="width-300 my-2">
+                <div class="card shadow-sm">
+                    <a href="{{url_for('product_bp.get_product', product_id=1)}}">
+                        <img data-loader="#imageLoader3" class="product-image bd-placeholder-img card-img-top hover-scale hover-opaque" width="100%" src="{{url_for('static', filename='images/banner3.jpg')}}" hidden="true" />
+                        <div id="imageLoader3" class="skeleton-loader-image"></div>
+                    </a>
+
+                    <div class="card-body">
+                        <p class="card-text">Beef Burger - Town Grill</p>
+                        <strike class="text-warning">UGX 22,000</strike>
+                        <p><strong>UGX 16,000</strong></p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{url_for('product_bp.get_product', product_id=1)}}" class="btn btn-primary hover-scale-2">Order</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

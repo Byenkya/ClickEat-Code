@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block body %}
+	<div id="body" v-show="showSpinnerModal">
+		{% include 'index/header.html' %}
+		{% include 'cart/cart-products.html' %}
+	</div>
+{% endblock %}
+
+{% block vue %}
+<script type="text/javascript">
+    var vue = new Vue({
+        el: '#body',
+        data: {
+            cartProducts: [],
+            cartProduct: null,
+            cartCount: null,
+            static: "/static/images/",
+            customer: {
+                id: parseInt('{{current_user.id or 0}}'),
+                contact: '{{current_user.contact}}',
+                token: '{{current_user.token}}',
+            },
+
+            spinnerModal: new bootstrap.Modal(document.getElementById('spinnerModal')),
+            cartProductsLoaded: false,
+        },
+        created: function() {
+        	this.getCartProducts()
+        },
+        computed: {
+            showSpinnerModal(){
+                if (this.cartProductsLoaded){
+                    this.spinnerModal.hide()
+                    return true
+                }
+                this.spinnerModal.show()
+                return false
+            },
+            total() {
+                total = 0
+                for (var i=0; i<this.cartProducts.length; i++) {
+                    cartProduct = this.cartProducts[i]
+                    total += cartProduct.unit_price * cartProduct.quantity
+                }
+                return total
+            }
+        },
+        methods: {
+            getCartProducts(){
+                fetch(`/api/v1/cart_operations/${this.customer.id}?platform=web`)
+                .then(r => r.json())
+                .then(data => {
+                	if(data.cart_items){
+	                    this.cartProducts=data.cart_items.map((product)=>{
+	                        product['imgLoaded'] = false
+	                        return product
+	                    })
+
+                	}
+                })
+                .then(()=>{
+                    this.cartProductsLoaded = true
+                })
+            },
+
+            removeFromCart(product){
+                fetch(`/api/v1/cart_operations/${product.product_id}?platform=web`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": 'application/json',
+                    }
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.cart_items){
+                        this.cartProducts=data.cart_items.map((product)=>{
+                            product['imgLoaded'] = false
+                            return product
+                        })
+
+                    }
+                })
+            },
+
+            updateCartProductQuantity(product, increase=true){
+                product.quantity = increase ? product.quantity+1 : product.quantity-1
+                data = {
+                        "product_id": product.product_id,
+                        "quantity": product.quantity,
+                    }
+                fetch(`/api/v1/cart_operations/${this.customer.id}?platform=web`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response=>response.json())
+                .then(data=>{
+                    if(data.cart_items){
+                        this.cartProducts=data.cart_items.map((product)=>{
+                            product['imgLoaded'] = false
+                            return product
+                        })
+
+                    }
+                })
+            }
+        }
+    });
+</script>
+{% endblock %}

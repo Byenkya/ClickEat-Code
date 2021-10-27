@@ -1,0 +1,18 @@
+<div v-show="phase==2">
+	<h5 class="card-title"><strong>Select Payment Method</strong></h5>
+	<form method="POST" action="">
+		<small>Payment method <span class="text-danger">*</span></small>
+		<ul class="list-group list-group-horizontal">
+			<li class="list-group-item my-auto" v-for="paymentMethod in paymentMethods">
+				<input :id="paymentMethod.id" name="payment" type="radio" value="1" @click="changePaymentMethod(paymentMethod.name)" checked='paymentMethod.checked'> 
+				<label :for="paymentMethod.id">{{'{{paymentMethod.name}}'}}</label>
+			</li> 
+		</ul>
+	</form>
+
+    <div class="fixed-bottom bg-dark text-warning p-2" align="center">
+        <button class="btn btn-link nav-link text-warning d-inline" @click="goToPhase(1)"><strong><span class="fa fa-angle-left"></span> BACK</strong></button>
+        <button class="btn btn-link nav-link text-warning d-inline" @click="goToPhase(3)"><strong>NEXT <span class="fa fa-angle-right"></span></strong></button>
+    </div>
+</div>
+			
