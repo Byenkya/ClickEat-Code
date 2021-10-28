@@ -2,8 +2,8 @@
 	<h4><span class="fa fa-shopping-basket"></span> Cart</h4>
 	<div class="d-flex bg-white p-2">
 		<label class="flex-fill m-auto">Cart</label>
-		<strong class="flex-fill m-auto">{{'{{total}}'}}</strong>
-		<a href="{{url_for('checkout_bp.checkout')}}" class="flex-fill btn btn-warning">Checkout</a>
+		<strong class="flex-fill m-auto">UGX {{'{{Number(total).toLocaleString()}}'}}</strong>
+		<a href="{{url_for('checkout_bp.checkout')}}" class="flex-fill btn btn-primary">Checkout</a>
 	</div>
 	<hr>
 	<div v-if="cartProducts.length">
@@ -14,7 +14,7 @@
 				</td>
 				<td>
 					<p class="card-text skeleton-loader">{{'{{product.product_name}}'}}</p>
-		            <p><strong class="skeleton-loader">UGX {{'{{product.unit_price*product.quantity}}'}}</strong></p>	
+		            <p><strong class="skeleton-loader">UGX {{'{{Number(product.unit_price*product.quantity).toLocaleString()}}'}}</strong></p>	
 		            <input id="numberInput" class="number-input" type="number" name="number" min="1" max="10" data-target="#numberDisplay" hidden />
 					<div class="input-group mb-3">
 						<button class="btn btn-outline-secondary number-input-minus" data-number-input="#numberInput" type="button" @click="updateCartProductQuantity(product, false)" :disabled="product.quantity==1">-</button>
@@ -29,8 +29,8 @@
 		</table>
 		<div class="d-flex bg-white p-2">
 		<label class="flex-fill m-auto">Total</label>
-		<strong class="flex-fill m-auto">{{'{{total}}'}}</strong>
-		<a href="{{url_for('checkout_bp.checkout')}}" class="flex-fill btn btn-warning">Checkout</a>
+		<strong class="flex-fill m-auto">UGX {{'{{Number(total).toLocaleString()}}'}}</strong>
+		<a href="{{url_for('checkout_bp.checkout')}}" class="flex-fill btn btn-primary">Checkout</a>
 	</div>
 	</div>
 	<div v-show="!cartProducts.length">

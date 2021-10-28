@@ -73,7 +73,7 @@ def login():
 	return render_template("signin_signup/signin-signup.html", show_login=True, login_form=login_form, signup_form=signup_form)
 
 
-@index_bp.route('logout', methods=["GET"])
+@index_bp.route('customer/logout', methods=["GET"])
 def logout():
 	logout_user()
 	return redirect(url_for('index_bp.index'))

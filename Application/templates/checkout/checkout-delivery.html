@@ -34,7 +34,7 @@
 		</tr>
 		<tr>
 			<td>Delivery Fee</td>
-			<td><strong>{{'{{deliveryFee}}'}}</strong></td>
+			<td><strong>UGX {{'{{Number(deliveryFee).toLocaleString()}}'}}</strong></td>
 		</tr>
 	</table>
 	<form method="POST" action="{{url_for('customer_bp.change_customer_address')}}">

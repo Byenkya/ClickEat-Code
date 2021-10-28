@@ -19,7 +19,7 @@
         </tr>
         <tr>
             <td>Delivery Fee</td>
-            <td><strong>{{'{{deliveryFee}}'}}</strong></td>
+            <td><strong>UGX {{'{{Number(deliveryFee).toLocaleString()}}'}}</strong></td>
         </tr>
     </table>
 
@@ -31,21 +31,22 @@
             </td>
             <td>
                 <p class="card-text skeleton-loader">{{'{{product.product_name}}'}}</p>
-                <p><strong class="skeleton-loader">UGX {{'{{product.unit_price*product.quantity}}'}}</strong></p>   
+                <p class="card-text skeleton-loader">x {{'{{product.quantity}}'}}</p>
+                <p><strong class="skeleton-loader">UGX {{'{{Number(product.unit_price*product.quantity).toLocaleString()}}'}}</strong></p>   
                 <input id="numberInput" class="number-input" type="number" name="number" min="1" max="10" data-target="#numberDisplay" hidden />
             </td>
         </tr>
         <tr>
             <td>Items</td>
-            <td>UGX {{'{{total}}'}}</td>
+            <td>UGX {{'{{Number(total).toLocaleString()}}'}}</td>
         </tr>
         <tr>
             <td>Delivery fee</td>
-            <td>UGX {{'{{deliveryFee}}'}}</td>
+            <td>UGX {{'{{Number(deliveryFee).toLocaleString()}}'}}</td>
         </tr>
         <tr>
             <td>Total</td>
-            <td><strong>UGX {{'{{total+deliveryFee}}'}}</strong> (Payment by {{'{{paymentMethod}}'}})</td>
+            <td><strong>UGX {{'{{Number(total+deliveryFee).toLocaleString()}}'}}</strong> (Payment by {{'{{paymentMethod}}'}})</td>
         </tr>
     </table>
 
@@ -53,7 +54,7 @@
         <button class="btn btn-link nav-link text-warning d-inline" @click="goToPhase(2)">
             <strong><span class="fa fa-angle-left"></span> BACK</strong>
         </button>
-        <button class="btn btn-warning d-inline" @click="placeOrder()">
+        <button class="btn btn-primary d-inline" @click="placeOrder()">
             <strong>PLACE ORDER <span class="fa fa-check"></span></strong>
         </button>
     </div>

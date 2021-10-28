@@ -7,10 +7,10 @@
 <hr>
 	<div class="container">
 		<div class="row p-2">
-			<div class="col-md-4">
-				<img class="img-fluid" src="{{url_for('static', filename='product_images/'+product.product_picture)}}"/>
+			<div class="col-md-3">
+				<img class="img-fluid img-thumbnail" src="{{url_for('static', filename='product_images/'+product.product_picture)}}"/>
 			</div>
-			<div class="col-md-4 p-2">
+			<div class="col-md-5 p-2">
 				<p class="card-text skeleton-loader">{{'{{currentProduct.name}}'}}</p>
 	            <small v-if="currentProduct.promotional_price">
                     <strike class="text-warning">{{'{{currentProduct.price}}'}} UGX</strike> <span class="text-danger">{{'{{(currentProduct.price-currentProduct.promotional_price)/currentProduct.price*100}}'}}% OFF</span>
