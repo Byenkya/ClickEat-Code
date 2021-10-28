@@ -4,16 +4,18 @@
 <div id="body" v-show="showSpinnerModal">
 	{% include 'index/header.html' %}
 	{% include 'index/product-search.html' %}
-
+<hr>
 	<div class="container">
 		<div class="row p-2">
 			<div class="col-md-4">
-				<img class="img-fluid" src="{{url_for('static', filename='images/'+product.product_picture)}}"/>
+				<img class="img-fluid" src="{{url_for('static', filename='product_images/'+product.product_picture)}}"/>
 			</div>
 			<div class="col-md-4 p-2">
 				<p class="card-text skeleton-loader">{{'{{currentProduct.name}}'}}</p>
-	            <strike class="text-warning skeleton-loader">UGX {{'{{currentProduct.price-((20/100)*currentProduct.price)}}'}}</strike>
-	            <p><strong class="skeleton-loader">UGX {{'{{currentProduct.price}}'}}</strong></p>
+	            <small v-if="currentProduct.promotional_price">
+                    <strike class="text-warning">{{'{{currentProduct.price}}'}} UGX</strike> <span class="text-danger">{{'{{(currentProduct.price-currentProduct.promotional_price)/currentProduct.price*100}}'}}% OFF</span>
+                </small>
+	            <p><strong class="skeleton-loader">UGX {{'{{currentProduct.price}}'}} UGX</strong></p>
         		<button class="btn btn-primary hover-scale-2" @click="addToCart(currentProduct)">Add to Cart</button>
 			</div>
 			<div class="col-md-4 p-2 border bg-light">
@@ -22,6 +24,7 @@
 			</div>
 		</div>
 	</div>
+    <hr>
 
 	{% include 'product/products.html' %}
 </div>
@@ -42,6 +45,7 @@
             product: null,
             currentProduct: {},
             cartCount: null,
+            searchString: '',
             static: "/static/product_images/",
             spinnerModal: new bootstrap.Modal(document.getElementById('spinnerModal')),
             loadModal: new bootstrap.Modal(document.getElementById('loadModal')),
@@ -82,6 +86,21 @@
                 	this.setCurrentPrroduct()
                 })
             },
+
+            searchProduct(){
+                fetch(`/api/v1/searched_products?platform=web&searchString=${this.searchString}`)
+                .then(r => r.json())
+                .then(data => {
+                    this.products=data.map((product)=>{
+                        product['imgLoaded'] = false
+                        return product
+                    })
+                })
+                .then(()=>{
+                    this.productsLoaded = true
+                })
+            },
+
             getSubCatgories(){
                 fetch("/api/v1/fetch_all_subcats?platform=web")
                 .then(r => r.json())

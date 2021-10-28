@@ -23,6 +23,7 @@
             subCategories: [],
             product: null,
             cartCount: null,
+            searchString: '',
             static: "/static/product_images/",
             spinnerModal: new bootstrap.Modal(document.getElementById('spinnerModal')),
             loadModal: new bootstrap.Modal(document.getElementById('loadModal')),
@@ -55,6 +56,23 @@
                 })
                 .then(()=>{
                     this.productsLoaded = true
+                })
+            },
+
+            searchProduct(){
+                this.loadModal.show()
+                fetch(`/api/v1/searched_products?platform=web&searchString=${this.searchString}`)
+                .then(r => r.json())
+                .then(data => {
+                    console.log(data)
+                    this.products=data.map((product)=>{
+                        product['imgLoaded'] = false
+                        return product
+                    })
+                })
+                .then(()=>{
+                    this.productsLoaded = true
+                    this.loadModal.hide()
                 })
             },
 

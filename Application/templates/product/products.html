@@ -7,22 +7,27 @@
                 {{'{{subCategory.name}}'}}  
             </button>
         </div>
-    </div> -->
-    <div class="col-md-12">
+    </div> --> 
+    <div class="col-md-12 p-0 m-0">
         <div class="album py-5 bg-light" id="products">
             <div class="container" v-if="products.length">
                 <div class="d-flex justify-content-around flex-wrap">
                     <div :id="'product'+product.product_id" class="my-2" v-for="product in products">
                         <div class="card shadow-sm">
                             <a :href="'/product/'+product.product_id">
-                                <img data-loader="#imageLoader1" class="product-image bd-placeholder-img card-img-top hover-scale hover-opaque" width="100%" v-bind:src="static+product.product_picture" @load="product.imgLoaded=true" v-show="product.imgLoaded"/>
-                                <div id="imageLoader1" class="skeleton-loader-image" v-show="!product.imgLoaded"></div> 
+                                <img data-loader="#imageLoader1" class="product-image bd-placeholder-img card-img-top hover-scale hover-opaque" width="100%" v-bind:src="static+product.product_picture+'?dummy='+Math.random()" @load="product.imgLoaded=true"/>
+                                <div id="imageLoader1" class="skeleton-loader-image" v-show="!product.imgLoaded" style="position: absolute; top:0;"></div> 
                             </a>
 
                             <div class="card-body">
-                                <p class="card-text">{%raw%}{{product.name}}{%endraw%}</p>
-                                <strike class="text-warning">{%raw%}{{product.price-((20/100)*product.price)}}{%endraw%}</strike>
-                                <p><strong>{%raw%}{{product.price}}{%endraw%}</strong></p>
+                                <p class="card-text">{{'{{product.name}}'}}</p>
+                                <div style="height: 1.5rem;">
+                                    <small v-if="product.promotional_price">
+                                        <strike class="text-warning">{{'{{product.price}}'}} UGX</strike> <span class="text-danger">{{'{{(product.price-product.promotional_price)/product.price*100}}'}}% OFF</span>
+                                    </small>
+                                </div>
+
+                                <p><strong>{{'{{Number(product.price).toLocaleString()}}'}} UGX</strong></p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <button class="btn btn-primary hover-scale-2" @click='addToCart(product)'>Add To Cart</button>
                                     <a href="{{url_for('product_bp.get_product', product_id=1)}}" class="btn btn-link hover-scale-2"><span class="fa fa-2x fa-angle-right"></span></a>
