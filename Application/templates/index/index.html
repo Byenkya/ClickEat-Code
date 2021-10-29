@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 
 {% block body %}
-    <div id="body" v-show="showSpinnerModal">
-    	{% include 'index/header.html' %}
-    	{% include 'index/product-search.html' %}
-    	{% include 'index/banner.html' %}
-    	{% include 'product/products.html' %}
+    <div id="body">
+        <div>
+            <div class="d-block" :class="{'d-none':showSpinnerModal}">
+                {% include 'index/loading.html' %}
+        	</div>
+            {% include 'index/header.html' %}
+        	{% include 'index/product-search.html' %}
+        	{% include 'index/banner.html' %}
+        	{% include 'product/products.html' %}
+        </div>
     </div>
 {% endblock %}
 
@@ -73,6 +78,7 @@
                 .then(()=>{
                     this.productsLoaded = true
                     this.loadModal.hide()
+                    document.getElementById('products').scrollIntoView({behavior: 'smooth'})
                 })
             },
 

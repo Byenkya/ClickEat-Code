@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block body %}
-	<div id="body" v-show="showSpinnerModal">
+	<div id="body">
+        <div class="d-block" :class="{'d-none':showSpinnerModal}">
+            {% include 'index/loading.html' %}
+        </div>
 		{% include 'index/header.html' %}
 		{% include 'cart/cart-products.html' %}
 	</div>
