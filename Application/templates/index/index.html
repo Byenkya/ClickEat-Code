@@ -6,7 +6,6 @@
             <div class="d-block" :class="{'d-none':showSpinnerModal}">
                 {% include 'index/loading.html' %}
         	</div>
-            {% include 'index/header.html' %}
         	{% include 'index/product-search.html' %}
         	{% include 'index/banner.html' %}
         	{% include 'product/products.html' %}
@@ -51,11 +50,15 @@
         },
         methods: {
             getProducts(){
-                fetch("/api/v1/all_products?platform=web")
+                fetch("/api/v1/home_products?platform=web")
                 .then(r => r.json())
                 .then(data => {
-                    this.products=data.map((product)=>{
+                    this.products=data.all_products.map((product)=>{
                         product['imgLoaded'] = false
+                        product['imgLoaded'] = false
+                        product['actualPrice'] = Number(product.price).toLocaleString()
+                        product['promotionalPrice'] = Number(product.promotional_price).toLocaleString()
+                        product['discount'] = Math.round((product.price-product.promotional_price)/product.price*100)
                         return product
                     })
                 })
@@ -69,9 +72,12 @@
                 fetch(`/api/v1/searched_products?platform=web&searchString=${this.searchString}`)
                 .then(r => r.json())
                 .then(data => {
-                    console.log(data)
                     this.products=data.map((product)=>{
                         product['imgLoaded'] = false
+                        product['imgLoaded'] = false
+                        product['actualPrice'] = Number(product.price).toLocaleString()
+                        product['promotionalPrice'] = Number(product.promotional_price).toLocaleString()
+                        product['discount'] = Math.round((product.price-product.promotional_price)/product.price*100)
                         return product
                     })
                 })

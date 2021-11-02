@@ -5,7 +5,6 @@
 	<div :class="{'d-none':showSpinnerModal}">
         {% include 'index/loading.html' %}
     </div>
-    {% include 'index/header.html' %}
 	{% include 'index/product-search.html' %}
     
     <hr>
@@ -18,10 +17,17 @@
 			</div>
 			<div class="col-md-4 p-3">
 				<p class="card-text skeleton-loader">{{'{{currentProduct.name}}'}}</p>
-	            <small v-show="currentProduct.promotional_price">
-                    <strike class="text-warning">{{'{{Number(currentProduct.price).toLocaleString()}}'}} UGX</strike> <span class="text-danger">{{'{{(currentProduct.price-currentProduct.promotional_price)/currentProduct.price*100}}'}}% OFF</span>
-                </small>
-	            <p><strong class="skeleton-loader">UGX {{'{{Number(currentProduct.price).toLocaleString()}}'}} UGX</strong></p>
+	            <div v-show="currentProduct.promotional_price">
+                    <small>
+                        <strike class="text-warning">{{'{{currentProduct.actualPrice}}'}} UGX</strike> <span class="text-danger">{{'{{currentProduct.discount}}'}}% OFF</span>
+                    </small>
+                    <p><strong class="skeleton-loader">UGX {{'{{currentProduct.promotionalPrice}}'}} UGX</strong></p>
+	            </div>
+
+                <div v-show="!currentProduct.promotional_price">
+                    <p><strong class="skeleton-loader">UGX {{'{{currentProduct.actualPrice}}'}} UGX</strong></p>
+                </div>
+
         		<button class="btn btn-primary hover-scale-2" @click="addToCart(currentProduct)">Add to Cart</button>
 			</div>
 
@@ -81,11 +87,14 @@
         		this.currentProduct = filter[0]
         	},
             getProducts(){
-                fetch("/api/v1/all_products?platform=web")
+                fetch("/api/v1/home_products?platform=web")
                 .then(r => r.json())
                 .then(data => {
-                    this.products=data.map((product)=>{
+                    this.products=data.all_products.map((product)=>{
                         product['imgLoaded'] = false
+                        product['actualPrice'] = Number(product.price).toLocaleString()
+                        product['promotionalPrice'] = Number(product.promotional_price).toLocaleString()
+                        product['discount'] = Math.round((product.price-product.promotional_price)/product.price*100)
                         return product
                     })
                 })
@@ -100,9 +109,11 @@
                 fetch(`/api/v1/searched_products?platform=web&searchString=${this.searchString}`)
                 .then(r => r.json())
                 .then(data => {
-                    console.log(data)
                     this.products=data.map((product)=>{
                         product['imgLoaded'] = false
+                        product['actualPrice'] = Number(product.price).toLocaleString()
+                        product['promotionalPrice'] = Number(product.promotional_price).toLocaleString()
+                        product['discount'] = Math.round((product.price-product.promotional_price)/product.price*100)
                         return product
                     })
                 })

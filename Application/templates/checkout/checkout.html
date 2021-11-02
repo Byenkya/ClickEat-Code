@@ -7,7 +7,7 @@
             {% include 'index/loading.html' %}
         </div>
 		{% include 'index/header.html' %}
-		<div class="container">
+		<div class="container py-4">
 			<div class="d-flex justify-content-between my-2">
 				<div align="center">
 					<span class="border border-primary px-2 rounded-circle" :class="{'bg-primary':phase>=1}"><span class="fa fa-check" v-if="phase>1"></span><span v-if="phase<=1">1</span></span>
@@ -106,7 +106,12 @@
                 return total
             },
             deliveryFee(){
-                filtered=this.places.filter(place=>place.village==this.address.village)
+                filtered = []
+                if (this.address) {
+                    filtered=this.places.filter(place => {
+                        return place.village==this.address.village
+                    })
+                }
                 fee = 0
                 if(filtered.length){
                     fee = filtered[0].fee 
