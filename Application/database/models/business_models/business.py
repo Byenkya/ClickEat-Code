@@ -161,7 +161,8 @@ class Resturant(Base):
             restaurants = cls.query.all()
             for restaurant in restaurants:
                 if restaurant.deals_in != "drinks":
-                    rest.append(restaurant)
+                    if restaurant.approved:
+                        rest.append(restaurant)
             return rest
         except:
             session.rollback()
