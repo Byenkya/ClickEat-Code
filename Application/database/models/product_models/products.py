@@ -18,6 +18,42 @@ pdtds = LazyLoader("Application.database.models.product_models.product_discounts
 subCat = LazyLoader("Application.database.models.product_models.subcategory")
 cat = LazyLoader("Application.database.models.product_models.category")
 
+# generators
+def food_snacks_generator(data_list):
+    _date = datetime.now(ni_timezone)
+    current_time = _date.astimezone(timezone)
+    for product in data_list:
+        if product.resturant.favourite and product.approved and product.suspend != True:
+            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+            operation_start_time = _start_date.astimezone(timezone)
+            operation_stop_time = _end_date.astimezone(timezone)
+            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                pdt = product.serialize()
+                pdt["available"] = True
+                yield pdt
+
+            else:
+                yield product.serialize()
+
+def drinks_generator(data_list):
+    _date = datetime.now(ni_timezone)
+    current_time = _date.astimezone(timezone)
+    for product in data_list:
+        if product.approved and product.suspend != True:
+            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+            operation_start_time = _start_date.astimezone(timezone)
+            operation_stop_time = _end_date.astimezone(timezone)
+            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                pdt = product.serialize()
+                pdt["available"] = True
+                yield pdt
+            else:
+                yield product.serialize()
+
+
+
 class Products(Base):
     __tablename__ = "products"
 
@@ -169,45 +205,44 @@ class Products(Base):
     def home_products(cls):
         try:
             #home products
-            _date = datetime.now(ni_timezone)
-            current_time = _date.astimezone(timezone)
+            # _date = datetime.now(ni_timezone)
+            # current_time = _date.astimezone(timezone)
             home_products = []
-            products = []
-            drinks = []
-            for product in cls.query.all():
-                if product.resturant.favourite and product.approved and product.suspend != True:
-                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-                    operation_start_time = _start_date.astimezone(timezone)
-                    operation_stop_time = _end_date.astimezone(timezone)
-                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                        pdt = product.serialize()
-                        pdt["available"] = True
-                        products.append(pdt)
+            # products = []
+            # drinks = []
+            # for product in cls.query.all():
+            #     if product.resturant.favourite and product.approved and product.suspend != True:
+            #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+            #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+            #         operation_start_time = _start_date.astimezone(timezone)
+            #         operation_stop_time = _end_date.astimezone(timezone)
+            #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+            #             pdt = product.serialize()
+            #             pdt["available"] = True
+            #             products.append(pdt)
 
-                    else:
-                        products.append(product.serialize())
-
-            for product in cls.query.filter_by(sub_category_id=6).all():
-                if product.approved and product.suspend != True:
-                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-                    operation_start_time = _start_date.astimezone(timezone)
-                    operation_stop_time = _end_date.astimezone(timezone)
-                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                        pdt = product.serialize()
-                        pdt["available"] = True
-                        drinks.append(pdt)
-                    else:
-                        drinks.append(product.serialize())
+            #         else:
+            #             products.append(product.serialize())
+            # for product in cls.query.filter_by(sub_category_id=6).all():
+            #     if product.approved and product.suspend != True:
+            #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+            #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+            #         operation_start_time = _start_date.astimezone(timezone)
+            #         operation_stop_time = _end_date.astimezone(timezone)
+            #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+            #             pdt = product.serialize()
+            #             pdt["available"] = True
+            #             drinks.append(pdt)
+            #         else:
+            #             drinks.append(product.serialize())
 
 
 
             # products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite and product.approved and product.suspend != True], 2)
             # drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all() if product.approved and product.suspend != True], 2)
 
-            home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":sample(products, 2)})
-            home_products.append({"id":2,"title":"Drinks & Beverages", "products": sample(drinks, 2) })
+            home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":sample(list(food_snacks_generator(cls.query.all())), 2)})
+            home_products.append({"id":2,"title":"Drinks & Beverages", "products": sample(list(drinks_generator(cls.query.filter_by(sub_category_id=6).all())), 2) })
 
             return home_products
 

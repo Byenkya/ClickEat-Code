@@ -74,7 +74,7 @@ from Application import template_filters
 #register api routes
 from Application.API.resources.Products.products import (ProductsApi, 
 AddToCartApi, CartOperationApi, DrinksSubCatApi, DrinksApi, HomeProductsResource,
-SearchedProductsResource, SubCategoryProductsApI, AllProductsAPI, TopSellingProductsAPI, CategoryProductsApI, FetchAllSubCategoriesApi)
+SearchedProductsResource, SubCategoryProductsApI, CategoryProductsApI, FetchAllSubCategoriesApi)
 from Application.API.resources.Products.comments import CommentsApi
 from Application.API.resources.Products.product_rates import ProductRatingApi
 from Application.API.resources.Restaurants.restaurants import RestaurantApi
@@ -98,8 +98,6 @@ api.add_resource(HomeProductsResource, '/api/v1/home_products')
 api.add_resource(SearchedProductsResource, '/api/v1/searched_products')
 api.add_resource(SubCategoryProductsApI, '/api/v1/sub_cat_products/<int:id>')
 api.add_resource(CategoryProductsApI, '/api/v1/cat_products')
-api.add_resource(AllProductsAPI, '/api/v1/all_products')
-api.add_resource(TopSellingProductsAPI, '/api/v1/top_selling_products')
 api.add_resource(FetchAllSubCategoriesApi, '/api/v1/fetch_all_subcats')
 
 
