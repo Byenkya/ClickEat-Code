@@ -81,7 +81,8 @@ from Application.API.resources.Restaurants.restaurants import RestaurantApi
 from Application.API.resources.Places.places import PlacesApi
 from Application.API.resources.Customer.customer import (
     CustomerApi, AuthenticationApi, CustomerAddressAPi, 
-    CustomerUpdateInformationApi, UpdateCustomerAccountInfo, AddNewCustomerAddressApi, ForgotPasswordResource
+    CustomerUpdateInformationApi, UpdateCustomerAccountInfo, AddNewCustomerAddressApi, ForgotPasswordResource,
+    SignUpApi, CheckUserEmail
     )
 from Application.API.resources.Customer.customer_order import OrdersApi, CustomerOrdersApi
 
@@ -99,6 +100,7 @@ api.add_resource(SearchedProductsResource, '/api/v1/searched_products')
 api.add_resource(SubCategoryProductsApI, '/api/v1/sub_cat_products/<int:id>')
 api.add_resource(CategoryProductsApI, '/api/v1/cat_products')
 api.add_resource(FetchAllSubCategoriesApi, '/api/v1/fetch_all_subcats')
+api.add_resource(CheckUserEmail, '/api/v1/check_user_email')
 
 
 #restaurants routes
@@ -117,6 +119,7 @@ api.add_resource(CustomerUpdateInformationApi, '/api/v1/update_info/<int:id>')
 api.add_resource(UpdateCustomerAccountInfo, '/api/v1/update_account_info/<int:id>')
 api.add_resource(AddNewCustomerAddressApi, '/api/v1/add_address/<int:id>')
 api.add_resource(ForgotPasswordResource, '/api/v1/forgot_password')
+api.add_resource(SignUpApi, '/api/v1/register_via_email')
 
 
 #Register Blueprints

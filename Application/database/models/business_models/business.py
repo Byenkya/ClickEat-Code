@@ -9,6 +9,13 @@ from Application.utils import LazyLoader
 #lazy loading i.e some data will be intialized when its actually needed.
 pdts = LazyLoader("Application.database.models.product_models.products")
 
+def rest_generator(data_list):
+    for restaurant in data_list:
+        if restaurant.deals_in != "drinks":
+            if restaurant.approved:
+                yield restaurant
+
+
 class Resturant(Base):
     __tablename__ = "resturant"
 
@@ -157,13 +164,13 @@ class Resturant(Base):
     @classmethod
     def read_restaurants(cls):
         try:
-            rest = []
-            restaurants = cls.query.all()
-            for restaurant in restaurants:
-                if restaurant.deals_in != "drinks":
-                    if restaurant.approved:
-                        rest.append(restaurant)
-            return rest
+            # rest = []
+            # restaurants = cls.query.all()
+            # for restaurant in restaurants:
+            #     if restaurant.deals_in != "drinks":
+            #         if restaurant.approved:
+            #             rest.append(restaurant)
+            return list(rest_generator(cls.query.all()))
         except:
             session.rollback()
 

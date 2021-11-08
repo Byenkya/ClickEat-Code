@@ -15,6 +15,33 @@ address_fields = {
     "customer_id": fields.Integer
 }
 
+class CheckUserEmail(Resource):
+    def post(self):
+        email = request.json["email"]
+        if email:
+            customer = Customer().google_sign_in(email=email)
+            return customer
+
+
+class SignUpApi(Resource):
+    def post(self):
+        customer_names = request.json["names"]
+        email = request.json["email"]
+        contact = request.json["contact"]
+        profile_picture = request.json["profile_picture"]
+        password = request.json["password"]
+        customer_details = Customer()(
+            name=customer_names,
+            email=email,
+            contact=contact,
+            profile_picture=profile_picture,
+            password=password
+        )   
+
+        if customer_details:
+            customer = Customer().google_sign_in(email=email)
+            return customer
+
 class CustomerApi(Resource): 
     def post(self):
         print(request.json)

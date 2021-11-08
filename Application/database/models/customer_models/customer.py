@@ -110,6 +110,21 @@ class Customer(Base, UserMixin):
             session.rollback()
 
     @classmethod
+    def google_sign_in(cls, email):
+        try:
+            user = cls.query.filter_by(email=email).first()
+
+            if user:
+                token = TokenGenerator(user).generate_api_token()
+                user = user.serializer()
+                user["token"] = token
+                return user
+            else:
+                return False
+        except Exception as e:
+            print("An error occured while saving customer google sigin details: ",e)
+
+    @classmethod
     def check_user(cls,telephone,password):
         try:
             user = cls.query.filter_by(contact=telephone).first()
