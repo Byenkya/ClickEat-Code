@@ -15,17 +15,18 @@ def all_top_selling_pdts_generator(data_list):
         for product in data_list:
             pdt = pdts.Products.read_product(id=product.product_id)
             if pdt:
-                if pdt.approved and pdt.suspend != True:
-                    _start_date = ni_timezone.localize(pdt.resturant.operation_start_time)
-                    _end_date = ni_timezone.localize(pdt.resturant.operation_stop_time)
-                    operation_start_time = _start_date.astimezone(timezone)
-                    operation_stop_time = _end_date.astimezone(timezone)
-                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                        pdt = pdt.serialize()
-                        pdt["available"] = True
-                        yield pdt
-                    else:
-                        yield pdt.serialize()
+                if pdt.resturant.approved:
+                    if pdt.approved and pdt.suspend != True:
+                        _start_date = ni_timezone.localize(pdt.resturant.operation_start_time)
+                        _end_date = ni_timezone.localize(pdt.resturant.operation_stop_time)
+                        operation_start_time = _start_date.astimezone(timezone)
+                        operation_stop_time = _end_date.astimezone(timezone)
+                        if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                            pdt = pdt.serialize()
+                            pdt["available"] = True
+                            yield pdt
+                        else:
+                            yield pdt.serialize()
 
     else:
         return None
@@ -86,33 +87,6 @@ class TopSellingProducts(Base):
             return list(
                     all_top_selling_pdts_generator(cls.query.order_by(TopSellingProducts.id.desc()).all())
             )
-            # _date = datetime.now(ni_timezone)
-            # current_time = _date.astimezone(timezone)
-            # products = [] #cls.query.order_by(Order.id.desc())
-            # top_discounts_ids = cls.query.order_by(TopSellingProducts.id.desc()).all()
-            # if top_discounts_ids:
-            #     for product in top_discounts_ids:
-            #         pdt = pdts.Products.read_product(id=product.product_id)
-            #         if pdt:
-            #             if pdt.approved and pdt.suspend != True:
-            #                 _start_date = ni_timezone.localize(pdt.resturant.operation_start_time)
-            #                 _end_date = ni_timezone.localize(pdt.resturant.operation_stop_time)
-            #                 operation_start_time = _start_date.astimezone(timezone)
-            #                 operation_stop_time = _end_date.astimezone(timezone)
-            #                 if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-            #                     pdt = pdt.serialize()
-            #                     pdt["available"] = True
-            #                     products.append(pdt)
-            #                 else:
-            #                     products.append(pdt.serialize())
-
-
-            #     return list(
-            #         all_top_selling_pdts_generator(cls.query.order_by(TopSellingProducts.id.desc()).all())
-            #     )
-
-            # else:
-            #     return None
         except Exception as e:
             session.rollback()
             print("Error While retriving records: ", e)

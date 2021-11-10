@@ -23,34 +23,36 @@ def food_snacks_generator(data_list):
     _date = datetime.now(ni_timezone)
     current_time = _date.astimezone(timezone)
     for product in data_list:
-        if product.resturant.favourite and product.approved and product.suspend != True:
-            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            operation_start_time = _start_date.astimezone(timezone)
-            operation_stop_time = _end_date.astimezone(timezone)
-            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                pdt = product.serialize()
-                pdt["available"] = True
-                yield pdt
+        if product.resturant.approved:
+            if product.resturant.favourite and product.approved and product.suspend != True:
+                _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = _start_date.astimezone(timezone)
+                operation_stop_time = _end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                    pdt = product.serialize()
+                    pdt["available"] = True
+                    yield pdt
 
-            else:
-                yield product.serialize()
+                else:
+                    yield product.serialize()
 
 def drinks_generator(data_list):
     _date = datetime.now(ni_timezone)
     current_time = _date.astimezone(timezone)
     for product in data_list:
-        if product.approved and product.suspend != True:
-            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            operation_start_time = _start_date.astimezone(timezone)
-            operation_stop_time = _end_date.astimezone(timezone)
-            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                pdt = product.serialize()
-                pdt["available"] = True
-                yield pdt
-            else:
-                yield product.serialize()
+        if product.resturant.approved:
+            if product.approved and product.suspend != True:
+                _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = _start_date.astimezone(timezone)
+                operation_stop_time = _end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                    pdt = product.serialize()
+                    pdt["available"] = True
+                    yield pdt
+                else:
+                    yield product.serialize()
 
 
 
@@ -204,43 +206,7 @@ class Products(Base):
     @classmethod  
     def home_products(cls):
         try:
-            #home products
-            # _date = datetime.now(ni_timezone)
-            # current_time = _date.astimezone(timezone)
             home_products = []
-            # products = []
-            # drinks = []
-            # for product in cls.query.all():
-            #     if product.resturant.favourite and product.approved and product.suspend != True:
-            #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            #         operation_start_time = _start_date.astimezone(timezone)
-            #         operation_stop_time = _end_date.astimezone(timezone)
-            #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-            #             pdt = product.serialize()
-            #             pdt["available"] = True
-            #             products.append(pdt)
-
-            #         else:
-            #             products.append(product.serialize())
-            # for product in cls.query.filter_by(sub_category_id=6).all():
-            #     if product.approved and product.suspend != True:
-            #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            #         operation_start_time = _start_date.astimezone(timezone)
-            #         operation_stop_time = _end_date.astimezone(timezone)
-            #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-            #             pdt = product.serialize()
-            #             pdt["available"] = True
-            #             drinks.append(pdt)
-            #         else:
-            #             drinks.append(product.serialize())
-
-
-
-            # products = sample([product.serialize() for product in cls.query.all() if product.resturant.favourite and product.approved and product.suspend != True], 2)
-            # drinks = sample([product.serialize() for product in cls.query.filter_by(sub_category_id=6).all() if product.approved and product.suspend != True], 2)
-
             home_products.append({"id":1,"title":"Favorite Food & Snacks", "products":sample(list(food_snacks_generator(cls.query.all())), 2)})
             home_products.append({"id":2,"title":"Drinks & Beverages", "products": sample(list(drinks_generator(cls.query.filter_by(sub_category_id=6).all())), 2) })
 
@@ -272,26 +238,27 @@ class Products(Base):
                 restaurant_products = [product for product in cls.query.filter_by(**kwargs).all()]
 
                 for product in restaurant_products:
-                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-                    operation_start_time = _start_date.astimezone(timezone)
-                    operation_stop_time = _end_date.astimezone(timezone)
-                    if product.approved and product.suspend != True:
-                        if f"{product.sub_category}" in products_based_on_sub_cat_dict:
-                            if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
+                    if product.resturant.approved:
+                        _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                        _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                        operation_start_time = _start_date.astimezone(timezone)
+                        operation_stop_time = _end_date.astimezone(timezone)
+                        if product.approved and product.suspend != True:
+                            if f"{product.sub_category}" in products_based_on_sub_cat_dict:
+                                if product not in products_based_on_sub_cat_dict[f"{product.sub_category}"]: #Avoid duplicates
+                                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                                        pdt = product.serialize()
+                                        pdt["available"] = True
+                                        products_based_on_sub_cat_dict[f"{product.sub_category}"] += [pdt] #Add the product to this group
+                                    else:
+                                        products_based_on_sub_cat_dict[f"{product.sub_category}"] += [product.serialize()]
+                            else:
                                 if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
                                     pdt = product.serialize()
                                     pdt["available"] = True
-                                    products_based_on_sub_cat_dict[f"{product.sub_category}"] += [pdt] #Add the product to this group
+                                    products_based_on_sub_cat_dict[f"{product.sub_category}"] = [pdt]
                                 else:
-                                    products_based_on_sub_cat_dict[f"{product.sub_category}"] += [product.serialize()]
-                        else:
-                            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                                pdt = product.serialize()
-                                pdt["available"] = True
-                                products_based_on_sub_cat_dict[f"{product.sub_category}"] = [pdt]
-                            else:
-                                products_based_on_sub_cat_dict[f"{product.sub_category}"] = [product.serialize()]
+                                    products_based_on_sub_cat_dict[f"{product.sub_category}"] = [product.serialize()]
 
                 for sub_cat,products in products_based_on_sub_cat_dict.items():
                     banch = {"sub_category": sub_cat, "products": products}

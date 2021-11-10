@@ -13,18 +13,19 @@ ni_timezone = pytz.timezone('Africa/Nairobi')
 #generators
 def vegetables_generator(data_list):
     for product in data_list:
-        _date = datetime.now(ni_timezone)
-        current_time = _date.astimezone(timezone)
-        _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-        _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-        operation_start_time = _start_date.astimezone(timezone)
-        operation_stop_time = _end_date.astimezone(timezone)
-        if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-            pdt = product.serialize()
-            pdt["available"] = True
-            yield pdt
-        else:
-            yield product.serialize()
+        if product.resturant.approved:
+            _date = datetime.now(ni_timezone)
+            current_time = _date.astimezone(timezone)
+            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+            operation_start_time = _start_date.astimezone(timezone)
+            operation_stop_time = _end_date.astimezone(timezone)
+            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                pdt = product.serialize()
+                pdt["available"] = True
+                yield pdt
+            else:
+                yield product.serialize()
 
 def home_sub_cat_generator(data_list):
     for sub in data_list:
@@ -40,17 +41,18 @@ def all_products_generator(data_list):
     _date = datetime.now(ni_timezone)
     current_time = _date.astimezone(timezone)
     for product in data_list:
-        if product.approved and product.suspend != True:
-            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            operation_start_time = _start_date.astimezone(timezone)
-            operation_stop_time = _end_date.astimezone(timezone)
-            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                pdt = product.serialize()
-                pdt["available"] = True
-                yield pdt
-            else:
-                yield product.serialize()
+        if product.resturant.approved:
+            if product.approved and product.suspend != True:
+                _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = _start_date.astimezone(timezone)
+                operation_stop_time = _end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                    pdt = product.serialize()
+                    pdt["available"] = True
+                    yield pdt
+                else:
+                    yield product.serialize()
 
 
 
@@ -168,22 +170,6 @@ class DrinksSubCatApi(Resource):
 #Home products
 class HomeProductsResource(Resource):
     def get(self):
-        # _date = datetime.now(ni_timezone)
-        # current_time = _date.astimezone(timezone)
-        # fruits_vegetables = []
-        # for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all():
-        #     if product.approved and product.suspend != True:
-        #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-        #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-        #         operation_start_time = _start_date.astimezone(timezone)
-        #         operation_stop_time = _end_date.astimezone(timezone)
-        #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-        #             pdt = product.serialize()
-        #             pdt["available"] = True
-        #             fruits_vegetables.append(pdt)
-        #         else:
-        #             fruits_vegetables.append(product.serialize())
-
         home_products = Products.home_products()
         home_products.append(
             {
@@ -192,31 +178,7 @@ class HomeProductsResource(Resource):
                 "products": sample(list(vegetables_generator(session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name=="Fruits and Vegetables").order_by(Products.product_id).all())), 2)
             }
         )
-        # home_sub_cats_list = []
-        # sub_cats = SubCategory.read_sub_cat()
-        # all_products = []
-
-        # for sub in sub_cats:
-        #     product_image = Products.read_product_by_sub_cat(sub["sub_category_id"])
-        #     if product_image:
-        #         home_sub_cats = {}
-        #         home_sub_cats['id'] = sub["sub_category_id"]
-        #         home_sub_cats['subCatImage'] = product_image.product_picture 
-        #         home_sub_cats['name'] = sub["name"]
-        #         home_sub_cats_list.append(home_sub_cats)
-        # for product in Products.read_products():
-        #     if product.approved and product.suspend != True:
-        #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-        #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-        #         operation_start_time = _start_date.astimezone(timezone)
-        #         operation_stop_time = _end_date.astimezone(timezone)
-        #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-        #             pdt = product.serialize()
-        #             pdt["available"] = True
-        #             all_products.append(pdt)
-        #         else:
-        #             all_products.append(product.serialize())  
-
+        
         top_selling_products = TopSellingProducts.read_all_top_discount_products()    
         return {
                 "home_images_products": home_products,
@@ -242,17 +204,6 @@ def sub_cat_generator(data_list):
 #read subcategories
 class FetchAllSubCategoriesApi(Resource):
     def get(self):
-        # home_sub_cats_list = []
-        # sub_cats = SubCategory.read_sub_cat()
-        # for sub in sub_cats:
-        #     product_image = Products.read_product_by_sub_cat(sub["sub_category_id"])
-        #     if product_image:
-        #         home_sub_cats = {}
-        #         home_sub_cats['id'] = sub["sub_category_id"]
-        #         home_sub_cats['subCatImage'] = product_image.product_picture 
-        #         home_sub_cats['name'] = sub["name"]
-        #         home_sub_cats_list.append(home_sub_cats)
-
         return list(sub_cat_generator(SubCategory.read_sub_cat()))
 
 #generator for seacrhed products
@@ -260,17 +211,18 @@ def search_pdt_generator(data_list):
     _date = datetime.now(ni_timezone)
     current_time = _date.astimezone(timezone)
     for product in data_list:
-        if product.approved and product.suspend != True:
-            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            operation_start_time = _start_date.astimezone(timezone)
-            operation_stop_time = _end_date.astimezone(timezone)
-            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                pdt = product.serialize()
-                pdt["available"] = True
-                yield pdt
-            else:
-                yield product.serialize()
+        if product.resturant.approved:
+            if product.approved and product.suspend != True:
+                _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                operation_start_time = _start_date.astimezone(timezone)
+                operation_stop_time = _end_date.astimezone(timezone)
+                if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                    pdt = product.serialize()
+                    pdt["available"] = True
+                    yield pdt
+                else:
+                    yield product.serialize()
 
 
 #searched Products
@@ -300,18 +252,6 @@ class SearchedProductsResource(Resource):
                     .filter(
                         SubCategory.name.like(f"%{search_item}%")
                     ).order_by(Products.product_id).all()
-            # for product in products:
-            #     if product.approved and product.suspend != True:
-            #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            #         operation_start_time = _start_date.astimezone(timezone)
-            #         operation_stop_time = _end_date.astimezone(timezone)
-            #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-            #             pdt = product.serialize()
-            #             pdt["available"] = True
-            #             searched_pdts.append(pdt)
-            #         else:
-            #             searched_pdts.append(product.serialize())
         return list(search_pdt_generator(products))
 
 #category generator
@@ -319,50 +259,8 @@ def cat_pdt_generator(data_list):
     _date = datetime.now(ni_timezone)
     current_time = _date.astimezone(timezone)
     for product in data_list:
-        if product.approved and product.suspend != True:
-            _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            operation_start_time = _start_date.astimezone(timezone)
-            operation_stop_time = _end_date.astimezone(timezone)
-            if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-                pdt = product.serialize()
-                pdt["available"] = True
-                yield pdt
-            else:
-                yield product.serialize()
-
-
-#products based on category
-categoryProductsStringsArgs = reqparse.RequestParser()
-categoryProductsStringsArgs.add_argument("categoryName", type=str)
-class CategoryProductsApI(Resource):
-    def get(self):
-        # _date = datetime.now(ni_timezone)
-        # current_time = _date.astimezone(timezone)
-        args = categoryProductsStringsArgs.parse_args()
-        # products = []
-        if args.get("categoryName", None):
-            categoryName = args["categoryName"]
-            # for product in session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all():
-            #     if product.approved and product.suspend != True:
-            #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-            #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-            #         operation_start_time = _start_date.astimezone(timezone)
-            #         operation_stop_time = _end_date.astimezone(timezone)
-            #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-            #             pdt = product.serialize()
-            #             pdt["available"] = True
-            #             products.append(pdt)
-            #         else:
-            #             products.append(product.serialize())
-            return list(cat_pdt_generator(session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all()))
-
-#sub_cat pdts generator
-def sub_cat_pdt_generator(data_list):
-    _date = datetime.now(ni_timezone)
-    current_time = _date.astimezone(timezone)
-    for product in data_list:
-        if product.approved and product.suspend != True:
+        if product.resturant.approved:
+            if product.approved and product.suspend != True:
                 _start_date = ni_timezone.localize(product.resturant.operation_start_time)
                 _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
                 operation_start_time = _start_date.astimezone(timezone)
@@ -375,26 +273,38 @@ def sub_cat_pdt_generator(data_list):
                     yield product.serialize()
 
 
+#products based on category
+categoryProductsStringsArgs = reqparse.RequestParser()
+categoryProductsStringsArgs.add_argument("categoryName", type=str)
+class CategoryProductsApI(Resource):
+    def get(self):
+        args = categoryProductsStringsArgs.parse_args()
+        if args.get("categoryName", None):
+            categoryName = args["categoryName"]
+            return list(cat_pdt_generator(session.query(Products).join(Products.sub_category).join(SubCategory.category).filter(Category.name==categoryName).order_by(Products.product_id).all()))
+
+#sub_cat pdts generator
+def sub_cat_pdt_generator(data_list):
+    _date = datetime.now(ni_timezone)
+    current_time = _date.astimezone(timezone)
+    for product in data_list:
+        if product.resturant.approved:
+            if product.approved and product.suspend != True:
+                    _start_date = ni_timezone.localize(product.resturant.operation_start_time)
+                    _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
+                    operation_start_time = _start_date.astimezone(timezone)
+                    operation_stop_time = _end_date.astimezone(timezone)
+                    if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
+                        pdt = product.serialize()
+                        pdt["available"] = True
+                        yield pdt
+                    else:
+                        yield product.serialize()
+
+
 #sub_category_products
 class SubCategoryProductsApI(Resource):
     def get(self, id):
-        # _date = datetime.now(ni_timezone)
-        # current_time = _date.astimezone(timezone)
-        # sub_cat_pdts = []
-        # products = Products.read_products_based_on_sub_cat(id)
-        # for product in products:
-        #     if product.approved and product.suspend != True:
-        #         _start_date = ni_timezone.localize(product.resturant.operation_start_time)
-        #         _end_date = ni_timezone.localize(product.resturant.operation_stop_time)
-        #         operation_start_time = _start_date.astimezone(timezone)
-        #         operation_stop_time = _end_date.astimezone(timezone)
-        #         if current_time.hour >= operation_start_time.hour and current_time.hour <= operation_stop_time.hour:
-        #             pdt = product.serialize()
-        #             pdt["available"] = True
-        #             sub_cat_pdts.append(pdt)
-        #         else:
-        #             sub_cat_pdts.append(product.serialize())
-    
         return list(sub_cat_pdt_generator(Products.read_products_based_on_sub_cat(id)))
 
 
