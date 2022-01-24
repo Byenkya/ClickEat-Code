@@ -8,6 +8,7 @@ from .click_eat_models import *
 from .order_models import *
 from .product_models import *
 from .payment_models import *
+from .places_models import *
 
 
 def load_user(user_id):

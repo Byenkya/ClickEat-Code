@@ -6,8 +6,10 @@ from wtforms.widgets import HiddenInput, Select, TextArea
 from Application.database.models import Customer, CustomerAddress
 from Application.database.initialize_database import session
 from Application.utils import join_telephone
-from Application.API.resources.Places.places import arua_district_places
+# from Application.API.resources.Places.places import arua_district_places
+from Application.database.models import PlacePrices
 
+arua_district_places = PlacePrices.read_place_prices()
 
 def unique_update_email(form, field):
     if Customer.query.filter(Customer.id!=form.id.data).filter_by(email=field.data).first():

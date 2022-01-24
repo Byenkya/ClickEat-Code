@@ -6,7 +6,10 @@ from wtforms.widgets import HiddenInput, Select
 from Application.database.models import Customer, CustomerAddress
 from Application.database.initialize_database import session
 from Application.utils import join_telephone
-from Application.API.resources.Places.places import arua_district_places
+from Application.database.models import PlacePrices
+
+arua_district_places = PlacePrices.read_place_prices()
+
 
 
 payment_methods = [

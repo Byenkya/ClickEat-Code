@@ -64,7 +64,7 @@ class CustomModelView(ModelView):
         return current_user.is_authenticated and str(getattr(current_user, "account_type", None)) == "administrator"
 
 
-## Customer Models
+## Customer Models 
 class CustomerView(CustomModelView):
     can_delete = False
     can_view_details = True
@@ -399,6 +399,19 @@ class DeliveryMethodsView(CustomModelView):
 
     def scaffold_form(self):
         form_class = super(DeliveryMethodsView, self).scaffold_form()
+
+        return form_class
+
+class PlacesView(CustomModelView):
+    can_delete = True
+    can_view_deatails = True
+    can_export = True
+    can_create = True
+
+    column_filters = ("village",)
+
+    def scaffold_form(self):
+        form_class = super(PlacesView, self).scaffold_form()
 
         return form_class
 

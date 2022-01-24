@@ -43,6 +43,7 @@ with warnings.catch_warnings():
     admin.add_view(admin_models.AccountTypeView(db.AccountType, session, category="Click_Eat"))
     admin.add_view(admin_models.StaffAccountsView(db.StaffAccounts, session, category="Click_Eat"))
     admin.add_view(admin_models.HomeImagesView(db.HomeImages, session, category="Click_Eat"))
+    admin.add_view(admin_models.PlacesView(db.PlacePrices, session, category="Click_Eat"))
 
     admin.add_view(ad_views.LogoutView(name="logout", url="/logout"))
 
