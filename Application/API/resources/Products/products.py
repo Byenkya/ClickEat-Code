@@ -76,6 +76,12 @@ class ProductsApi(Resource):
 
         return restaurant_products
 
+class GetProductByIdResource(Resource):
+    def get(self, id):
+        product = Products.read_product(id)
+
+        return product
+
 class DrinksApi(Resource):
     def get(self, id):
         drinks_based_on_sub_cat = Products.read_all_products(sub_category_id=id)

@@ -27,3 +27,8 @@ def rest_generator(data_list):
 class RestaurantApi(Resource):
     def get(self):             
         return jsonify(restaurants = list(rest_generator(Resturant.read_restaurants())))
+
+class GetRestaurantById(Resource):
+    def get(self, id):
+        rest = Resturant.read_restaurant(id)
+        return rest.serialize()

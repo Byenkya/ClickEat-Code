@@ -173,7 +173,7 @@ class Products(Base):
         try:
             product = cls.query.filter_by(product_id=id).first()
             if product:
-                return product
+                return product.serialize()
         except:
             session.rollback()
 

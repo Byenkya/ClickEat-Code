@@ -74,10 +74,11 @@ from Application import template_filters
 #register api routes
 from Application.API.resources.Products.products import (ProductsApi, 
 AddToCartApi, CartOperationApi, DrinksSubCatApi, DrinksApi, HomeProductsResource,
-SearchedProductsResource, SubCategoryProductsApI, CategoryProductsApI, FetchAllSubCategoriesApi)
+SearchedProductsResource, SubCategoryProductsApI, CategoryProductsApI, 
+FetchAllSubCategoriesApi, GetProductByIdResource)
 from Application.API.resources.Products.comments import CommentsApi
 from Application.API.resources.Products.product_rates import ProductRatingApi
-from Application.API.resources.Restaurants.restaurants import RestaurantApi
+from Application.API.resources.Restaurants.restaurants import RestaurantApi, GetRestaurantById
 from Application.API.resources.Places.places import PlacesApi
 from Application.API.resources.Customer.customer import (
     CustomerApi, AuthenticationApi, CustomerAddressAPi, 
@@ -101,10 +102,12 @@ api.add_resource(SubCategoryProductsApI, '/api/v1/sub_cat_products/<int:id>')
 api.add_resource(CategoryProductsApI, '/api/v1/cat_products')
 api.add_resource(FetchAllSubCategoriesApi, '/api/v1/fetch_all_subcats')
 api.add_resource(CheckUserEmail, '/api/v1/check_user_email')
+api.add_resource(GetProductByIdResource, '/api/v1/get_product/<int:id>')
 
 
 #restaurants routes
 api.add_resource(RestaurantApi, '/api/v1/restaurants')
+api.add_resource(GetRestaurantById, '/api/v1/get_restaurant/<int:id>')
    
 #Arua places routes
 api.add_resource(PlacesApi, '/api/v1/arua_places')

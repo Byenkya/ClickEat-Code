@@ -1,5 +1,5 @@
 from Application.database.sqlalchemy_imports import (
-    Column, Integer, String, Boolean, DateTime, func, Enum
+    Column, Integer, String, Boolean, DateTime, func, Enum, BigInteger, Float
 )
 
 from Application.database.initialize_database import Base, session, pwd_context
@@ -38,6 +38,7 @@ class Resturant(Base):
     approved = Column(Boolean, nullable=False, default=False)
     operation_start_time = Column(DateTime, default=datetime.now(), nullable=False)
     operation_stop_time = Column(DateTime, default=datetime.now(), nullable=False)
+    #standard_delivery_fee = Column(Float, nullable=False, default=0.0)
 
     def __repr__(self):
         return self.business_name
