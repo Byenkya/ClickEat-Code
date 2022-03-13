@@ -3,6 +3,7 @@ from Application import config
 # from flask_migrate import Migrate, MigrateCommand, Manager
 from flask_restful import Api
 import Application.extensions as ext
+from flask_cors import CORS
 
 app = Flask(
         __name__,
@@ -17,6 +18,9 @@ login_manager = ext.login_manager
 login_manager.init_app(app)
 login_manager.login = "info"
 login_manager.login_view = "index_bp.signin_signup"
+
+# cors
+CORS(app, resources={r'/api/*': {'origins': '*'}})
 
 
 app.config.from_object(config.DevelopmentConfig)
