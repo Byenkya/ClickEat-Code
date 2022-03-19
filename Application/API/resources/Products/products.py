@@ -80,7 +80,7 @@ class GetProductByIdResource(Resource):
     def get(self, id):
         product = Products.read_product(id)
 
-        return product
+        return product.serialize()
 
 class DrinksApi(Resource):
     def get(self, id):
