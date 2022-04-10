@@ -21,22 +21,22 @@ BACKUP_PATH = os.path.dirname(os.path.abspath(__file__)) + '/back_up'
 DATETIME = time.strftime("%Y%m%d-%H%M%S")
 TODAY_BACKUP_PATH = BACKUP_PATH + '/' + DATETIME
 
-def save_to_drive():
-    for file in os.listdir(TODAY_BACKUP_PATH):
-        f = drive.CreateFile({'click_eat_back_up' : file})
-        f.SetContentFile(os.path.join(TODAY_BACKUP_PATH, file))
-        f.Upload()
-        # due to unknown bug in pydrive if we
-        # Due to a known bug in pydrive if we 
-        # don't empty the variable used to
-        # upload the files to Google Drive the
-        # file stays open in memory and causes a
-        # memory leak, therefore preventing its 
-        # deletion
-        f = None
+# def save_to_drive():
+#     for file in os.listdir(TODAY_BACKUP_PATH):
+#         f = drive.CreateFile({'click_eat_back_up' : file})
+#         f.SetContentFile(os.path.join(TODAY_BACKUP_PATH, file))
+#         f.Upload()
+#         # due to unknown bug in pydrive if we
+#         # Due to a known bug in pydrive if we 
+#         # don't empty the variable used to
+#         # upload the files to Google Drive the
+#         # file stays open in memory and causes a
+#         # memory leak, therefore preventing its 
+#         # deletion
+#         f = None
     
-    for file in os.listdir(TODAY_BACKUP_PATH):
-        os.remove(os.path.join(TODAY_BACKUP_PATH, file))
+#     for file in os.listdir(TODAY_BACKUP_PATH):
+#         os.remove(os.path.join(TODAY_BACKUP_PATH, file))
 
 # checking the backup folder already exists or not. If not exists will create it.
 try:
@@ -85,7 +85,7 @@ else:
     os.system(dumpcmd)
     gzipcmd = "gzip " + pipes.quote(TODAY_BACKUP_PATH) + "/" + db + ".sql"
     os.system(gzipcmd)
-    save_to_drive()
+    # save_to_drive()
 
 print("")
 print("Backup script completed")
