@@ -5,9 +5,9 @@ import pipes
 from pydrive.drive import GoogleDrive
 from pydrive.auth import GoogleAuth
 
-gauth = GoogleAuth()
-gauth.LocalWebserverAuth()
-drive = GoogleDrive(gauth)
+# gauth = GoogleAuth()
+# gauth.LocalWebserverAuth()
+# drive = GoogleDrive(gauth)
 
 DB_HOST  = "127.0.0.1" #os.environ["DATABASE_ADDRESS"]
 DB_USER = os.environ["DATABASE_USER"]
